@@ -8,8 +8,16 @@ import { CardsLessonListScreen } from './components/CardsLessonListScreen';
 import { CardsSetupScreen } from './components/CardsSetupScreen';
 import { TrainingScreen } from './components/TrainingScreen';
 
+import { PronunciationScreen } from './components/PronunciationScreen';
+import { PhoneticaTestScreen } from './components/PhoneticaTestScreen';
+import { PhoneticaTestListScreen } from './components/PhoneticaTestListScreen';
+import type { PhoneticsTestId } from './content/phonetics/tests';
+
 type Screen =
   | { name: 'home' }
+  | { name: 'pronunciation' }
+  | { name: 'phonetics-test-list' }
+  | { name: 'phonetics-test'; testId: PhoneticsTestId }
   | { name: 'theory-list' }
   | { name: 'theory-lesson'; lessonId: string }
   | { name: 'cards-lesson-list' }
@@ -28,8 +36,19 @@ function App() {
         <HomeScreen
           onOpenTheory={() => setScreen({ name: 'theory-list' })}
           onOpenCards={() => setScreen({ name: 'cards-lesson-list' })}
+          onOpenPronunciation={() => setScreen({ name: 'pronunciation' })}
+          onOpenPhoneticaTest={() => setScreen({ name: 'phonetics-test-list' })}
         />
       );
+
+    case 'pronunciation':
+      return <PronunciationScreen onBack={() => setScreen({ name: 'home' })} />;
+
+    case 'phonetics-test':
+      return <PhoneticaTestScreen key={screen.testId} testId={screen.testId} onBack={() => setScreen({ name: 'phonetics-test-list' })} />;
+
+    case 'phonetics-test-list':
+      return <PhoneticaTestListScreen onBack={() => setScreen({ name: 'home' })} onOpenTest={(testId) => setScreen({ name: 'phonetics-test', testId })} />;
 
     case 'theory-list':
       return (
