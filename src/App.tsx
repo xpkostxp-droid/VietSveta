@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import type { CardOrder, Direction } from './types';
 import { saveLastActivity } from './domain/lastActivity';
+import { BackButton } from './components/BackButton';
+import { ListeningLessonScreen } from './components/ListeningLessonScreen';
 import { HomeScreen } from './components/HomeScreen';
 import { TheoryListScreen } from './components/TheoryListScreen';
 import { TheoryLessonScreen } from './components/TheoryLessonScreen';
@@ -15,6 +17,8 @@ import type { PhoneticsTestId } from './content/phonetics/tests';
 
 type Screen =
   | { name: 'home' }
+  | { name: 'listening' }
+  | { name: 'listening-lesson' }
   | { name: 'pronunciation' }
   | { name: 'phonetics-test-list' }
   | { name: 'phonetics-test'; testId: PhoneticsTestId }
@@ -34,12 +38,19 @@ function App() {
       // по-прежнему запоминается через saveLastActivity ниже, на будущее.
       return (
         <HomeScreen
+          onOpenListening={() => setScreen({ name: 'listening' })}
           onOpenTheory={() => setScreen({ name: 'theory-list' })}
           onOpenCards={() => setScreen({ name: 'cards-lesson-list' })}
           onOpenPronunciation={() => setScreen({ name: 'pronunciation' })}
           onOpenPhoneticaTest={() => setScreen({ name: 'phonetics-test-list' })}
         />
       );
+
+    case 'listening':
+      return <div className="screen"><BackButton onClick={() => setScreen({ name: 'home' })} label="На главную" /><h1 className="screen-title">Аудирование</h1><button className="lesson-item" onClick={() => setScreen({ name: 'listening-lesson' })}><span className="lesson-number">Урок 1</span><span>Поездка в Вунгтау</span></button></div>;
+
+    case 'listening-lesson':
+      return <ListeningLessonScreen onBack={() => setScreen({ name: 'listening' })} />;
 
     case 'pronunciation':
       return <PronunciationScreen onBack={() => setScreen({ name: 'home' })} />;

@@ -1029,3 +1029,29 @@ a:focus-visible {
     background: transparent;
   }
 }
+
+.home-tile-listening { grid-column: 1 / -1; grid-row: 1; justify-self: center; width: calc((100% - 12px) / 2); min-width: 0; padding: 10px; gap: 6px; }
+.home-tile-listening .home-tile-icon { width: 26px; height: 26px; flex-shrink: 0; }
+.home-tile-listening .home-tile-label { min-width: 0; overflow-wrap: anywhere; }
+.home-tile-pronunciation, .home-tile-phonetics-test { grid-row: 2; }
+.home-tile-study { grid-row: 3; }
+
+.screen-listening { max-width: 760px; }
+.listening-subtitle { margin: 0; color: var(--color-muted); }
+.listening-player { position: sticky; top: 0; z-index: 3; background: var(--color-bg); padding: 12px 0; display: grid; gap: 8px; }
+.listening-player audio { width: 100%; }
+.listening-player button { min-height: 42px; }
+.listening-dialogue { display: grid; gap: 16px; padding-bottom: 32px; }
+.listening-turn { padding: 16px; border: 2px solid transparent; border-radius: 20px; background: white; scroll-margin-top: 150px; }
+.listening-man { margin-right: 24px; background: var(--color-blue-soft); }
+.listening-woman { margin-left: 24px; background: var(--color-primary-soft); }
+.listening-narrator { color: var(--color-muted); background: #f3ecdf; }
+.listening-turn-active { border-color: var(--color-primary); }
+.listening-speaker { display: flex; align-items: center; gap: 10px; font-size: .9rem; }
+.listening-speaker > span { font-size: 26px; }
+.listening-speaker > button { margin-left: auto; background: transparent; border: 1px solid var(--color-border); border-radius: 50%; width: 44px; height: 44px; color: var(--color-primary-dark); }
+.listening-turn p { margin: 8px 0 0; line-height: 1.9; }
+.listening-word { display: inline; font: inherit; padding: 2px 1px; background: transparent; border: 0; border-radius: 5px; color: inherit; cursor: pointer; }
+.listening-word-active { background: #ffdf83; color: #493200; box-shadow: 0 0 0 2px #ffdf83; }
+.listening-word:focus-visible { outline: 2px solid var(--color-primary); }
+@media (prefers-reduced-motion: reduce) { .listening-turn { scroll-behavior: auto; } }
