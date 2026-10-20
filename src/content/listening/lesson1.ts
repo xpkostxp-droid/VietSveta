@@ -122,7 +122,8 @@ export const listeningTurns: ListeningTurn[] = [
         "start": 10.091,
         "end": 10.31
       }
-    ]
+    ],
+    "translation": "Урок 5, раздел 4.2. Тан с женой обсуждают поездку на отдых в Вунгтау. Послушайте их разговор и ответьте на вопросы."
   },
   {
     "speaker": "man",
@@ -189,7 +190,8 @@ export const listeningTurns: ListeningTurn[] = [
         "start": 16.455,
         "end": 16.746
       }
-    ]
+    ],
+    "translation": "Как жарко! Давай на следующей неделе съездим отдохнуть в Вунгтау!"
   },
   {
     "speaker": "woman",
@@ -276,7 +278,8 @@ export const listeningTurns: ListeningTurn[] = [
         "start": 22.536,
         "end": 22.744
       }
-    ]
+    ],
+    "translation": "Давай! Мы уже давно не были в Вунгтау. В какой день ты собираешься поехать?"
   },
   {
     "speaker": "man",
@@ -378,7 +381,8 @@ export const listeningTurns: ListeningTurn[] = [
         "start": 30.748,
         "end": 31.013
       }
-    ]
+    ],
+    "translation": "Поедем в субботу в полдень, вернёмся в воскресенье во второй половине дня. Мне нравится гулять ночью по пляжу — это замечательно!"
   },
   {
     "speaker": "woman",
@@ -450,7 +454,8 @@ export const listeningTurns: ListeningTurn[] = [
         "start": 35.863,
         "end": 36.113
       }
-    ]
+    ],
+    "translation": "На два дня в Вунгтау? А в какой гостинице ты собираешься остановиться?"
   },
   {
     "speaker": "man",
@@ -547,7 +552,8 @@ export const listeningTurns: ListeningTurn[] = [
         "start": 42.952,
         "end": 43.266
       }
-    ]
+    ],
+    "translation": "Ну, дай подумать. Возможно, в этот раз снимем номер в большой гостинице рядом с пляжем."
   },
   {
     "speaker": "woman",
@@ -624,7 +630,8 @@ export const listeningTurns: ListeningTurn[] = [
         "start": 47.471,
         "end": 47.697
       }
-    ]
+    ],
+    "translation": "Но ты знаешь, сколько стоит ночь в большой гостинице?"
   },
   {
     "speaker": "man",
@@ -716,7 +723,8 @@ export const listeningTurns: ListeningTurn[] = [
         "start": 53.882,
         "end": 54.112
       }
-    ]
+    ],
+    "translation": "Хм, не знаю. Говорят, в этом сезоне туристов мало, поэтому гостиницы не очень дорогие."
   },
   {
     "speaker": "woman",
@@ -778,7 +786,8 @@ export const listeningTurns: ListeningTurn[] = [
         "start": 57.487,
         "end": 57.707
       }
-    ]
+    ],
+    "translation": "Но как минимум всё равно больше трёхсот тысяч донгов за ночь."
   },
   {
     "speaker": "man",
@@ -835,7 +844,8 @@ export const listeningTurns: ListeningTurn[] = [
         "start": 62.116,
         "end": 62.416
       }
-    ]
+    ],
+    "translation": "Да, наверное, чуть больше трёхсот тысяч донгов за ночь."
   },
   {
     "speaker": "woman",
@@ -927,7 +937,8 @@ export const listeningTurns: ListeningTurn[] = [
         "start": 67.932,
         "end": 68.13
       }
-    ]
+    ],
+    "translation": "Очень дорого! Может, съездим только на один день, чтобы не снимать гостиницу?"
   },
   {
     "speaker": "man",
@@ -1084,6 +1095,7 @@ export const listeningTurns: ListeningTurn[] = [
         "start": 78.655,
         "end": 78.884
       }
-    ]
+    ],
+    "translation": "Да, пожалуй. Наверное, ты права. В этот раз можно съездить всего на один день. В следующем году останемся в Вунгтау на ночь."
   }
 ];
