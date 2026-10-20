@@ -1055,3 +1055,5 @@ a:focus-visible {
 .listening-word-active { background: #ffdf83; color: #493200; box-shadow: 0 0 0 2px #ffdf83; }
 .listening-word:focus-visible { outline: 2px solid var(--color-primary); }
 @media (prefers-reduced-motion: reduce) { .listening-turn { scroll-behavior: auto; } }
+
+.listening-turn .listening-translation { font-size: 1rem; color: #54646b; margin-top: .6rem; line-height: 1.5; }
