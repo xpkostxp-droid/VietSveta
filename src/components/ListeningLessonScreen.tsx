@@ -1,14 +1,17 @@
 import { useEffect, useRef, useState } from 'react';
 import { BackButton } from './BackButton';
 import { listeningTurns } from '../content/listening/lesson1';
+import { marketTurns } from '../content/listening/market';
 const names = { narrator: 'Вступление', man: 'Тан', woman: 'Жена Тана' };
-export function ListeningLessonScreen({ onBack }: { onBack: () => void }) {
+export function ListeningLessonScreen({ onBack, lesson = 1 }: { onBack: () => void; lesson?: number }) {
+  const turns = lesson === 2 ? marketTurns : listeningTurns;
+  const labels = lesson === 2 ? { narrator: 'Вступление', man: 'Продавец', woman: 'Покупатель' } : names;
   const audioRef = useRef<HTMLAudioElement>(null);
   const rowsRef = useRef<(HTMLElement | null)[]>([]);
   const [time, setTime] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [error, setError] = useState('');
-  const activeTurn = listeningTurns.findIndex(turn => time >= turn.start && time < turn.end);
+  const activeTurn = turns.findIndex(turn => time >= turn.start && time < turn.end);
   useEffect(() => {
     const audio = audioRef.current!;
     let frame = 0;
@@ -26,19 +29,21 @@ export function ListeningLessonScreen({ onBack }: { onBack: () => void }) {
   }
   return <div className="screen screen-listening">
     <BackButton onClick={onBack} label="К урокам аудирования" />
-    <span className="badge">Аудирование · Урок 1</span>
-    <h1 className="screen-title">Поездка в Вунгтау</h1>
-    <p className="listening-subtitle" lang="vi">Đi Vũng Tàu nghỉ mát</p>
+    <span className="badge">Аудирование · Урок {lesson}</span>
+    <h1 className="screen-title">{lesson === 2 ? 'На рынке' : 'Поездка в Вунгтау'}</h1>
+    <p className="listening-subtitle" lang="vi">{lesson === 2 ? 'Đi chợ' : 'Đi Vũng Tàu nghỉ mát'}</p>
     <div className="listening-player">
-      <audio ref={audioRef} controls preload="auto" src={`${import.meta.env.BASE_URL}audio/listening/vung-tau.mp3`} onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} onEnded={() => setPlaying(false)} onError={() => setError('Не удалось загрузить запись.')} />
-      <button className="secondary-button" onClick={() => void playFrom(12.65)}>Слушать диалог сначала</button>
+      <audio ref={audioRef} controls preload="auto" src={`${import.meta.env.BASE_URL}audio/listening/${lesson === 2 ? 'market' : 'vung-tau'}.mp3`} onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} onEnded={() => setPlaying(false)} onError={() => setError('Не удалось загрузить запись.')} />
+      <button className="secondary-button" onClick={() => void playFrom(lesson === 2 ? 4.3 : 12.65)}>Слушать диалог сначала</button>
     </div>
     {error && <p className="pronunciation-error" role="alert">{error}</p>}
     <p className="hint-text">Нажми на слово, чтобы послушать с этого места.</p>
     <div className="listening-dialogue">
-      {listeningTurns.map((turn, row) => <section key={row} ref={element => { rowsRef.current[row] = element; }} className={`listening-turn listening-${turn.speaker}${activeTurn === row ? ' listening-turn-active' : ''}`}>
-        <div className="listening-speaker"><span aria-hidden="true">{turn.speaker === 'man' ? '👨' : turn.speaker === 'woman' ? '👩' : '🎧'}</span><strong>{names[turn.speaker]}</strong><button onClick={() => void playFrom(Math.max(0, turn.start - .08))} aria-label={`Послушать реплику: ${names[turn.speaker]}`}>▶</button></div>
+      {turns.map((turn, row) => <section key={row} ref={element => { rowsRef.current[row] = element; }} className={`listening-turn listening-${turn.speaker}${activeTurn === row ? ' listening-turn-active' : ''}`}>
+        {turn.group && (row === 0 || turns[row - 1].group !== turn.group) && <h2>{turn.group}</h2>}
+        <div className="listening-speaker"><span aria-hidden="true">{turn.speaker === 'man' ? '👨' : turn.speaker === 'woman' ? '👩' : '🎧'}</span><strong>{labels[turn.speaker]}</strong><button onClick={() => void playFrom(Math.max(0, turn.start - .08))} aria-label={`Послушать реплику: ${labels[turn.speaker]}`}>▶</button></div>
         <p lang="vi">{turn.words.map((word, index) => <span key={index}><button className={`listening-word${time >= word.start && time < word.end ? ' listening-word-active' : ''}`} onClick={() => void playFrom(Math.max(0, word.start - .04))}>{word.text}</button>{' '}</span>)}</p>
+      {turn.translation && <p className="listening-translation" lang="ru">{turn.translation}</p>}
       </section>)}
     </div>
   </div>;

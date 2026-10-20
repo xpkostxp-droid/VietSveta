@@ -18,7 +18,7 @@ import type { PhoneticsTestId } from './content/phonetics/tests';
 type Screen =
   | { name: 'home' }
   | { name: 'listening' }
-  | { name: 'listening-lesson' }
+  | { name: 'listening-lesson'; lesson?: number }
   | { name: 'pronunciation' }
   | { name: 'phonetics-test-list' }
   | { name: 'phonetics-test'; testId: PhoneticsTestId }
@@ -47,10 +47,10 @@ function App() {
       );
 
     case 'listening':
-      return <div className="screen"><BackButton onClick={() => setScreen({ name: 'home' })} label="На главную" /><h1 className="screen-title">Аудирование</h1><button className="lesson-item" onClick={() => setScreen({ name: 'listening-lesson' })}><span className="lesson-number">Урок 1</span><span>Поездка в Вунгтау</span></button></div>;
+      return <div className="screen"><BackButton onClick={() => setScreen({ name: 'home' })} label="На главную" /><h1 className="screen-title">Аудирование</h1><button className="lesson-item" onClick={() => setScreen({ name: 'listening-lesson' })}><span className="lesson-number">Урок 1</span><span>Поездка в Вунгтау</span></button><button className="lesson-item" onClick={() => setScreen({ name: 'listening-lesson', lesson: 2 })}><span className="lesson-number">Урок 2</span><span>На рынке · 4 диалога</span></button></div>;
 
     case 'listening-lesson':
-      return <ListeningLessonScreen onBack={() => setScreen({ name: 'listening' })} />;
+      return <ListeningLessonScreen key={screen.lesson ?? 1} lesson={screen.lesson} onBack={() => setScreen({ name: 'listening' })} />;
 
     case 'pronunciation':
       return <PronunciationScreen onBack={() => setScreen({ name: 'home' })} />;

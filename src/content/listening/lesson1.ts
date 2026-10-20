@@ -1,5 +1,5 @@
 export type ListeningWord = { text: string; start: number; end: number };
-export type ListeningTurn = { speaker: "narrator" | "man" | "woman"; start: number; end: number; words: ListeningWord[] };
+export type ListeningTurn = { translation?: string; group?: string; speaker: "narrator" | "man" | "woman"; start: number; end: number; words: ListeningWord[] };
 // Phrase boundaries follow the recording; word timings are estimated within voiced portions.
 export const listeningTurns: ListeningTurn[] = [
   {
