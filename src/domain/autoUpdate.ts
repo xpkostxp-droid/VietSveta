@@ -52,12 +52,10 @@ export function startAutoUpdate(currentVersion: string, navigate = (url: string)
   window.addEventListener('focus', checkVisible);
   window.addEventListener('online', checkVisible);
   document.addEventListener('visibilitychange', checkVisible);
-  const checkTimer = window.setInterval(() => void check(), 60_000);
   const retryTimer = window.setInterval(applyUpdate, 2_000);
   void check();
   return () => {
     navigating = true;
-    window.clearInterval(checkTimer);
     window.clearInterval(retryTimer);
     window.removeEventListener('pageshow', checkVisible);
     window.removeEventListener('focus', checkVisible);
