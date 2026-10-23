@@ -295,6 +295,25 @@ export const flashCards: FlashCard[] = [
   {"id":"l56-12","lessonId":"lesson-56","vi":"đồng ý","ru":"соглашаться, быть согласным"},
   {"id":"l56-13","lessonId":"lesson-56","vi":"cuối cùng","ru":"наконец, в итоге"},
   {"id":"l56-14","lessonId":"lesson-56","vi":"quyết định","ru":"решать, принимать решение; решение"},
+  // Овощи и упаковка: принадлежность к уроку 43 подтверждена.
+  {"id":"l43-38","lessonId":"lesson-43","vi":"khoai tây","ru":"картофель"},
+  {"id":"l43-39","lessonId":"lesson-43","vi":"bắp","ru":"кукуруза (южное название)"},
+  {"id":"l43-40","lessonId":"lesson-43","vi":"ngô","ru":"кукуруза (северное название)"},
+  {"id":"l43-41","lessonId":"lesson-43","vi":"tỏi","ru":"чеснок"},
+  {"id":"l43-42","lessonId":"lesson-43","vi":"ớt ngọt","ru":"сладкий перец"},
+  {"id":"l43-43","lessonId":"lesson-43","vi":"hành củ","ru":"репчатый лук, лук в луковицах"},
+  {"id":"l43-44","lessonId":"lesson-43","vi":"hành lá","ru":"зелёный лук"},
+  {"id":"l43-45","lessonId":"lesson-43","vi":"bắp cải","ru":"капуста"},
+  {"id":"l43-46","lessonId":"lesson-43","vi":"súp lơ","ru":"цветная капуста"},
+  {"id":"l43-47","lessonId":"lesson-43","vi":"dưa chuột","ru":"огурец"},
+  {"id":"l43-48","lessonId":"lesson-43","vi":"cà chua","ru":"помидор"},
+  {"id":"l43-49","lessonId":"lesson-43","vi":"nấm","ru":"гриб, грибы"},
+  {"id":"l43-50","lessonId":"lesson-43","vi":"củ cải đỏ","ru":"красный редис"},
+  {"id":"l43-51","lessonId":"lesson-43","vi":"củ cải trắng","ru":"белая редька, дайкон"},
+  {"id":"l43-52","lessonId":"lesson-43","vi":"thì là","ru":"укроп"},
+  {"id":"l43-53","lessonId":"lesson-43","vi":"suất","ru":"порция"},
+  {"id":"l43-54","lessonId":"lesson-43","vi":"thùng","ru":"коробка, ящик"},
+  {"id":"l43-55","lessonId":"lesson-43","vi":"két","ru":"ящик для бутылок"},
 ];
 
 export function getCardsForLesson(lessonId: string): FlashCard[] {
