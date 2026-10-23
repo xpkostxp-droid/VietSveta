@@ -1,3 +1,4 @@
+import { MarketGameScreen } from './components/MarketGameScreen';
 import { useState } from 'react';
 import type { CardOrder, Direction } from './types';
 import { saveLastActivity } from './domain/lastActivity';
@@ -17,6 +18,7 @@ import type { PhoneticsTestId } from './content/phonetics/tests';
 
 type Screen =
   | { name: 'home' }
+  | { name: 'game' }
   | { name: 'listening' }
   | { name: 'listening-lesson'; lesson?: number }
   | { name: 'pronunciation' }
@@ -38,6 +40,7 @@ function App() {
       // по-прежнему запоминается через saveLastActivity ниже, на будущее.
       return (
         <HomeScreen
+          onOpenGame={() => setScreen({ name: 'game' })}
           onOpenListening={() => setScreen({ name: 'listening' })}
           onOpenTheory={() => setScreen({ name: 'theory-list' })}
           onOpenCards={() => setScreen({ name: 'cards-lesson-list' })}
@@ -45,6 +48,9 @@ function App() {
           onOpenPhoneticaTest={() => setScreen({ name: 'phonetics-test-list' })}
         />
       );
+
+    case 'game':
+      return <MarketGameScreen onBack={() => setScreen({ name: 'home' })} />;
 
     case 'listening':
       return <div className="screen"><BackButton onClick={() => setScreen({ name: 'home' })} label="На главную" /><h1 className="screen-title">Аудирование</h1><button className="lesson-item" onClick={() => setScreen({ name: 'listening-lesson' })}><span className="lesson-number">Урок 1</span><span>Поездка в Вунгтау</span></button><button className="lesson-item" onClick={() => setScreen({ name: 'listening-lesson', lesson: 2 })}><span className="lesson-number">Урок 2</span><span>На рынке · 4 диалога</span></button></div>;
