@@ -1075,3 +1075,12 @@ a:focus-visible {
 .market-basket { font-size: 2rem; text-align: center; min-height: 50px; }
 .market-screen button:disabled { opacity: .45; cursor: default; }
 .market-intro .secondary-button { margin-top: 12px; }
+.blitz-status { display: flex; justify-content: space-between; gap: 12px; margin: 20px 0 10px; font-weight: 600; }
+.blitz-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.blitz-option { min-height: 62px; border: 2px solid #b9dcd7; border-radius: 16px; padding: 10px 6px; background: white; color: #184944; font-size: 1.15rem; font-weight: 600; overflow-wrap: anywhere; touch-action: manipulation; }
+.blitz-option.blitz-wrong:disabled { opacity: 1; background: #fce4e4; color: #9a2929; border-color: #d88484; }
+.blitz-option.blitz-correct:disabled { opacity: 1; background: #daf2df; color: #216336; border-color: #57a871; }
+.blitz-feedback { min-height: 48px; line-height: 1.5; }
+.blitz-result { font-size: 1.3rem; font-weight: 700; }
+.blitz-errors { text-align: left; line-height: 1.8; padding-left: 24px; }
+.blitz-card .market-product { font-size: clamp(85px, 23vw, 120px); }

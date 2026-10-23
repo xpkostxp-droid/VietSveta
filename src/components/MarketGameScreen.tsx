@@ -1,30 +1,10 @@
+import { products } from '../content/marketProducts';
+import { MarketBlitzScreen } from './MarketBlitzScreen';
 import { useEffect, useState } from 'react';
 import { BackButton } from './BackButton';
 import { hasVietnameseVoice, onVoicesChanged, speakVietnamese, stopSpeaking } from '../domain/speech';
 import { readJSON, writeJSON } from '../domain/storage';
 
-const products = [
-  ['🍅', 'cà chua', 'помидор', 'vegetables'],
-  ['🥒', 'dưa chuột', 'огурец', 'vegetables'],
-  ['🥔', 'khoai tây', 'картофель', 'vegetables'],
-  ['🧅', 'hành củ', 'репчатый лук', 'vegetables'],
-  ['🧄', 'tỏi', 'чеснок', 'vegetables'],
-  ['🌽', 'ngô', 'кукуруза', 'vegetables'],
-  ['🥬', 'bắp cải', 'капуста', 'vegetables'],
-  ['🫑', 'ớt ngọt', 'сладкий перец', 'vegetables'],
-  ['🍄', 'nấm', 'грибы', 'vegetables'],
-  ['🍌', 'chuối', 'банан', 'fruits'],
-  ['🥭', 'xoài', 'манго', 'fruits'],
-  ['🍉', 'dưa hấu', 'арбуз', 'fruits'],
-  ['🍎', 'táo', 'яблоко', 'fruits'],
-  ['🍊', 'cam', 'апельсин', 'fruits'],
-  ['🍇', 'nho', 'виноград', 'fruits'],
-  ['🍓', 'dâu tây', 'клубника', 'fruits'],
-  ['🍍', 'thơm', 'ананас', 'fruits'],
-  ['🥥', 'dừa', 'кокос', 'fruits'],
-  ['🥑', 'bơ', 'авокадо', 'fruits'],
-  ['🍑', 'đào', 'персик', 'fruits'],
-] as const;
 const key = 'vietSveta.marketGame.v1';
 type Progress = Record<string, number>;
 function loadScores(): Progress {
@@ -34,6 +14,7 @@ function loadScores(): Progress {
 }
 
 export function MarketGameScreen({ onBack }: { onBack: () => void }) {
+  const [blitz, setBlitz] = useState(false);
   const [category, setCategory] = useState('all');
   const [queue, setQueue] = useState<number[]>([]);
   const [started, setStarted] = useState(false);
@@ -68,10 +49,12 @@ export function MarketGameScreen({ onBack }: { onBack: () => void }) {
     else remaining.splice(Math.min(2, remaining.length), 0, queue[0]);
     setQueue(remaining); setHint(false); setRevealed(false);
   };
+  if (blitz) return <MarketBlitzScreen onBack={() => setBlitz(false)} />;
   return <div className="screen market-screen">
     <BackButton onClick={started ? () => { stopSpeaking(); setStarted(false); } : onBack} label={started ? 'К выбору игры' : 'На главную'} />
     <h1 className="screen-title">Фрукты и овощи</h1>
     {!started ? <>
+      <div className="market-intro"><h2>⚡ Блиц: фрукты и овощи</h2><p>Уже выучила? Выбери название из шести вариантов. Все продукты вперемешку, каждый — один раз. Ошибки проверим отдельно.</p><button className="big-button" onClick={() => setBlitz(true)}>Начать блиц</button></div>
       <div className="market-intro">🧺<h2>Собери корзину</h2><p>Посмотри на картинку и назови продукт по-вьетнамски вслух. Затем открой ответ и проверь себя.</p><p>Пять продуктов за раунд. Дважды вспомни название без подсказки — и продукт в корзине. Забытые слова вернутся чуть позже.</p></div>
       <div className="market-options">{[['all', 'Всё вместе'], ['fruits', 'Фрукты · урок 44'], ['vegetables', 'Овощи · урок 43']].map(([value, label]) => <button key={value} className={'choice-button ' + (category === value ? 'choice-button-active' : '')} aria-pressed={category === value} onClick={() => setCategory(value)}>{label}</button>)}</div>
       <button className="big-button" onClick={start}>На рынок →</button>
