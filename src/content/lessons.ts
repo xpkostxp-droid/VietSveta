@@ -32,7 +32,13 @@ export const lessons: Lesson[] = [
     number: 52,
     title: 'So sánh — Сравнение',
   },
-];
+  {"id":"lesson-43","number":43,"title":"Приготовление еды и заказ в кафе"},
+  {"id":"lesson-44","number":44,"title":"Фрукты"},
+  {"id":"lesson-45","number":45,"title":"Вкусы"},
+  {"id":"lesson-54","number":54,"title":"Входить и заходить"},
+  {"id":"lesson-55","number":55,"title":"Сервис, проживание и прогулка"},
+  {"id":"lesson-56","number":56,"title":"Общение и гостиница"},
+].sort((a, b) => a.number - b.number);
 
 // Материалы теории по ID урока. У урока без записи здесь экран теории
 // покажет заглушку «Материалы скоро появятся».
