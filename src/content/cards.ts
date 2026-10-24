@@ -262,7 +262,7 @@ export const flashCards: FlashCard[] = [
   {"id":"l45-13","lessonId":"lesson-45","vi":"kiếm tiền","ru":"зарабатывать деньги"},
   {"id":"l45-14","lessonId":"lesson-45","vi":"kinh tế","ru":"экономика"},
   {"id":"l45-15","lessonId":"lesson-45","vi":"tiết kiệm","ru":"экономить; экономный"},
-  {"id":"l54-01","lessonId":"lesson-54","vi":"vào","ru":"входить, заходить"},
+  {"id":"l54-01","lessonId":"lesson-56","vi":"vào","ru":"входить, заходить"},
   {"id":"l55-01","lessonId":"lesson-55","vi":"view","ru":"вид из окна, панорама (английское слово)"},
   {"id":"l55-02","lessonId":"lesson-55","vi":"khác nhau","ru":"различаться, отличаться друг от друга"},
   {"id":"l55-03","lessonId":"lesson-55","vi":"miễn phí","ru":"бесплатно, бесплатный"},
