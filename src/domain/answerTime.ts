@@ -1,4 +1,3 @@
-import { recordParticipantAttempt } from './leaderboard';
 import { readJSON, writeJSON } from './storage';
 export function formatAnswerTime(ms: number) {
   const tenths = Math.floor(Math.max(0, ms) / 100);
@@ -28,7 +27,6 @@ export interface TimedAttempt {
   completed: boolean;
 }
 export function saveTimedAttempt(attempt: TimedAttempt) {
-  recordParticipantAttempt(attempt.game, attempt.correct, attempt.correctTimeMs);
   const key = 'vietSveta.timedAttempts.v1';
   const existing = readJSON(key);
   const rows = Array.isArray(existing) ? existing : [];
