@@ -58,7 +58,7 @@ export function MarketGameScreen({ onBack }: { onBack: () => void }) {
       <button className="big-button" style={{ width: '100%', minHeight: 110, fontSize: '1.5rem', fontWeight: 800 }} onClick={() => setMode('training')}>🧺 Обучение</button>
     </div>
   </div>;
-  return <div className="screen market-screen">
+  return <div className={'screen market-screen' + (started && current ? ' market-learning-active' : '')}>
     <BackButton onClick={started ? () => { stopSpeaking(); setStarted(false); } : () => setMode('menu')} label={started ? 'К обучению' : 'К выбору режима'} />
     <h1 className="screen-title">Фрукты и овощи</h1>
     {!started ? <>
@@ -66,20 +66,26 @@ export function MarketGameScreen({ onBack }: { onBack: () => void }) {
       <div className="market-options">{[['all', 'Всё вместе'], ['fruits', 'Фрукты · урок 44'], ['vegetables', 'Овощи · урок 43']].map(([value, label]) => <button key={value} className={'choice-button ' + (category === value ? 'choice-button-active' : '')} aria-pressed={category === value} onClick={() => setCategory(value)}>{label}</button>)}</div>
       <button className="big-button" onClick={start}>На рынок →</button>
     </> : current ? <>
-      <p className="market-counter">В корзине: {basket.length} из 5 · Без таймера</p>
-      <div className="market-card">
+      <p className="learning-counter">🧺 {basket.length} из 5 · Назови по-вьетнамски</p>
+      <div className="market-card learning-card">
         <div className="market-product" role="img" aria-label={current[2]}>{current[0]}</div>
         <p className="market-russian">{current[2]}</p>
-        <h2>Как это по-вьетнамски?</h2>
         <div className="market-answer" aria-live="polite">{revealed ? current[1] : hint ? current[1].slice(0, 1) + '…' : 'Вспомни и скажи вслух'}</div>
-        {!revealed ? <div className="market-actions"><button className="secondary-button" disabled={hint} onClick={() => setHint(true)}>Первая буква</button><button className="big-button" onClick={() => { setRevealed(true); speakVietnamese(current[1]); }}>Показать ответ</button></div> : <>
-          <button className="secondary-button" disabled={!voice} onClick={() => speakVietnamese(current[1])}>🔊 Послушать</button>
-          <p>Получилось вспомнить до открытия ответа?</p>
-          <div className="market-ratings"><button className="big-button" disabled={hint} onClick={() => rate(true)}>Вспомнила</button><button className="secondary-button" onClick={() => rate(false)}>С подсказкой</button><button className="secondary-button" onClick={() => rate(false)}>Забыла</button></div>
-        </>}
+        <div className="learning-toolbar">
+          <div className="learning-tools" style={{ visibility: revealed ? 'hidden' : 'visible' }} aria-hidden={revealed}>
+            <button className="secondary-button" disabled={hint || revealed} onClick={() => setHint(true)}>Первая буква</button>
+            <button className="big-button" disabled={revealed} onClick={() => { setRevealed(true); speakVietnamese(current[1]); }}>Показать ответ</button>
+          </div>
+          <div className="learning-tools learning-listen" style={{ visibility: revealed ? 'visible' : 'hidden' }} aria-hidden={!revealed}>
+            <button className="secondary-button" disabled={!voice || !revealed} onClick={() => speakVietnamese(current[1])}>🔊 Послушать</button>
+          </div>
+        </div>
+        <div className="market-ratings learning-ratings" style={{ visibility: revealed ? 'visible' : 'hidden' }} aria-hidden={!revealed}>
+          <button className="big-button" disabled={!revealed || hint} onClick={() => rate(true)}>Вспомнил</button>
+          <button className="secondary-button" disabled={!revealed} onClick={() => rate(false)}>С подсказкой</button>
+          <button className="secondary-button" disabled={!revealed} onClick={() => rate(false)}>Забыл</button>
+        </div>
       </div>
-      <div className="market-basket" aria-label="Собранные продукты">🧺 {basket.map(i => products[i][0]).join(' ')}</div>
-      {!voice && <p className="market-note">Для озвучки нужен вьетнамский голос на устройстве. Играть можно и без звука.</p>}
-    </> : <div className="market-intro"><div className="market-basket">🧺 {basket.map(i => products[i][0]).join(' ')}</div><h2>Корзина собрана!</h2><p>Все пять названий вспомнила дважды без подсказки. В следующем раунде первыми появятся слова, которым нужно больше практики.</p><button className="big-button" onClick={start}>Ещё пять продуктов</button><button className="secondary-button" onClick={() => setStarted(false)}>Выбрать категорию</button></div>}
+    </> : <div className="market-intro"><div className="market-basket">🧺 {basket.map(i => products[i][0]).join(' ')}</div><h2>Корзина собрана!</h2><p>Все пять названий удалось вспомнить дважды без подсказки. В следующем раунде первыми появятся слова, которым нужно больше практики.</p><button className="big-button" onClick={start}>Ещё пять продуктов</button><button className="secondary-button" onClick={() => setStarted(false)}>Выбрать категорию</button></div>}
   </div>;
 }
