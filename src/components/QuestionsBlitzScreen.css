@@ -12,3 +12,11 @@
 .qs-timer-bottom { display: flex; justify-content: center; padding: 8px 0 4px; }
 .qs-timer-bottom .qs-circle { width: 76px; height: 76px; }
 @media(max-height:720px) { .qs-question-row { min-height: 106px; } .qs-prompt strong { font-size: 28px; } .qs-balance-scene { height: 172px; } .qs-controls { min-height: 86px; } .qs-timer-bottom { padding: 2px 0; } .qs-timer-bottom .qs-circle { width: 58px; height: 58px; } }
+/* Read the question directly above its answer choices. */
+.qs-timer-top { display: flex; justify-content: center; padding: 2px 0 4px; }
+.qs-timer-top .qs-circle { width: 66px; height: 66px; }
+.qs-question-row { min-height: 112px; background: #fff2d9; border: 1px solid #ebd4ac; border-radius: 18px; padding: 12px 10px; }
+.qs-prompt strong { color: #95501e; font-weight: 800; }
+.qs-prompt small, .qs-prompt-note { color: #82654d; }
+.qs-playing .qs-message { min-height: 0; height: 22px; line-height: 22px; }
+@media(max-height:720px) { .qs-timer-top .qs-circle { width: 52px; height: 52px; } .qs-question-row { min-height: 98px; padding: 8px; } .qs-playing .qs-balance-scene { height: 162px; } }

@@ -15,11 +15,13 @@ it('balances on a correct answer, keeps the same direction during feedback and s
  expect(node.querySelector('[role="progressbar"]')?.getAttribute('aria-valuenow')).toBe('5');
  await click('Ai'); expect(node.querySelector('.scale-success')).toBeTruthy();
  expect(node.querySelector('.scale-answer-label')?.textContent).toBe('Ai');
- expect(node.querySelector('.qs-controls')!.compareDocumentPosition(node.querySelector('.qs-timer-bottom')!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+ expect(node.querySelector('.qs-timer-top')!.compareDocumentPosition(node.querySelector('.qs-controls')!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
  expect(node.querySelector('.qs-prompt strong')?.textContent).toBe('Кто');
  expect([...node.querySelectorAll<HTMLButtonElement>('.qs-answer')].every(b=>b.disabled)).toBe(true);
  await time(1200); expect(node.querySelector('.qs-prompt strong')?.textContent).toBe('Gì');
+ expect(node.querySelector('.scale-answer-label')?.textContent).toBe('Ai');
  await click('Что'); expect(node.querySelector('.qs-score')?.textContent).toContain('2');
+ expect([...node.querySelectorAll('.scale-answer-label')].map(n=>n.textContent)).toEqual(expect.arrayContaining(['Ai','Gì']));
  expect(localStorage.getItem('vietsveta.questions.blitz.best')).toBe('2');
 });
 it('tips and spills after a wrong answer, then retries the missed question first', async () => {
