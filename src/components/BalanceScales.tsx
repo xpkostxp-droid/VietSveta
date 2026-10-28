@@ -1,11 +1,14 @@
 import { useId } from 'react';
 
-export function BalanceScales({ heavy, outcome, turn }: { heavy: 'left' | 'right'; outcome: 'question' | 'success' | 'failed'; turn: number }) {
+export function BalanceScales({ heavy, outcome, turn, label }: { heavy: 'left' | 'right'; outcome: 'question' | 'success' | 'failed'; turn: number; label?: string }) {
   const id = useId().replace(/:/g, '');
   const sign = heavy === 'right' ? 1 : -1;
   const angle = outcome === 'success' ? 0 : sign * (outcome === 'failed' ? 32 : 8);
   const left = outcome === 'success' ? 2 : heavy === 'left' ? outcome === 'failed' ? 3 : 2 : 1;
   const right = outcome === 'success' ? 2 : heavy === 'right' ? outcome === 'failed' ? 3 : 2 : 1;
+  const labelWords = (label ?? '').split(' ');
+  const splitAt = Math.ceil(labelWords.length / 2);
+  const labelLines = (label ?? '').length <= 9 ? [label ?? ''] : [labelWords.slice(0, splitAt).join(' '), labelWords.slice(splitAt).join(' ')];
   const pan = (side: 'left' | 'right', x: number, count: number) => {
     const incoming = outcome === 'success' ? side !== heavy : outcome === 'failed' && side === heavy;
     return <g className="scale-pan" style={{ transform: `rotate(${-angle}deg)`, transformOrigin: `${x}px 75px` }}>
@@ -13,8 +16,8 @@ export function BalanceScales({ heavy, outcome, turn }: { heavy: 'left' | 'right
       <path d={`M${x - 43} 153 Q${x} 190 ${x + 43} 153 Z`} fill={`url(#${id}-pan)`} stroke="#8c6a39" strokeWidth="2" />
       <g className={outcome === 'failed' ? `scale-spill scale-spill-${side}` : ''}>
         {Array.from({ length: count }, (_, i) => <g key={`${turn}-${i}-${incoming && i === count - 1 ? 'incoming' : 'base'}`} className={(incoming && i === count - 1 ? 'scale-incoming ' : '') + (outcome === 'success' && i === 0 ? 'scale-clearing' : '')}>
-          <rect x={x - 17} y={151 - (i + 1) * 26} width="34" height="25" rx="5" fill={side === 'left' ? '#62b8a4' : '#e6ad58'} stroke={side === 'left' ? '#287b69' : '#ad7834'} strokeWidth="1.5" />
-          <path d={`M${x - 12} ${130 - i * 26}h23`} stroke="#ffffff80" strokeWidth="3" strokeLinecap="round" />
+          <rect x={x - (label && incoming && i === count - 1 ? 44 : 17)} y={label && incoming && i === count - 1 ? 151 - i * 26 - 38 : 151 - (i + 1) * 26} width={label && incoming && i === count - 1 ? 88 : 34} height={label && incoming && i === count - 1 ? 38 : 25} rx="5" fill={side === 'left' ? '#62b8a4' : '#e6ad58'} stroke={side === 'left' ? '#287b69' : '#ad7834'} strokeWidth="1.5" />
+          {label && incoming && i === count - 1 ? <text className="scale-answer-label" x={x} y={151 - i * 26 - (labelLines.length === 1 ? 14 : 23)} textAnchor="middle" fontSize="13" fontWeight="800" fill="#173c32">{labelLines.map((line, n) => <tspan key={n} x={x} dy={n === 0 ? 0 : 15}>{line}</tspan>)}</text> : <path d={`M${x - 12} ${130 - i * 26}h23`} stroke="#ffffff80" strokeWidth="3" strokeLinecap="round" />}
         </g>)}
       </g>
     </g>;

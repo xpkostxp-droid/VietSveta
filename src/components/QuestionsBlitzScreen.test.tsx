@@ -14,6 +14,8 @@ it('balances on a correct answer, keeps the same direction during feedback and s
  expect(node.querySelector('h1')).toBeNull(); expect(node.querySelector('.qs-prompt strong')?.textContent).toBe('Кто');
  expect(node.querySelector('[role="progressbar"]')?.getAttribute('aria-valuenow')).toBe('5');
  await click('Ai'); expect(node.querySelector('.scale-success')).toBeTruthy();
+ expect(node.querySelector('.scale-answer-label')?.textContent).toBe('Ai');
+ expect(node.querySelector('.qs-controls')!.compareDocumentPosition(node.querySelector('.qs-timer-bottom')!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
  expect(node.querySelector('.qs-prompt strong')?.textContent).toBe('Кто');
  expect([...node.querySelectorAll<HTMLButtonElement>('.qs-answer')].every(b=>b.disabled)).toBe(true);
  await time(1200); expect(node.querySelector('.qs-prompt strong')?.textContent).toBe('Gì');
@@ -31,4 +33,11 @@ it('times out at five seconds without awarding a point', async () => {
  await click('⚡ Начать суперблиц'); await time(4900); expect(node.querySelector('.scale-failed')).toBeNull();
  await time(100); expect(node.querySelector('.scale-failed')).toBeTruthy(); expect(node.textContent).toContain('Время вышло!');
  expect(localStorage.getItem('vietsveta.questions.blitz.best')).toBeNull();
+});
+
+it('separates a long parenthetical clarification from the centered main question', async () => {
+ await click('⚡ Начать суперблиц');
+ for (const label of ['Ai','Что','Ở đâu','Куда','Từ đâu','Когда','Ngày nào','Во сколько','Tại sao','Как']) { await click(label); await time(1200); }
+ expect(node.querySelector('.qs-prompt strong')?.textContent).toBe('Сколько');
+ expect(node.querySelector('.qs-prompt-note')?.textContent).toBe('общее количество');
 });
