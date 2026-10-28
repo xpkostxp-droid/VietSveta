@@ -59,7 +59,7 @@ it('basic mode checks all 15 words in both directions, finishes at 30 and keeps 
   expect(pair).toBeTruthy(); expect(seen.has(pair[0]+reverse)).toBe(false); seen.add(pair[0]+reverse);
   expect(reverse).toBe(i%2===1); await time(200); await click(pair[reverse?1:0]); await time(1200);
  }
- expect(node.textContent).toContain('Время ответов: 0:06,0');
+ expect(node.textContent).toContain('Время правильных ответов: 0:06,0');
  const attempts=JSON.parse(localStorage.getItem('vietSveta.timedAttempts.v1')!);
  expect(attempts[attempts.length-1].answerTimeMs).toBe(6000);
  expect(seen.size).toBe(30); expect(node.textContent).toContain('30 из 30');
@@ -67,4 +67,16 @@ it('basic mode checks all 15 words in both directions, finishes at 30 and keeps 
  expect(localStorage.getItem('vietsveta.questions.basic15.best')).toBe('30');
  expect(localStorage.getItem('vietsveta.questions.blitz.best')).toBeNull();
  await time(6000); expect(node.textContent).not.toContain('Время вышло!');
+});
+it('excludes the losing question and replaces an equal-score record with a faster run', async () => {
+ await click('⚡ Начать суперблиц'); await time(300); await click('Ai'); await time(1200);
+ await time(4000); await click('Кто');
+ let rows=JSON.parse(localStorage.getItem('vietSveta.timedAttempts.v1')!);
+ expect(rows[rows.length-1].correctTimeMs).toBe(300);
+ expect(rows[rows.length-1].answerTimeMs).toBe(4300);
+ await click('Играть снова'); await time(100); await click('Gì'); await time(1200);
+ await click('Где');
+ const record=JSON.parse(localStorage.getItem('vietSveta.gameRecord.questions-24.v1')!);
+ expect(record).toEqual({correct:1,correctTimeMs:100});
+ expect(node.textContent).toContain('0,10 сек');
 });

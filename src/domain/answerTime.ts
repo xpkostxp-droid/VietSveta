@@ -23,6 +23,7 @@ export interface TimedAttempt {
   correct: number;
   total: number | null;
   answerTimeMs: number;
+  correctTimeMs: number;
   completed: boolean;
 }
 export function saveTimedAttempt(attempt: TimedAttempt) {
