@@ -20,3 +20,4 @@
 .qs-prompt small, .qs-prompt-note { color: #82654d; }
 .qs-playing .qs-message { min-height: 0; height: 22px; line-height: 22px; }
 @media(max-height:720px) { .qs-timer-top .qs-circle { width: 52px; height: 52px; } .qs-question-row { min-height: 98px; padding: 8px; } .qs-playing .qs-balance-scene { height: 162px; } }
+.qs-total-time { text-align: center; margin: 0; font-size: 1rem; font-weight: 750; color: #42695e; font-variant-numeric: tabular-nums; }

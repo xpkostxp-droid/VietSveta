@@ -1,3 +1,4 @@
+import { createAnswerClock, formatAnswerTime, saveTimedAttempt } from '../domain/answerTime';
 import { useEffect, useRef, useState } from 'react';
 import { products } from '../content/marketProducts';
 import { readJSON, writeJSON } from '../domain/storage';
@@ -29,6 +30,9 @@ function saveErrors(indices: number[]) { writeJSON(storageKey, indices.map(taskK
 type Phase = 'question' | 'success' | 'wrong' | 'timeout' | 'answer';
 
 export function MarketBlitzScreen({ onBack }: { onBack: () => void }) {
+  const isReview = useRef(false);
+  const answerClock = useRef(createAnswerClock());
+  const [answerTime, setAnswerTime] = useState(0);
   const [saved, setSaved] = useState(loadErrors);
   const [round, setRound] = useState<number[]>([]);
   const [position, setPosition] = useState(0);
@@ -54,6 +58,7 @@ export function MarketBlitzScreen({ onBack }: { onBack: () => void }) {
   useEffect(() => {
     function hide() {
       if (document.hidden && active && !pausedRef.current) {
+        if (!locked.current) answerClock.current.pause();
         frozen.current = Math.max(0, deadline.current - Date.now());
         pausedRef.current = true; setPaused(true); stopSpeaking(); sound.current?.stop();
       }
@@ -69,7 +74,7 @@ export function MarketBlitzScreen({ onBack }: { onBack: () => void }) {
       const tick = () => {
         if (pausedRef.current) return;
         const left = Math.max(0, deadline.current - Date.now());
-        setRemaining(left);
+        setRemaining(left); setAnswerTime(answerClock.current.value());
         const second = Math.ceil(left / 1000);
         if (second > 0 && second <= 3 && second < lastBeep.current) { sound.current?.beep(); lastBeep.current = second; }
         if (!left) resolve(null);
@@ -90,26 +95,29 @@ export function MarketBlitzScreen({ onBack }: { onBack: () => void }) {
       else {
         const next = position + 1;
         setPosition(next); setOptions(optionsFor(productForTask(round[next]))); setSelected(null);
-        setRemaining(QUESTION_MS); deadline.current = Date.now() + QUESTION_MS;
+        setRemaining(QUESTION_MS); deadline.current = Date.now() + QUESTION_MS; answerClock.current.begin();
         locked.current = false; lastBeep.current = 5; setPhase('question');
       }
     }, FEEDBACK_MS);
     return () => clearTimeout(timer);
   }, [active, paused, phase, position, round]);
 
-  function start(indices: number[]) {
+  function start(indices: number[], review = false) {
+    isReview.current = review;
     const next = orderHarvestTasks(indices);
     if (!next.length) return;
+    answerClock.current.reset(); setAnswerTime(0);
     sound.current ??= createCountdownSound(); sound.current.unlock();
     lastBeep.current = 5;
     stopSpeaking(); setRound(next); setPosition(0); setOptions(optionsFor(productForTask(next[0])));
     setErrors([]); setCollected([]); setSelected(null); setPhase('question');
     setRemaining(QUESTION_MS); setStreak(0); setBest(0);
     setStarted(true); setActive(true); setPaused(false); pausedRef.current = false;
-    locked.current = false; deadline.current = Date.now() + QUESTION_MS;
+    locked.current = false; deadline.current = Date.now() + QUESTION_MS; answerClock.current.begin();
   }
   function resolve(index: number | null) {
     if (locked.current || pausedRef.current || !active) return;
+    setAnswerTime(answerClock.current.finish());
     locked.current = true; sound.current?.stop();
     const current = round[position];
     // A click at or after the deadline is a timeout, even between timer ticks.
@@ -129,9 +137,14 @@ export function MarketBlitzScreen({ onBack }: { onBack: () => void }) {
   function resume() {
     if (document.hidden) return;
     sound.current?.unlock();
+    if (phase === 'question') answerClock.current.resume();
     deadline.current = Date.now() + frozen.current;
     pausedRef.current = false; setPaused(false);
   }
+  useEffect(() => {
+    if (!started || active) return;
+    saveTimedAttempt({game:isReview.current ? 'harvest-review' : 'harvest-40',correct:collected.length,total:round.length,answerTimeMs:answerClock.current.value(),completed:true});
+  }, [active]);
   const current = products[productForTask(round[position])];
   const pictureAnswers = isPictureAnswer(round[position]);
   const exploding = phase === 'wrong' || phase === 'timeout';
@@ -143,9 +156,9 @@ export function MarketBlitzScreen({ onBack }: { onBack: () => void }) {
       <p>Три варианта и пять секунд на ответ. Угадала — продукт в корзине. Ошибка или время вышло — пух! 💥 Этот продукт доберём после раунда.</p>
       <p>40 заданий: каждый из 20 продуктов — в двух направлениях. Картинка → название, затем название → картинка. Корзина при ошибке сохраняется.</p>
       <button className="big-button" onClick={() => start(allHarvestTasks)}>Начать проверку</button>
-      {saved.length > 0 && <button className="secondary-button" onClick={() => start(saved)}>Добрать урожай — {saved.length}</button>}
+      {saved.length > 0 && <button className="secondary-button" onClick={() => start(saved, true)}>Добрать урожай — {saved.length}</button>}
     </div> : active ? <>
-      <div className="harvest-play-header"><span>Задание {position + 1}/{round.length}</span><span>🧺 {collected.length} · 🔥 {streak}</span></div>
+      <div className="harvest-play-header"><span>Задание {position + 1}/{round.length}</span><span>⏱ {formatAnswerTime(answerTime)} · 🧺 {collected.length}</span></div>
       <div className="harvest-question-bar">
         <span>{pictureAnswers ? 'Выбери картинку' : 'Выбери название'}</span>
         <div className={'harvest-countdown' + (phase === 'question' && remaining <= 3000 ? ' harvest-countdown-urgent' : '')} role="progressbar" aria-label="Время на ответ" aria-valuemin={0} aria-valuemax={5} aria-valuenow={phase === 'question' ? Math.ceil(remaining / 1000) : 0}>
@@ -169,9 +182,9 @@ export function MarketBlitzScreen({ onBack }: { onBack: () => void }) {
         {paused && <div className="harvest-pause-overlay"><h2>Пауза ⏸</h2><button className="big-button" onClick={resume}>Продолжить</button></div>}
       </div>
     </> : <div className="market-intro"><h2>{saved.length === 0 ? 'Весь урожай спасён! 🎉' : 'Урожай собран не весь'}</h2>
-      <p className="blitz-result">Собрано {collected.length} из {round.length}</p><p>Лучшая серия: {best} 🔥</p>
+      <p className="blitz-result">Собрано {collected.length} из {round.length}</p><p>Лучшая серия: {best} 🔥</p><p>Время ответов: {formatAnswerTime(answerTime)}</p>
       {errors.length > 0 && <ul className="blitz-errors">{errors.map(i => <li key={i}>{products[productForTask(i)][0]} {products[productForTask(i)][2]} — <strong>{isPictureAnswer(i) ? 'узнать название' : 'вспомнить название'}</strong></li>)}</ul>}
-      {saved.length > 0 && <button className="big-button" onClick={() => start(saved)}>Добрать урожай — {saved.length}</button>}
+      {saved.length > 0 && <button className="big-button" onClick={() => start(saved, true)}>Добрать урожай — {saved.length}</button>}
       <button className="secondary-button" onClick={() => start(allHarvestTasks)}>Новый блиц</button>
     </div>}
   </div>;

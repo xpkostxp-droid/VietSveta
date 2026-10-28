@@ -57,8 +57,11 @@ it('basic mode checks all 15 words in both directions, finishes at 30 and keeps 
   const reverse=node.querySelector('.qs-prompt small')!.textContent==='Выбери перевод';
   const pair=basicQuestions.find(p=>p[reverse?0:1]===prompt)!;
   expect(pair).toBeTruthy(); expect(seen.has(pair[0]+reverse)).toBe(false); seen.add(pair[0]+reverse);
-  expect(reverse).toBe(i%2===1); await click(pair[reverse?1:0]); await time(1200);
+  expect(reverse).toBe(i%2===1); await time(200); await click(pair[reverse?1:0]); await time(1200);
  }
+ expect(node.textContent).toContain('Время ответов: 0:06,0');
+ const attempts=JSON.parse(localStorage.getItem('vietSveta.timedAttempts.v1')!);
+ expect(attempts[attempts.length-1].answerTimeMs).toBe(6000);
  expect(seen.size).toBe(30); expect(node.textContent).toContain('30 из 30');
  expect(node.querySelector('.qs-answers')).toBeNull();
  expect(localStorage.getItem('vietsveta.questions.basic15.best')).toBe('30');
