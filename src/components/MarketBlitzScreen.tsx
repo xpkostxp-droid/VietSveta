@@ -2,11 +2,13 @@ import { useEffect, useRef, useState } from 'react';
 import { products } from '../content/marketProducts';
 import { readJSON, writeJSON } from '../domain/storage';
 import { speakVietnamese, stopSpeaking } from '../domain/speech';
+import { createCountdownSound } from '../domain/countdownSound';
 import { BackButton } from './BackButton';
 
 const storageKey = 'vietSveta.marketBlitz.errors.v1';
 const QUESTION_MS = 5000;
 const FEEDBACK_MS = 1700;
+const EXPLOSION_MS = 700;
 function shuffled<T,>(items: readonly T[]): T[] {
   const result = [...items];
   for (let i = result.length - 1; i > 0; i--) {
@@ -24,7 +26,7 @@ function loadErrors(): number[] {
   return Array.isArray(raw) ? products.map((p, i) => raw.includes(p[1]) ? i : -1).filter(i => i >= 0) : [];
 }
 function saveErrors(indices: number[]) { writeJSON(storageKey, indices.map(i => products[i][1])); }
-type Phase = 'question' | 'success' | 'wrong' | 'timeout';
+type Phase = 'question' | 'success' | 'wrong' | 'timeout' | 'answer';
 
 export function MarketBlitzScreen({ onBack }: { onBack: () => void }) {
   const [saved, setSaved] = useState(loadErrors);
@@ -41,17 +43,19 @@ export function MarketBlitzScreen({ onBack }: { onBack: () => void }) {
   const [paused, setPaused] = useState(false);
   const [streak, setStreak] = useState(0);
   const [best, setBest] = useState(0);
+  const sound = useRef<ReturnType<typeof createCountdownSound> | null>(null);
+  const lastBeep = useRef(5);
   const deadline = useRef(0);
   const frozen = useRef(QUESTION_MS);
   const locked = useRef(false);
   const pausedRef = useRef(false);
 
-  useEffect(() => () => stopSpeaking(), []);
+  useEffect(() => () => { stopSpeaking(); sound.current?.close(); }, []);
   useEffect(() => {
     function hide() {
       if (document.hidden && active && !pausedRef.current) {
         frozen.current = Math.max(0, deadline.current - Date.now());
-        pausedRef.current = true; setPaused(true); stopSpeaking();
+        pausedRef.current = true; setPaused(true); stopSpeaking(); sound.current?.stop();
       }
     }
     document.addEventListener('visibilitychange', hide);
@@ -66,10 +70,19 @@ export function MarketBlitzScreen({ onBack }: { onBack: () => void }) {
         if (pausedRef.current) return;
         const left = Math.max(0, deadline.current - Date.now());
         setRemaining(left);
+        const second = Math.ceil(left / 1000);
+        if (second > 0 && second <= 3 && second < lastBeep.current) { sound.current?.beep(); lastBeep.current = second; }
         if (!left) resolve(null);
       };
       const timer = setInterval(tick, 100);
       return () => clearInterval(timer);
+    }
+    if (phase === 'wrong' || phase === 'timeout') {
+      const timer = setTimeout(() => {
+        if (pausedRef.current) return;
+        setPhase('answer'); speakVietnamese(products[round[position]][1]);
+      }, EXPLOSION_MS);
+      return () => clearTimeout(timer);
     }
     const timer = setTimeout(() => {
       if (pausedRef.current) return;
@@ -78,7 +91,7 @@ export function MarketBlitzScreen({ onBack }: { onBack: () => void }) {
         const next = position + 1;
         setPosition(next); setOptions(optionsFor(round[next])); setSelected(null);
         setRemaining(QUESTION_MS); deadline.current = Date.now() + QUESTION_MS;
-        locked.current = false; setPhase('question');
+        locked.current = false; lastBeep.current = 5; setPhase('question');
       }
     }, FEEDBACK_MS);
     return () => clearTimeout(timer);
@@ -87,6 +100,8 @@ export function MarketBlitzScreen({ onBack }: { onBack: () => void }) {
   function start(indices: number[]) {
     const next = shuffled(indices);
     if (!next.length) return;
+    sound.current ??= createCountdownSound(); sound.current.unlock();
+    lastBeep.current = 5;
     stopSpeaking(); setRound(next); setPosition(0); setOptions(optionsFor(next[0]));
     setErrors([]); setCollected([]); setSelected(null); setPhase('question');
     setRemaining(QUESTION_MS); setStreak(0); setBest(0);
@@ -95,7 +110,7 @@ export function MarketBlitzScreen({ onBack }: { onBack: () => void }) {
   }
   function resolve(index: number | null) {
     if (locked.current || pausedRef.current || !active) return;
-    locked.current = true;
+    locked.current = true; sound.current?.stop();
     const current = round[position];
     // A click at or after the deadline is a timeout, even between timer ticks.
     const timedOut = index === null || Date.now() >= deadline.current;
@@ -108,14 +123,17 @@ export function MarketBlitzScreen({ onBack }: { onBack: () => void }) {
     } else {
       setErrors(e => [...e, current]); setStreak(0);
     }
-    speakVietnamese(products[current][1]);
+    if (success) speakVietnamese(products[current][1]);
   }
   function resume() {
     if (document.hidden) return;
+    sound.current?.unlock();
     deadline.current = Date.now() + frozen.current;
     pausedRef.current = false; setPaused(false);
   }
   const current = products[round[position]];
+  const exploding = phase === 'wrong' || phase === 'timeout';
+  const showAnswer = phase === 'success' || phase === 'answer';
   return <div className="screen market-screen harvest-screen">
     <BackButton onClick={onBack} label="К выбору игры" />
     <h1 className="screen-title">🍉 Спаси урожай</h1>
@@ -128,15 +146,15 @@ export function MarketBlitzScreen({ onBack }: { onBack: () => void }) {
       <div className="blitz-status"><span>Продукт {position + 1} из {round.length}</span><span>🧺 {collected.length} · 🔥 {streak}</span></div>
       <div className="harvest-timer" role="progressbar" aria-label="Время на ответ" aria-valuemin={0} aria-valuemax={5} aria-valuenow={phase === 'question' ? Math.ceil(remaining / 1000) : 0}><div style={{ width: `${phase === 'question' ? remaining / QUESTION_MS * 100 : 0}%` }} /></div>
       <p className="harvest-seconds">{paused ? 'Пауза' : phase === 'question' ? `${Math.ceil(remaining / 1000)} сек` : phase === 'success' ? '+1 в корзину!' : phase === 'timeout' ? 'Время вышло!' : 'Пух! Доберём позже'}</p>
-      {paused ? <div className="market-intro"><h2>Урожай подождёт ⏸</h2><p>Игра на паузе. Продолжим, когда будешь готова.</p><button className="big-button" onClick={resume}>Продолжить</button></div> : <div className="market-card blitz-card">
+      {paused ? <div className="market-intro"><h2>Урожай подождёт ⏸</h2><p>Игра на паузе. Продолжим, когда будешь готова.</p><button className="big-button" onClick={resume}>Продолжить</button></div> : <div className={'market-card blitz-card' + (exploding ? ' harvest-shake' : '')}>
         <div className={'harvest-stage harvest-' + phase} key={`${position}-${phase}`}>
           <div className="market-product" role="img" aria-label={current[2]}>{current[0]}</div>
           {(phase === 'wrong' || phase === 'timeout') && <div className="harvest-puff" aria-hidden="true">💥<span>✦</span><span>✧</span><span>✦</span></div>}
         </div>
-        <h2>{phase === 'question' ? 'Выбери название' : current[1]}</h2>
-        {phase !== 'question' && <p className="harvest-translation">{current[2]}</p>}
-        <div className="blitz-options harvest-options">{options.map(i => <button key={i} className={'blitz-option' + (phase !== 'question' && i === round[position] ? ' blitz-correct' : selected === i && phase === 'wrong' ? ' blitz-wrong' : '')} disabled={phase !== 'question'} onClick={() => resolve(i)}>{products[i][1]}</button>)}</div>
-        <p className="blitz-feedback" aria-live="polite">{phase === 'question' ? 'Три варианта — один правильный' : phase === 'success' ? 'Спасён! Следующий продукт…' : 'Правильное название показано выше. Этот продукт ушёл в повтор.'}</p>
+        <h2>{showAnswer ? current[1] : exploding ? '💥' : 'Выбери название'}</h2>
+        {showAnswer && <p className="harvest-translation">{current[2]}</p>}
+        <div className="blitz-options harvest-options">{options.map(i => <button key={i} className={'blitz-option' + (showAnswer && i === round[position] ? ' blitz-correct' : selected === i && phase === 'wrong' ? ' blitz-wrong' : '')} disabled={phase !== 'question'} onClick={() => resolve(i)}>{products[i][1]}</button>)}</div>
+        <p className="blitz-feedback" aria-live="polite">{phase === 'question' ? 'Три варианта — один правильный' : phase === 'success' ? 'Спасён! Следующий продукт…' : exploding ? 'Пух! 💥' : 'Правильное название показано выше. Этот продукт ушёл в повтор.'}</p>
       </div>}
       <div className="market-basket" aria-label="Собранные продукты">🧺 {collected.map(i => products[i][0]).join(' ')}</div>
     </> : <div className="market-intro"><h2>{saved.length === 0 ? 'Весь урожай спасён! 🎉' : 'Урожай собран не весь'}</h2>

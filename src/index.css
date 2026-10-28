@@ -1104,3 +1104,6 @@ a:focus-visible {
 @keyframes harvest-puff { 0% { transform: scale(.2); opacity: 0; } 35% { transform: scale(1.15); opacity: 1; } 100% { transform: scale(1.4); opacity: 0; } }
 @keyframes harvest-catch { 0% { transform: translateY(0) scale(1); opacity: 1; } 30% { transform: translateY(-24px) scale(1.05); opacity: 1; } 100% { transform: translateY(100px) scale(.3); opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .harvest-stage *, .harvest-puff { animation: none !important; } .harvest-puff { font-size: 70px; } }
+.harvest-shake { animation: harvest-shake .45s ease-out; }
+@keyframes harvest-shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-7px) rotate(-1deg); } 40%, 80% { transform: translateX(7px) rotate(1deg); } }
+@media (prefers-reduced-motion: reduce) { .harvest-shake { animation: none; } }

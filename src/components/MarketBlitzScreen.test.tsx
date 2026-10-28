@@ -4,6 +4,8 @@ import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { MarketBlitzScreen } from './MarketBlitzScreen';
 import { products } from '../content/marketProducts';
+const audio = vi.hoisted(() => ({ beep: vi.fn(), unlock: vi.fn(), stop: vi.fn(), close: vi.fn() }));
+vi.mock('../domain/countdownSound', () => ({ createCountdownSound: () => audio }));
 Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
 let node: HTMLDivElement;
 let root: Root;
@@ -19,7 +21,7 @@ function answer() {
 }
 async function time(ms: number) { await act(async () => { vi.advanceTimersByTime(ms); }); }
 beforeEach(async () => {
-  localStorage.clear(); vi.useFakeTimers(); Object.defineProperty(document, 'hidden', { configurable: true, value: false });
+  vi.clearAllMocks(); localStorage.clear(); vi.useFakeTimers(); Object.defineProperty(document, 'hidden', { configurable: true, value: false });
   node = document.createElement('div'); document.body.append(node); root = createRoot(node);
   await act(async () => root.render(<MarketBlitzScreen onBack={() => {}} />));
 });
@@ -37,6 +39,7 @@ it('has three choices, visits products once, explodes on a final error and clear
       expect(options.every(b=>b.disabled)).toBe(true);
       expect(JSON.parse(localStorage.getItem(key)!)).toContain(correct);
     } else await click(correct);
+    if (i === products.length - 1) await time(700);
     await time(1700);
   }
   expect(seen.size).toBe(products.length); expect(node.textContent).toContain('Собрано 19 из 20');
@@ -50,7 +53,7 @@ it('times out at five seconds, records the word, and starts the next card with a
   expect(node.querySelector('.harvest-question')).toBeTruthy(); await time(100);
   expect(node.querySelector('.harvest-timeout')).toBeTruthy();
   expect(JSON.parse(localStorage.getItem(key)!)).toContain(word);
-  await time(1700); expect(node.textContent).toContain('Продукт 2 из 20');
+  await time(700); await time(1700); expect(node.textContent).toContain('Продукт 2 из 20');
   expect(node.querySelector('[role="progressbar"]')?.getAttribute('aria-valuenow')).toBe('5');
 });
 it('pauses hidden tabs and requires explicit resume with the remaining time', async () => {
@@ -70,5 +73,20 @@ it('does not accept a rapid second answer or lose the saved error when leaving e
   await act(async () => { wrong.click(); right.click(); });
   expect(node.querySelector('.harvest-wrong')).toBeTruthy();
   expect(JSON.parse(localStorage.getItem(key)!)).toEqual([correct]);
-  await time(1700); expect(node.textContent).toContain('Продукт 2 из 20');
+  await time(700); await time(1700); expect(node.textContent).toContain('Продукт 2 из 20');
+});
+
+it('warns only at three, two and one seconds and reveals the answer after the explosion', async () => {
+  await click('Начать проверку');
+  await time(1900); expect(audio.beep).not.toHaveBeenCalled();
+  await time(100); expect(audio.beep).toHaveBeenCalledTimes(1);
+  await time(1000); expect(audio.beep).toHaveBeenCalledTimes(2);
+  await time(1000); expect(audio.beep).toHaveBeenCalledTimes(3);
+  const correct = answer();
+  await time(1000); expect(node.querySelector('.harvest-shake')).toBeTruthy();
+  expect(node.querySelector('.blitz-card h2')?.textContent).not.toBe(correct);
+  expect(node.querySelector('.blitz-correct')).toBeNull();
+  await time(699); expect(node.querySelector('.blitz-card h2')?.textContent).not.toBe(correct);
+  await time(1); expect(node.querySelector('.blitz-card h2')?.textContent).toBe(correct);
+  expect(audio.beep).toHaveBeenCalledTimes(3);
 });
