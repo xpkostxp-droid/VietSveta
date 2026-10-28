@@ -53,7 +53,7 @@ function App() {
       );
 
     case 'games-menu':
-      return <div className="screen"><BackButton onClick={() => setScreen({ name: 'home' })} label="На главную"/><h1 className="screen-title">Игры</h1><button className="lesson-item" onClick={() => setScreen({ name: 'game' })}><span className="lesson-number">🍎 Фрукты и овощи</span></button><button className="lesson-item" onClick={() => setScreen({ name: 'questions-blitz' })}><span className="lesson-number">🏗️ Вопросы · Суперблиц</span></button></div>;
+      return <div className="screen"><BackButton onClick={() => setScreen({ name: 'home' })} label="На главную"/><h1 className="screen-title">Игры</h1><button className="lesson-item" onClick={() => setScreen({ name: 'game' })}><span className="lesson-title" style={{ fontSize: '1.35rem', fontWeight: 800, color: '#174f49', lineHeight: 1.35 }}>🍎 Фрукты и овощи</span></button><button className="lesson-item" onClick={() => setScreen({ name: 'questions-blitz' })}><span className="lesson-title" style={{ fontSize: '1.35rem', fontWeight: 800, color: '#174f49', lineHeight: 1.35 }}>🏗️ Вопросы · Суперблиц</span></button></div>;
 
     case 'questions-blitz':
       return <QuestionsBlitzScreen onBack={() => setScreen({ name: 'games-menu' })}/>;
