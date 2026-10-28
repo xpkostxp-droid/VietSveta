@@ -7,7 +7,7 @@ import { BackButton } from './BackButton';
 import { speakVietnamese, stopSpeaking } from '../domain/speech';
 import './QuestionsBlitzScreen.css';
 
-const superCards: [string,string][] = [
+export const superCards: [string,string][] = [
  ['Ai','Кто'],['Gì','Что'],['Ở đâu','Где'],['Đi đâu','Куда'],
  ['Từ đâu','Откуда'],['Khi nào','Когда'],['Ngày nào','В какой день'],
  ['Mấy giờ','Во сколько'],['Tại sao','Почему'],['Thế nào','Как'],
@@ -46,6 +46,7 @@ function crash(ctx:AudioContext){
 export function QuestionsBlitzScreen({onBack, variant = 'super'}:{onBack:()=>void; variant?: 'super' | 'basic'}){
  const basic = variant === 'basic';
  const cards = basic ? basicQuestions : superCards;
+ const totalTasks = cards.length * 2;
  const bestKey = basic ? 'vietsveta.questions.basic15.best' : 'vietsveta.questions.blitz.best';
  const answerClock = useRef(createAnswerClock());
  const [answerTime, setAnswerTime] = useState(0);
@@ -61,7 +62,7 @@ export function QuestionsBlitzScreen({onBack, variant = 'super'}:{onBack:()=>voi
  const gameId = basic ? 'questions-15' : 'questions-24';
  const [record,setRecord]=useState(()=>readGameRecord(gameId,bestKey));
  const best=record.correct;
- const recordText = best > 0 && record.correctTimeMs !== null ? `${best}${basic ? ' из 30' : ''} · ${(record.correctTimeMs / 1000).toFixed(2).replace('.', ',')} сек` : 'пока нет';
+ const recordText = best > 0 && record.correctTimeMs !== null ? `${best} из ${totalTasks} · ${(record.correctTimeMs / 1000).toFixed(2).replace('.', ',')} сек` : 'пока нет';
  const [retry,setRetry]=useState<number|null>(null);
  const deadline=useRef<number|null>(null);
  const pending=useRef<ReturnType<typeof setTimeout>|null>(null);
@@ -69,15 +70,15 @@ export function QuestionsBlitzScreen({onBack, variant = 'super'}:{onBack:()=>voi
  const audio=useRef<AudioContext|null>(null);
  const lastBeep=useRef<number|null>(null);
  const sound=(kind:'beep'|'crash',count=3)=>{const ctx=audio.current;if(!ctx||ctx.state!=='running')return;try{if(kind==='crash')crash(ctx);else beep(ctx,count===1?660:count===2?740:820);}catch{}};
- const q=basic ? Math.floor(queue[0]/2) : queue[0];
+ const q=Math.floor(queue[0]/2);
  const [reverse,setReverse]=useState(false);
  const [heavy,setHeavy]=useState<'left'|'right'>('right');
  const choices=useRef<number[]>([]);
  const [options,setOptions]=useState<number[]>([]);
- const setQuestion=(list:number[],direction:boolean)=>{
-  const reversed = basic ? list[0] % 2 === 1 : direction;
+ const setQuestion=(list:number[])=>{
+  const reversed = list[0] % 2 === 1;
   setReverse(reversed); setHeavy(reversed ? 'left' : 'right');
-  const correct=basic ? Math.floor(list[0]/2) : list[0];
+  const correct=Math.floor(list[0]/2);
   if(correct===undefined)return;
   const others=shuffle(cards.map((_,i)=>i).filter(i=>i!==correct&&cards[i][reversed?1:0]!==cards[correct][reversed?1:0])).slice(0,2);
   const answerOptions=shuffle([correct,...others]);
@@ -91,7 +92,7 @@ export function QuestionsBlitzScreen({onBack, variant = 'super'}:{onBack:()=>voi
  };
  const makeQueue=()=>{
   const base=shuffle(cards.map((_,i)=>i));
-  return basic ? base.flatMap((p,i)=>[p*2,base[(i+7)%base.length]*2+1]) : base;
+  return base.flatMap((p,i)=>[p*2,base[(i+Math.floor(cards.length/2))%base.length]*2+1]);
  };
  const start=()=>{
   answerClock.current.reset(); setAnswerTime(0); correctTime.current=0; finishedTime.current=0;
@@ -100,8 +101,8 @@ export function QuestionsBlitzScreen({onBack, variant = 'super'}:{onBack:()=>voi
   if(pending.current)clearTimeout(pending.current);
   stopSpeaking();locked.current=false;setFailed(null);setFeedback(false);setBlocks([]);setStarted(true);
   let all=makeQueue();
-  if(retry!==null){if(basic){const at=all.indexOf(retry);all=[...all.slice(at),...all.slice(0,at)];}else{all=all.filter(i=>i!==retry);all.unshift(retry);}}
-  setRetry(null);setQuestion(all,false);
+  if(retry!==null){const at=all.indexOf(retry);all=[...all.slice(at),...all.slice(0,at)];}
+  setRetry(null);setQuestion(all);
  };
  const lose=(reason:'wrong'|'timeout')=>{
   if(locked.current)return;
@@ -121,12 +122,8 @@ export function QuestionsBlitzScreen({onBack, variant = 'super'}:{onBack:()=>voi
   pending.current=setTimeout(()=>{
    setFeedback(false);
    const remaining=queue.slice(1);
-   if(remaining.length===0){
-    if(basic){setCompleted(true);deadline.current=null;return;}
-    let again=shuffle(cards.map((_,i)=>i));
-    if(again[0]===q){again=[...again.slice(1),again[0]];}
-    setQuestion(again,updated.length%2===1);
-   }else setQuestion(remaining,updated.length%2===1);
+   if(remaining.length===0){setCompleted(true);deadline.current=null;return;}
+   setQuestion(remaining);
   },1200);
  };
  useEffect(()=>{
@@ -144,14 +141,14 @@ export function QuestionsBlitzScreen({onBack, variant = 'super'}:{onBack:()=>voi
  useEffect(()=>()=>{if(pending.current)clearTimeout(pending.current);stopSpeaking();void audio.current?.close();},[]);
  useEffect(()=>{
   if(!started || (!failed && !completed)) return;
-  saveTimedAttempt({game:basic?'questions-15':'questions-24',correct:blocks.length,total:basic?30:null,answerTimeMs:answerClock.current.value(),correctTimeMs:correctTime.current,completed});
+  saveTimedAttempt({game:basic?'questions-15':'questions-24',correct:blocks.length,total:totalTasks,answerTimeMs:answerClock.current.value(),correctTimeMs:correctTime.current,completed});
  },[failed,completed]);
- const promptText = !started ? '' : completed ? 'Все 30 заданий пройдены!' : failed ? (failed === 'timeout' ? 'Время вышло!' : 'Ошибка!') : cards[q][reverse ? 0 : 1];
+ const promptText = !started ? '' : completed ? `Все ${totalTasks} заданий пройдены!` : failed ? (failed === 'timeout' ? 'Время вышло!' : 'Ошибка!') : cards[q][reverse ? 0 : 1];
  const promptParts = promptText.match(/^(.*?)\s*\((.*?)\)$/);
  return <div className={'screen qs-screen' + (started ? ' qs-playing' : '')}>
-  <div className="qs-topbar"><BackButton onClick={started?()=>{deadline.current=null;if(pending.current)clearTimeout(pending.current);stopSpeaking();setStarted(false);}:onBack} label={started?'Назад':'К играм'}/>{started&&<div className="qs-score"><span>⚖️ {blocks.length}{basic ? '/30' : ''}</span><span>🏆 {best}</span></div>}</div>
+  <div className="qs-topbar"><BackButton onClick={started?()=>{deadline.current=null;if(pending.current)clearTimeout(pending.current);stopSpeaking();setStarted(false);}:onBack} label={started?'Назад':'К играм'}/>{started&&<div className="qs-score"><span>⚖️ {blocks.length}/{totalTasks}</span><span>🏆 {best}</span></div>}</div>
   {!started&&<h1 className="screen-title">⚖️ {basic ? 'Блиц · 15 слов' : 'Суперблиц · 24 слова'}</h1>}
-  {!started?<div className="qs-intro"><p>{basic ? '15 основных слов · 30 заданий в двух направлениях' : '24 выражения · два направления · игра до первой ошибки'} · 5 секунд на ответ.</p><p>Правильный ответ уравновешивает чаши. Ошибка или время вышло — перевес, и кубики падают. Трудный вопрос появится первым при новой попытке.</p><p>🏆 Рекорд: {recordText}</p><button className="big-button" onClick={start}>{basic ? '⚡ Начать блиц' : '⚡ Начать суперблиц'}</button></div>:<>
+  {!started?<div className="qs-intro"><p>{cards.length} слов · {totalTasks} заданий в двух направлениях · 5 секунд на ответ.</p><p>Правильный ответ уравновешивает чаши. Ошибка или время вышло — перевес, и кубики падают. Трудный вопрос появится первым при новой попытке.</p><p>🏆 Рекорд: {recordText}</p><button className="big-button" onClick={start}>{basic ? '⚡ Начать блиц' : '⚡ Начать суперблиц'}</button></div>:<>
    <p className="qs-total-time" aria-label="Общее время ответов">⏱ {formatAnswerTime(answerTime)}</p>
    <div className="qs-timer-top"><div className={'qs-circle'+(seconds<=3?' qs-circle-urgent':'')} role="progressbar" aria-label="Время на ответ" aria-valuemin={0} aria-valuemax={5} aria-valuenow={failed||completed?0:Math.ceil(seconds)}>
       <svg viewBox="0 0 100 100" aria-hidden="true"><circle className="qs-ring-bg" cx="50" cy="50" r="43"/><circle className="qs-ring" cx="50" cy="50" r="43" pathLength="100" strokeDasharray="100" strokeDashoffset={100-(failed?0:seconds/5*100)}/></svg><span>{failed?'0':feedback||completed?'✓':Math.ceil(seconds)}</span>
@@ -163,7 +160,7 @@ export function QuestionsBlitzScreen({onBack, variant = 'super'}:{onBack:()=>voi
 
    </div>
    <div className="qs-controls">
-   {completed?<div className="qs-end"><p>30 из 30 — отлично! 🎉</p><p>Время правильных ответов: {formatAnswerTime(correctTime.current)}</p><button className="big-button" onClick={start}>Играть снова</button></div>:failed?<div className="qs-end"><p>Правильно: <b>{cards[q][0]}</b> — {cards[q][1]}</p><p>Очки: {blocks.length} · Рекорд: {recordText}</p><p>Время правильных ответов: {formatAnswerTime(correctTime.current)}</p><button className="big-button" onClick={start}>Играть снова</button></div>:<div className="qs-answers">{options.map(i=><button key={i} className={'qs-answer'+(feedback&&i===q?' qs-correct':'')} disabled={feedback} onClick={()=>answer(i)}>{cards[i][reverse?1:0]}</button>)}</div>}
+   {completed?<div className="qs-end"><p>{totalTasks} из {totalTasks} — отлично! 🎉</p><p>Время правильных ответов: {formatAnswerTime(correctTime.current)}</p><button className="big-button" onClick={start}>Играть снова</button></div>:failed?<div className="qs-end"><p>Правильно: <b>{cards[q][0]}</b> — {cards[q][1]}</p><p>Очки: {blocks.length} из {totalTasks} · Рекорд: {recordText}</p><p>Время правильных ответов: {formatAnswerTime(correctTime.current)}</p><button className="big-button" onClick={start}>Играть снова</button></div>:<div className="qs-answers">{options.map(i=><button key={i} className={'qs-answer'+(feedback&&i===q?' qs-correct':'')} disabled={feedback} onClick={()=>answer(i)}>{cards[i][reverse?1:0]}</button>)}</div>}
    </div>
 
   </>}
