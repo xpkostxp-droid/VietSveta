@@ -1,3 +1,4 @@
+import { QuestionsBlitzScreen } from './components/QuestionsBlitzScreen';
 import { MarketGameScreen } from './components/MarketGameScreen';
 import { useState } from 'react';
 import type { CardOrder, Direction } from './types';
@@ -19,6 +20,8 @@ import type { PhoneticsTestId } from './content/phonetics/tests';
 type Screen =
   | { name: 'home' }
   | { name: 'game' }
+  | { name: 'games-menu' }
+  | { name: 'questions-blitz' }
   | { name: 'listening' }
   | { name: 'listening-lesson'; lesson?: number }
   | { name: 'pronunciation' }
@@ -40,7 +43,7 @@ function App() {
       // по-прежнему запоминается через saveLastActivity ниже, на будущее.
       return (
         <HomeScreen
-          onOpenGame={() => setScreen({ name: 'game' })}
+          onOpenGame={() => setScreen({ name: 'games-menu' })}
           onOpenListening={() => setScreen({ name: 'listening' })}
           onOpenTheory={() => setScreen({ name: 'theory-list' })}
           onOpenCards={() => setScreen({ name: 'cards-lesson-list' })}
@@ -49,8 +52,14 @@ function App() {
         />
       );
 
+    case 'games-menu':
+      return <div className="screen"><BackButton onClick={() => setScreen({ name: 'home' })} label="На главную"/><h1 className="screen-title">Игры</h1><button className="lesson-item" onClick={() => setScreen({ name: 'game' })}><span className="lesson-number">🍎 Фрукты и овощи</span></button><button className="lesson-item" onClick={() => setScreen({ name: 'questions-blitz' })}><span className="lesson-number">🏗️ Вопросы · Суперблиц</span></button></div>;
+
+    case 'questions-blitz':
+      return <QuestionsBlitzScreen onBack={() => setScreen({ name: 'games-menu' })}/>;
+
     case 'game':
-      return <MarketGameScreen onBack={() => setScreen({ name: 'home' })} />;
+      return <MarketGameScreen onBack={() => setScreen({ name: 'games-menu' })} />;
 
     case 'listening':
       return <div className="screen"><BackButton onClick={() => setScreen({ name: 'home' })} label="На главную" /><h1 className="screen-title">Аудирование</h1><button className="lesson-item" onClick={() => setScreen({ name: 'listening-lesson' })}><span className="lesson-number">Урок 1</span><span>Поездка в Вунгтау</span></button><button className="lesson-item" onClick={() => setScreen({ name: 'listening-lesson', lesson: 2 })}><span className="lesson-number">Урок 2</span><span>На рынке · 4 диалога</span></button></div>;
