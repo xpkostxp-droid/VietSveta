@@ -5,7 +5,8 @@ import { speakVietnamese, stopSpeaking } from '../domain/speech';
 import { createCountdownSound } from '../domain/countdownSound';
 import { BackButton } from './BackButton';
 
-const storageKey = 'vietSveta.marketBlitz.errors.v1';
+import { allHarvestTasks, productForTask, isPictureAnswer, taskKey, orderHarvestTasks, readHarvestErrors } from '../domain/harvestTasks';
+const storageKey = 'vietSveta.marketBlitz.errors.v2';
 const QUESTION_MS = 5000;
 const FEEDBACK_MS = 1700;
 const EXPLOSION_MS = 700;
@@ -22,10 +23,9 @@ function optionsFor(index: number) {
   return shuffled([index, ...shuffled(others).slice(0, 2)]);
 }
 function loadErrors(): number[] {
-  const raw = readJSON(storageKey);
-  return Array.isArray(raw) ? products.map((p, i) => raw.includes(p[1]) ? i : -1).filter(i => i >= 0) : [];
+  return readHarvestErrors(readJSON(storageKey), readJSON('vietSveta.marketBlitz.errors.v1'));
 }
-function saveErrors(indices: number[]) { writeJSON(storageKey, indices.map(i => products[i][1])); }
+function saveErrors(indices: number[]) { writeJSON(storageKey, indices.map(taskKey)); }
 type Phase = 'question' | 'success' | 'wrong' | 'timeout' | 'answer';
 
 export function MarketBlitzScreen({ onBack }: { onBack: () => void }) {
@@ -80,7 +80,7 @@ export function MarketBlitzScreen({ onBack }: { onBack: () => void }) {
     if (phase === 'wrong' || phase === 'timeout') {
       const timer = setTimeout(() => {
         if (pausedRef.current) return;
-        setPhase('answer'); speakVietnamese(products[round[position]][1]);
+        setPhase('answer'); speakVietnamese(products[productForTask(round[position])][1]);
       }, EXPLOSION_MS);
       return () => clearTimeout(timer);
     }
@@ -89,7 +89,7 @@ export function MarketBlitzScreen({ onBack }: { onBack: () => void }) {
       if (position + 1 === round.length) setActive(false);
       else {
         const next = position + 1;
-        setPosition(next); setOptions(optionsFor(round[next])); setSelected(null);
+        setPosition(next); setOptions(optionsFor(productForTask(round[next]))); setSelected(null);
         setRemaining(QUESTION_MS); deadline.current = Date.now() + QUESTION_MS;
         locked.current = false; lastBeep.current = 5; setPhase('question');
       }
@@ -98,11 +98,11 @@ export function MarketBlitzScreen({ onBack }: { onBack: () => void }) {
   }, [active, paused, phase, position, round]);
 
   function start(indices: number[]) {
-    const next = shuffled(indices);
+    const next = orderHarvestTasks(indices);
     if (!next.length) return;
     sound.current ??= createCountdownSound(); sound.current.unlock();
     lastBeep.current = 5;
-    stopSpeaking(); setRound(next); setPosition(0); setOptions(optionsFor(next[0]));
+    stopSpeaking(); setRound(next); setPosition(0); setOptions(optionsFor(productForTask(next[0])));
     setErrors([]); setCollected([]); setSelected(null); setPhase('question');
     setRemaining(QUESTION_MS); setStreak(0); setBest(0);
     setStarted(true); setActive(true); setPaused(false); pausedRef.current = false;
@@ -114,7 +114,7 @@ export function MarketBlitzScreen({ onBack }: { onBack: () => void }) {
     const current = round[position];
     // A click at or after the deadline is a timeout, even between timer ticks.
     const timedOut = index === null || Date.now() >= deadline.current;
-    const success = !timedOut && index === current;
+    const success = !timedOut && index === productForTask(current);
     setSelected(index); setPhase(success ? 'success' : timedOut ? 'timeout' : 'wrong');
     const nextSaved = success ? saved.filter(i => i !== current) : [...new Set([...saved, current])];
     setSaved(nextSaved); saveErrors(nextSaved);
@@ -123,7 +123,7 @@ export function MarketBlitzScreen({ onBack }: { onBack: () => void }) {
     } else {
       setErrors(e => [...e, current]); setStreak(0);
     }
-    if (success) speakVietnamese(products[current][1]);
+    if (success) speakVietnamese(products[productForTask(current)][1]);
     else sound.current?.explode();
   }
   function resume() {
@@ -132,40 +132,47 @@ export function MarketBlitzScreen({ onBack }: { onBack: () => void }) {
     deadline.current = Date.now() + frozen.current;
     pausedRef.current = false; setPaused(false);
   }
-  const current = products[round[position]];
+  const current = products[productForTask(round[position])];
+  const pictureAnswers = isPictureAnswer(round[position]);
   const exploding = phase === 'wrong' || phase === 'timeout';
   const showAnswer = phase === 'success' || phase === 'answer';
-  return <div className="screen market-screen harvest-screen">
+  return <div className={'screen market-screen harvest-screen' + (active ? ' harvest-playing' : '')}>
     <BackButton onClick={onBack} label="К выбору игры" />
     <h1 className="screen-title">🍉 Спаси урожай</h1>
     {!started ? <div className="market-intro"><h2>Фруктовый блиц</h2>
-      <p>Три названия и пять секунд на ответ. Угадала — продукт в корзине. Ошибка или время вышло — пух! 💥 Этот продукт доберём после раунда.</p>
-      <p>Все {products.length} фруктов и овощей вперемешку, каждый — один раз. Корзина при ошибке сохраняется.</p>
-      <button className="big-button" onClick={() => start(products.map((_, i) => i))}>Начать проверку</button>
+      <p>Три варианта и пять секунд на ответ. Угадала — продукт в корзине. Ошибка или время вышло — пух! 💥 Этот продукт доберём после раунда.</p>
+      <p>40 заданий: каждый из 20 продуктов — в двух направлениях. Картинка → название, затем название → картинка. Корзина при ошибке сохраняется.</p>
+      <button className="big-button" onClick={() => start(allHarvestTasks)}>Начать проверку</button>
       {saved.length > 0 && <button className="secondary-button" onClick={() => start(saved)}>Добрать урожай — {saved.length}</button>}
     </div> : active ? <>
-      <div className="blitz-status"><span>Продукт {position + 1} из {round.length}</span><span>🧺 {collected.length} · 🔥 {streak}</span></div>
-      <div className={'harvest-countdown' + (phase === 'question' && remaining <= 3000 ? ' harvest-countdown-urgent' : '')} role="progressbar" aria-label="Время на ответ" aria-valuemin={0} aria-valuemax={5} aria-valuenow={phase === 'question' ? Math.ceil(remaining / 1000) : 0}>
-        <svg viewBox="0 0 100 100" aria-hidden="true"><circle className="harvest-ring-track" cx="50" cy="50" r="43" /><circle className="harvest-ring-progress" cx="50" cy="50" r="43" pathLength="100" strokeDasharray="100" strokeDashoffset={100 - (phase === 'question' ? remaining / QUESTION_MS * 100 : 0)} /></svg>
-        <span className="harvest-countdown-number">{paused ? 'Ⅱ' : phase === 'question' ? Math.ceil(remaining / 1000) : phase === 'success' ? '✓' : '0'}</span>
-      </div>
-      {phase !== 'question' && <p className="harvest-seconds">{paused ? 'Пауза' : phase === 'success' ? '+1 в корзину!' : phase === 'timeout' ? 'Время вышло!' : 'Пух! Доберём позже'}</p>}
-      {paused ? <div className="market-intro"><h2>Урожай подождёт ⏸</h2><p>Игра на паузе. Продолжим, когда будешь готова.</p><button className="big-button" onClick={resume}>Продолжить</button></div> : <div className={'market-card blitz-card' + (exploding ? ' harvest-shake' : '')}>
-        <div className={'harvest-stage harvest-' + phase} key={`${position}-${phase}`}>
-          <div className="market-product" role="img" aria-label={current[2]}>{current[0]}</div>
-          {(phase === 'wrong' || phase === 'timeout') && <div className="harvest-puff" aria-hidden="true">💥<span>✦</span><span>✧</span><span>✦</span></div>}
+      <div className="harvest-play-header"><span>Задание {position + 1}/{round.length}</span><span>🧺 {collected.length} · 🔥 {streak}</span></div>
+      <div className="harvest-question-bar">
+        <span>{pictureAnswers ? 'Выбери картинку' : 'Выбери название'}</span>
+        <div className={'harvest-countdown' + (phase === 'question' && remaining <= 3000 ? ' harvest-countdown-urgent' : '')} role="progressbar" aria-label="Время на ответ" aria-valuemin={0} aria-valuemax={5} aria-valuenow={phase === 'question' ? Math.ceil(remaining / 1000) : 0}>
+          <svg viewBox="0 0 100 100" aria-hidden="true"><circle className="harvest-ring-track" cx="50" cy="50" r="43" /><circle className="harvest-ring-progress" cx="50" cy="50" r="43" pathLength="100" strokeDasharray="100" strokeDashoffset={100 - (phase === 'question' ? remaining / QUESTION_MS * 100 : 0)} /></svg>
+          <span className="harvest-countdown-number">{paused ? 'Ⅱ' : phase === 'question' ? Math.ceil(remaining / 1000) : phase === 'success' ? '✓' : '0'}</span>
         </div>
-        <h2>{showAnswer ? current[1] : exploding ? '💥' : 'Выбери название'}</h2>
-        {showAnswer && <p className="harvest-translation">{current[2]}</p>}
-        <div className="blitz-options harvest-options">{options.map(i => <button key={i} className={'blitz-option' + (showAnswer && i === round[position] ? ' blitz-correct' : selected === i && phase === 'wrong' ? ' blitz-wrong' : '')} disabled={phase !== 'question'} onClick={() => resolve(i)}>{products[i][1]}</button>)}</div>
-        <p className="blitz-feedback" aria-live="polite">{phase === 'question' ? 'Три варианта — один правильный' : phase === 'success' ? 'Спасён! Следующий продукт…' : exploding ? 'Пух! 💥' : 'Правильное название показано выше. Этот продукт ушёл в повтор.'}</p>
-      </div>}
-      <div className="market-basket" aria-label="Собранные продукты">🧺 {collected.map(i => products[i][0]).join(' ')}</div>
+      </div>
+      <div className="market-card blitz-card harvest-compact-card">
+        <div className={'harvest-stage harvest-' + phase} key={`${position}-${phase}`}>
+          <div className={'harvest-prompt-content' + (exploding ? ' harvest-shake' : '')}>
+            {pictureAnswers ? <h2 className="harvest-word-prompt">{current[1]}</h2> : <div className="market-product" role="img" aria-label={current[2]}>{current[0]}</div>}
+          </div>
+          {exploding && <div className="harvest-puff" aria-hidden="true">💥<span>✦</span><span>✧</span><span>✦</span></div>}
+        </div>
+        <div className="harvest-answer-slot" aria-live="polite">
+          <strong>{showAnswer ? current[1] : '\u00a0'}</strong>
+          <span>{showAnswer ? current[2] : '\u00a0'}</span>
+        </div>
+        <div className={'blitz-options harvest-options' + (pictureAnswers ? ' harvest-picture-options' : '')}>{options.map(i => <button key={i} aria-label={pictureAnswers ? products[i][2] : products[i][1]} className={'blitz-option' + (showAnswer && i === productForTask(round[position]) ? ' blitz-correct' : selected === i && phase === 'wrong' ? ' blitz-wrong' : '')} disabled={phase !== 'question' || paused} onClick={() => resolve(i)}>{pictureAnswers ? <span aria-hidden="true">{products[i][0]}</span> : products[i][1]}</button>)}</div>
+        <p className="blitz-feedback" aria-live="polite">{phase === 'question' ? ' ' : phase === 'success' ? '+1 в корзину!' : exploding ? 'Пух! 💥' : 'Повторим после раунда'}</p>
+        {paused && <div className="harvest-pause-overlay"><h2>Пауза ⏸</h2><button className="big-button" onClick={resume}>Продолжить</button></div>}
+      </div>
     </> : <div className="market-intro"><h2>{saved.length === 0 ? 'Весь урожай спасён! 🎉' : 'Урожай собран не весь'}</h2>
       <p className="blitz-result">Собрано {collected.length} из {round.length}</p><p>Лучшая серия: {best} 🔥</p>
-      {errors.length > 0 && <ul className="blitz-errors">{errors.map(i => <li key={i}>{products[i][0]} {products[i][2]} — <strong>{products[i][1]}</strong></li>)}</ul>}
+      {errors.length > 0 && <ul className="blitz-errors">{errors.map(i => <li key={i}>{products[productForTask(i)][0]} {products[productForTask(i)][2]} — <strong>{isPictureAnswer(i) ? 'узнать название' : 'вспомнить название'}</strong></li>)}</ul>}
       {saved.length > 0 && <button className="big-button" onClick={() => start(saved)}>Добрать урожай — {saved.length}</button>}
-      <button className="secondary-button" onClick={() => start(products.map((_, i) => i))}>Новый блиц</button>
+      <button className="secondary-button" onClick={() => start(allHarvestTasks)}>Новый блиц</button>
     </div>}
   </div>;
 }

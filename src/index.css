@@ -1116,3 +1116,26 @@ a:focus-visible {
 .harvest-ring-progress { stroke: currentColor; stroke-linecap: round; }
 .harvest-countdown-number { position: absolute; inset: 0; display: grid; place-items: center; font-size: 2.15rem; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
 .harvest-countdown-urgent { color: #cc6431; }
+/* Stable compact play area: feedback never inserts or removes layout rows. */
+.harvest-playing { padding-top: 12px; gap: 8px; }
+.harvest-playing .screen-title { font-size: 1.3rem; margin: 4px 0; }
+.harvest-play-header { display: flex; justify-content: space-between; gap: 10px; font-size: .95rem; font-weight: 750; }
+.harvest-question-bar { display: flex; align-items: center; justify-content: space-between; min-height: 66px; font-weight: 700; }
+.harvest-question-bar .harvest-countdown { width: 62px; height: 62px; margin: 0; flex-shrink: 0; }
+.harvest-question-bar .harvest-countdown-number { font-size: 1.65rem; }
+.harvest-compact-card { position: relative; margin: 0; padding: 12px; display: grid; grid-template-rows: 120px 62px 194px 30px; gap: 8px; }
+.harvest-compact-card .harvest-stage { height: 120px; min-width: 0; }
+.harvest-prompt-content { max-width: 100%; }
+.harvest-compact-card .market-product { font-size: 88px; }
+.harvest-word-prompt { margin: 0; font-size: clamp(1.8rem, 7vw, 2.4rem); color: #174f49; overflow-wrap: anywhere; text-align: center; }
+.harvest-answer-slot { display: grid; grid-template-rows: 32px 26px; text-align: center; align-content: center; }
+.harvest-answer-slot strong { font-size: 1.4rem; line-height: 32px; }
+.harvest-answer-slot span { font-size: 1rem; line-height: 26px; }
+.harvest-compact-card .harvest-options { margin: 0; grid-template-rows: repeat(3, 1fr); min-height: 0; }
+.harvest-compact-card .blitz-option { min-height: 0; padding: 6px; font-size: 1.35rem; line-height: 1.2; }
+.harvest-compact-card .harvest-picture-options { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: 1fr; align-items: center; }
+.harvest-picture-options .blitz-option { height: 100px; font-size: clamp(2.8rem, 12vw, 4rem); }
+.harvest-compact-card .blitz-feedback { min-height: 0; margin: 0; line-height: 30px; text-align: center; font-size: .95rem; }
+.harvest-pause-overlay { position: absolute; inset: 0; z-index: 2; border-radius: inherit; background: #fffdf6f5; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 16px; }
+@media (max-height: 720px) { .harvest-compact-card { grid-template-rows: 82px 62px 176px 30px; gap: 6px; padding: 10px; } .harvest-compact-card .harvest-stage { height: 82px; } .harvest-compact-card .market-product { font-size: 68px; } .harvest-playing .screen-title { font-size: 1.15rem; } }
+@media (prefers-reduced-motion: reduce) { .harvest-prompt-content { animation: none !important; } }
