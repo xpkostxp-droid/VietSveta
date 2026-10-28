@@ -2,6 +2,7 @@
 import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { beforeEach, afterEach, expect, it, vi } from 'vitest';
+import { basicQuestions } from '../content/basicQuestions';
 import { QuestionsBlitzScreen } from './QuestionsBlitzScreen';
 Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
 let node: HTMLDivElement; let root: Root;
@@ -42,4 +43,25 @@ it('separates a long parenthetical clarification from the centered main question
  for (const label of ['Ai','Что','Ở đâu','Куда','Từ đâu','Когда','Ngày nào','Во сколько','Tại sao','Как']) { await click(label); await time(1200); }
  expect(node.querySelector('.qs-prompt strong')?.textContent).toBe('Сколько');
  expect(node.querySelector('.qs-prompt-note')?.textContent).toBe('общее количество');
+});
+
+it('basic mode checks all 15 words in both directions, finishes at 30 and keeps a separate record', async () => {
+ await act(async () => root.unmount()); root=createRoot(node);
+ await act(async () => root.render(<QuestionsBlitzScreen variant="basic" onBack={() => {}}/>));
+ expect(node.textContent).toContain('30 заданий'); await click('⚡ Начать блиц');
+ const seen = new Set<string>();
+ for (let i=0;i<30;i++) {
+  const main=node.querySelector('.qs-prompt strong')!.textContent!;
+  const note=node.querySelector('.qs-prompt-note')?.textContent;
+  const prompt=note ? main+' ('+note+')' : main;
+  const reverse=node.querySelector('.qs-prompt small')!.textContent==='Выбери перевод';
+  const pair=basicQuestions.find(p=>p[reverse?0:1]===prompt)!;
+  expect(pair).toBeTruthy(); expect(seen.has(pair[0]+reverse)).toBe(false); seen.add(pair[0]+reverse);
+  expect(reverse).toBe(i%2===1); await click(pair[reverse?1:0]); await time(1200);
+ }
+ expect(seen.size).toBe(30); expect(node.textContent).toContain('30 из 30');
+ expect(node.querySelector('.qs-answers')).toBeNull();
+ expect(localStorage.getItem('vietsveta.questions.basic15.best')).toBe('30');
+ expect(localStorage.getItem('vietsveta.questions.blitz.best')).toBeNull();
+ await time(6000); expect(node.textContent).not.toContain('Время вышло!');
 });
