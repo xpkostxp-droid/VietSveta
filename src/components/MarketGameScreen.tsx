@@ -14,7 +14,7 @@ function loadScores(): Progress {
 }
 
 export function MarketGameScreen({ onBack }: { onBack: () => void }) {
-  const [blitz, setBlitz] = useState(false);
+  const [mode, setMode] = useState<'menu' | 'blitz' | 'training'>('menu');
   const [category, setCategory] = useState('all');
   const [queue, setQueue] = useState<number[]>([]);
   const [started, setStarted] = useState(false);
@@ -49,12 +49,19 @@ export function MarketGameScreen({ onBack }: { onBack: () => void }) {
     else remaining.splice(Math.min(2, remaining.length), 0, queue[0]);
     setQueue(remaining); setHint(false); setRevealed(false);
   };
-  if (blitz) return <MarketBlitzScreen onBack={() => setBlitz(false)} />;
+  if (mode === 'blitz') return <MarketBlitzScreen onBack={() => setMode('menu')} />;
+  if (mode === 'menu') return <div className="screen market-screen">
+    <BackButton onClick={onBack} label="К выбору игры" />
+    <h1 className="screen-title">Фрукты и овощи</h1>
+    <div className="market-options" style={{ gap: 18 }}>
+      <button className="big-button" style={{ width: '100%', minHeight: 110, fontSize: '1.5rem', fontWeight: 800 }} onClick={() => setMode('blitz')}>⚡ Блиц</button>
+      <button className="big-button" style={{ width: '100%', minHeight: 110, fontSize: '1.5rem', fontWeight: 800 }} onClick={() => setMode('training')}>🧺 Обучение</button>
+    </div>
+  </div>;
   return <div className="screen market-screen">
-    <BackButton onClick={started ? () => { stopSpeaking(); setStarted(false); } : onBack} label={started ? 'К выбору игры' : 'На главную'} />
+    <BackButton onClick={started ? () => { stopSpeaking(); setStarted(false); } : () => setMode('menu')} label={started ? 'К обучению' : 'К выбору режима'} />
     <h1 className="screen-title">Фрукты и овощи</h1>
     {!started ? <>
-      <div className="market-intro"><h2>⚡ Блиц: фрукты и овощи</h2><p>Спаси урожай! Три варианта и пять секунд на ответ. Собирай продукты в корзину, а пропущенные доберём после раунда.</p><button className="big-button" onClick={() => setBlitz(true)}>Начать блиц</button></div>
       <div className="market-intro">🧺<h2>Собери корзину</h2><p>Посмотри на картинку и назови продукт по-вьетнамски вслух. Затем открой ответ и проверь себя.</p><p>Пять продуктов за раунд. Дважды вспомни название без подсказки — и продукт в корзине. Забытые слова вернутся чуть позже.</p></div>
       <div className="market-options">{[['all', 'Всё вместе'], ['fruits', 'Фрукты · урок 44'], ['vegetables', 'Овощи · урок 43']].map(([value, label]) => <button key={value} className={'choice-button ' + (category === value ? 'choice-button-active' : '')} aria-pressed={category === value} onClick={() => setCategory(value)}>{label}</button>)}</div>
       <button className="big-button" onClick={start}>На рынок →</button>
