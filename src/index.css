@@ -1107,3 +1107,12 @@ a:focus-visible {
 .harvest-shake { animation: harvest-shake .45s ease-out; }
 @keyframes harvest-shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-7px) rotate(-1deg); } 40%, 80% { transform: translateX(7px) rotate(1deg); } }
 @media (prefers-reduced-motion: reduce) { .harvest-shake { animation: none; } }
+
+/* Compact circular countdown, reusing the existing five-second clock. */
+.harvest-countdown { position: relative; width: 88px; height: 88px; margin: 12px auto; color: #19877a; }
+.harvest-countdown svg { display: block; width: 100%; height: 100%; transform: rotate(-90deg); }
+.harvest-countdown circle { fill: none; stroke-width: 7; }
+.harvest-ring-track { stroke: #e4e9dd; }
+.harvest-ring-progress { stroke: currentColor; stroke-linecap: round; }
+.harvest-countdown-number { position: absolute; inset: 0; display: grid; place-items: center; font-size: 2.15rem; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+.harvest-countdown-urgent { color: #cc6431; }

@@ -144,8 +144,11 @@ export function MarketBlitzScreen({ onBack }: { onBack: () => void }) {
       {saved.length > 0 && <button className="secondary-button" onClick={() => start(saved)}>Добрать урожай — {saved.length}</button>}
     </div> : active ? <>
       <div className="blitz-status"><span>Продукт {position + 1} из {round.length}</span><span>🧺 {collected.length} · 🔥 {streak}</span></div>
-      <div className="harvest-timer" role="progressbar" aria-label="Время на ответ" aria-valuemin={0} aria-valuemax={5} aria-valuenow={phase === 'question' ? Math.ceil(remaining / 1000) : 0}><div style={{ width: `${phase === 'question' ? remaining / QUESTION_MS * 100 : 0}%` }} /></div>
-      <p className="harvest-seconds">{paused ? 'Пауза' : phase === 'question' ? `${Math.ceil(remaining / 1000)} сек` : phase === 'success' ? '+1 в корзину!' : phase === 'timeout' ? 'Время вышло!' : 'Пух! Доберём позже'}</p>
+      <div className={'harvest-countdown' + (phase === 'question' && remaining <= 3000 ? ' harvest-countdown-urgent' : '')} role="progressbar" aria-label="Время на ответ" aria-valuemin={0} aria-valuemax={5} aria-valuenow={phase === 'question' ? Math.ceil(remaining / 1000) : 0}>
+        <svg viewBox="0 0 100 100" aria-hidden="true"><circle className="harvest-ring-track" cx="50" cy="50" r="43" /><circle className="harvest-ring-progress" cx="50" cy="50" r="43" pathLength="100" strokeDasharray="100" strokeDashoffset={100 - (phase === 'question' ? remaining / QUESTION_MS * 100 : 0)} /></svg>
+        <span className="harvest-countdown-number">{paused ? 'Ⅱ' : phase === 'question' ? Math.ceil(remaining / 1000) : phase === 'success' ? '✓' : '0'}</span>
+      </div>
+      {phase !== 'question' && <p className="harvest-seconds">{paused ? 'Пауза' : phase === 'success' ? '+1 в корзину!' : phase === 'timeout' ? 'Время вышло!' : 'Пух! Доберём позже'}</p>}
       {paused ? <div className="market-intro"><h2>Урожай подождёт ⏸</h2><p>Игра на паузе. Продолжим, когда будешь готова.</p><button className="big-button" onClick={resume}>Продолжить</button></div> : <div className={'market-card blitz-card' + (exploding ? ' harvest-shake' : '')}>
         <div className={'harvest-stage harvest-' + phase} key={`${position}-${phase}`}>
           <div className="market-product" role="img" aria-label={current[2]}>{current[0]}</div>
