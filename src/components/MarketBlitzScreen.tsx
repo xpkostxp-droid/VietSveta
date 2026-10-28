@@ -124,6 +124,7 @@ export function MarketBlitzScreen({ onBack }: { onBack: () => void }) {
       setErrors(e => [...e, current]); setStreak(0);
     }
     if (success) speakVietnamese(products[current][1]);
+    else sound.current?.explode();
   }
   function resume() {
     if (document.hidden) return;

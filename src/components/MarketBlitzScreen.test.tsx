@@ -4,7 +4,7 @@ import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { MarketBlitzScreen } from './MarketBlitzScreen';
 import { products } from '../content/marketProducts';
-const audio = vi.hoisted(() => ({ beep: vi.fn(), unlock: vi.fn(), stop: vi.fn(), close: vi.fn() }));
+const audio = vi.hoisted(() => ({ beep: vi.fn(), explode: vi.fn(), unlock: vi.fn(), stop: vi.fn(), close: vi.fn() }));
 vi.mock('../domain/countdownSound', () => ({ createCountdownSound: () => audio }));
 Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
 let node: HTMLDivElement;
@@ -52,6 +52,7 @@ it('times out at five seconds, records the word, and starts the next card with a
   await click('Начать проверку'); const word = answer(); await time(4900);
   expect(node.querySelector('.harvest-question')).toBeTruthy(); await time(100);
   expect(node.querySelector('.harvest-timeout')).toBeTruthy();
+  expect(audio.explode).toHaveBeenCalledTimes(1);
   expect(JSON.parse(localStorage.getItem(key)!)).toContain(word);
   await time(700); await time(1700); expect(node.textContent).toContain('Продукт 2 из 20');
   expect(node.querySelector('[role="progressbar"]')?.getAttribute('aria-valuenow')).toBe('5');
