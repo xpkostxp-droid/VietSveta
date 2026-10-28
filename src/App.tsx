@@ -1,3 +1,4 @@
+import { LeaderboardScreen } from './components/LeaderboardScreen';
 import { QuestionsBlitzScreen } from './components/QuestionsBlitzScreen';
 import { MarketGameScreen } from './components/MarketGameScreen';
 import { useState } from 'react';
@@ -21,6 +22,7 @@ type Screen =
   | { name: 'home' }
   | { name: 'game' }
   | { name: 'games-menu' }
+  | { name: 'leaderboard' }
   | { name: 'questions-menu' }
   | { name: 'questions-blitz'; variant?: 'super' | 'basic' }
   | { name: 'listening' }
@@ -44,7 +46,7 @@ function App() {
       // по-прежнему запоминается через saveLastActivity ниже, на будущее.
       return (
         <HomeScreen
-          onOpenGame={() => setScreen({ name: 'games-menu' })}
+          onOpenGame={() => setScreen({ name: 'leaderboard' })}
           onOpenListening={() => setScreen({ name: 'listening' })}
           onOpenTheory={() => setScreen({ name: 'theory-list' })}
           onOpenCards={() => setScreen({ name: 'cards-lesson-list' })}
@@ -53,8 +55,11 @@ function App() {
         />
       );
 
+    case 'leaderboard':
+      return <LeaderboardScreen onBack={() => setScreen({ name: 'home' })} onPlay={() => setScreen({ name: 'games-menu' })}/>;
+
     case 'games-menu':
-      return <div className="screen"><BackButton onClick={() => setScreen({ name: 'home' })} label="На главную"/><h1 className="screen-title">Игры</h1><button className="lesson-item" onClick={() => setScreen({ name: 'game' })}><span className="lesson-title" style={{ fontSize: '1.35rem', fontWeight: 800, color: '#174f49', lineHeight: 1.35 }}>🍎 Овощи-фрукты</span></button><button className="lesson-item" onClick={() => setScreen({ name: 'questions-menu' })}><span className="lesson-title" style={{ fontSize: '1.35rem', fontWeight: 800, color: '#174f49', lineHeight: 1.35 }}>❓ Вопросительные слова</span></button></div>;
+      return <div className="screen"><BackButton onClick={() => setScreen({ name: 'leaderboard' })} label="К рейтингу"/><h1 className="screen-title">Игры</h1><button className="lesson-item" onClick={() => setScreen({ name: 'game' })}><span className="lesson-title" style={{ fontSize: '1.35rem', fontWeight: 800, color: '#174f49', lineHeight: 1.35 }}>🍎 Овощи-фрукты</span></button><button className="lesson-item" onClick={() => setScreen({ name: 'questions-menu' })}><span className="lesson-title" style={{ fontSize: '1.35rem', fontWeight: 800, color: '#174f49', lineHeight: 1.35 }}>❓ Вопросительные слова</span></button></div>;
 
     case 'questions-menu':
       return <div className="screen market-screen"><BackButton onClick={() => setScreen({ name: 'games-menu' })} label="К играм"/><h1 className="screen-title">Вопросительные слова</h1><div className="market-options"><button className="big-button" style={{ minHeight: 100, fontSize: '1.35rem' }} onClick={() => setScreen({ name: 'questions-blitz', variant: 'super' })}>⚖️ Суперблиц · 24 слова</button><button className="big-button" style={{ minHeight: 100, fontSize: '1.35rem' }} onClick={() => setScreen({ name: 'questions-blitz', variant: 'basic' })}>⚡ Блиц · 15 слов</button></div></div>;
