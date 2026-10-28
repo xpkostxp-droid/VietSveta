@@ -16,6 +16,29 @@ const cards: [string,string][] = [
  ['... chưa?','Уже ...? / Ещё не ...?']
 ];
 const shuffle=(items:number[])=>{const result=[...items];for(let i=result.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[result[i],result[j]]=[result[j],result[i]];}return result;};
+
+// Short synthesized sounds; no external audio files needed.
+function beep(ctx:AudioContext,frequency:number){
+ const now=ctx.currentTime;
+ const oscillator=ctx.createOscillator();const volume=ctx.createGain();
+ oscillator.type='sine';oscillator.frequency.value=frequency;
+ volume.gain.setValueAtTime(0.0001,now);
+ volume.gain.exponentialRampToValueAtTime(0.13,now+0.012);
+ volume.gain.exponentialRampToValueAtTime(0.0001,now+0.13);
+ oscillator.connect(volume).connect(ctx.destination);
+ oscillator.start(now);oscillator.stop(now+0.14);
+}
+function crash(ctx:AudioContext){
+ const duration=0.65;const sampleRate=ctx.sampleRate;
+ const buffer=ctx.createBuffer(1,Math.floor(sampleRate*duration),sampleRate);
+ const data=buffer.getChannelData(0);
+ for(let i=0;i<data.length;i++){const t=i/sampleRate;data[i]=(Math.random()*2-1)*Math.exp(-7*t)*(0.65+0.35*Math.sin(t*95));}
+ const source=ctx.createBufferSource();source.buffer=buffer;
+ const low=ctx.createBiquadFilter();low.type='lowpass';low.frequency.value=1100;
+ const gain=ctx.createGain();gain.gain.value=0.32;
+ source.connect(low).connect(gain).connect(ctx.destination);source.start();
+}
+
 const bestKey='vietsveta.questions.blitz.best';
 export function QuestionsBlitzScreen({onBack}:{onBack:()=>void}){
  const [started,setStarted]=useState(false);
@@ -29,6 +52,9 @@ export function QuestionsBlitzScreen({onBack}:{onBack:()=>void}){
  const deadline=useRef<number|null>(null);
  const pending=useRef<ReturnType<typeof setTimeout>|null>(null);
  const locked=useRef(false);
+ const audio=useRef<AudioContext|null>(null);
+ const lastBeep=useRef<number|null>(null);
+ const sound=(kind:'beep'|'crash',count=3)=>{const ctx=audio.current;if(!ctx||ctx.state!=='running')return;try{if(kind==='crash')crash(ctx);else beep(ctx,count===1?660:count===2?740:820);}catch{}};
  const q=queue[0];
  const reverse=blocks.length%2===1;
  const choices=useRef<number[]>([]);
@@ -42,10 +68,12 @@ export function QuestionsBlitzScreen({onBack}:{onBack:()=>void}){
   setOptions(answerOptions);
   setQueue(list);
   setSeconds(5);
+  lastBeep.current=null;
   deadline.current=Date.now()+5000;
   locked.current=false;
  };
  const start=()=>{
+  try{if(!audio.current)audio.current=new AudioContext();void audio.current.resume();}catch{}
   if(pending.current)clearTimeout(pending.current);
   stopSpeaking();locked.current=false;setFailed(null);setFeedback(false);setBlocks([]);setStarted(true);
   let all=shuffle(cards.map((_,i)=>i));
@@ -54,7 +82,7 @@ export function QuestionsBlitzScreen({onBack}:{onBack:()=>void}){
  };
  const lose=(reason:'wrong'|'timeout')=>{
   if(locked.current)return;
-  locked.current=true;deadline.current=null;setRetry(q);setFailed(reason);setFeedback(false);stopSpeaking();
+  locked.current=true;deadline.current=null;setRetry(q);setFailed(reason);setFeedback(false);stopSpeaking();sound('crash');
  };
  const answer=(index:number)=>{
   if(locked.current||failed||!started)return;
@@ -79,11 +107,13 @@ export function QuestionsBlitzScreen({onBack}:{onBack:()=>void}){
    if(deadline.current===null||locked.current)return;
    const left=Math.max(0,(deadline.current-Date.now())/1000);
    setSeconds(left);
+   const digit=Math.ceil(left);
+   if(digit>=1&&digit<=3&&lastBeep.current!==digit){lastBeep.current=digit;sound('beep',digit);}
    if(left<=0)lose('timeout');
   },50);
   return()=>clearInterval(id);
  },[started,failed,q]);
- useEffect(()=>()=>{if(pending.current)clearTimeout(pending.current);stopSpeaking();},[]);
+ useEffect(()=>()=>{if(pending.current)clearTimeout(pending.current);stopSpeaking();void audio.current?.close();},[]);
  return <div className="screen qs-screen">
   <BackButton onClick={started?()=>{deadline.current=null;if(pending.current)clearTimeout(pending.current);stopSpeaking();setStarted(false);}:onBack} label={started?'К выбору игры':'К играм'}/>
   <h1 className="screen-title">🏗️ Суперблиц · Вопросы</h1>
