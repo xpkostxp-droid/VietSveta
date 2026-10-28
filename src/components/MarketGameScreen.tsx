@@ -54,7 +54,7 @@ export function MarketGameScreen({ onBack }: { onBack: () => void }) {
     <BackButton onClick={started ? () => { stopSpeaking(); setStarted(false); } : onBack} label={started ? 'К выбору игры' : 'На главную'} />
     <h1 className="screen-title">Фрукты и овощи</h1>
     {!started ? <>
-      <div className="market-intro"><h2>⚡ Блиц: фрукты и овощи</h2><p>Уже выучила? Выбери название из шести вариантов. Все продукты вперемешку, каждый — один раз. Ошибки проверим отдельно.</p><button className="big-button" onClick={() => setBlitz(true)}>Начать блиц</button></div>
+      <div className="market-intro"><h2>⚡ Блиц: фрукты и овощи</h2><p>Спаси урожай! Три варианта и пять секунд на ответ. Собирай продукты в корзину, а пропущенные доберём после раунда.</p><button className="big-button" onClick={() => setBlitz(true)}>Начать блиц</button></div>
       <div className="market-intro">🧺<h2>Собери корзину</h2><p>Посмотри на картинку и назови продукт по-вьетнамски вслух. Затем открой ответ и проверь себя.</p><p>Пять продуктов за раунд. Дважды вспомни название без подсказки — и продукт в корзине. Забытые слова вернутся чуть позже.</p></div>
       <div className="market-options">{[['all', 'Всё вместе'], ['fruits', 'Фрукты · урок 44'], ['vegetables', 'Овощи · урок 43']].map(([value, label]) => <button key={value} className={'choice-button ' + (category === value ? 'choice-button-active' : '')} aria-pressed={category === value} onClick={() => setCategory(value)}>{label}</button>)}</div>
       <button className="big-button" onClick={start}>На рынок →</button>

@@ -1084,3 +1084,23 @@ a:focus-visible {
 .blitz-result { font-size: 1.3rem; font-weight: 700; }
 .blitz-errors { text-align: left; line-height: 1.8; padding-left: 24px; }
 .blitz-card .market-product { font-size: clamp(85px, 23vw, 120px); }
+
+.harvest-timer { height: 12px; background: #e4e9dd; border-radius: 20px; overflow: hidden; }
+.harvest-timer > div { height: 100%; background: #19877a; border-radius: inherit; }
+.harvest-seconds { text-align: center; font-size: 1.2rem; font-weight: 800; margin: 10px 0; }
+.harvest-stage { position: relative; height: 164px; display: grid; place-items: center; }
+.harvest-stage .market-product { line-height: 1; }
+.harvest-options { grid-template-columns: 1fr; }
+.harvest-options .blitz-option { min-height: 54px; font-size: 1.25rem; font-weight: 800; }
+.harvest-translation { margin: 0 0 12px; }
+.harvest-puff { position: absolute; font-size: 90px; animation: harvest-puff .65s ease-out both; }
+.harvest-puff span { position: absolute; font-size: 28px; color: #e69d20; }
+.harvest-puff span:nth-child(1) { left: -28px; top: 0; }
+.harvest-puff span:nth-child(2) { right: -25px; top: -20px; }
+.harvest-puff span:nth-child(3) { right: -15px; bottom: -15px; }
+.harvest-wrong .market-product, .harvest-timeout .market-product { animation: harvest-burst .45s ease-out both; }
+.harvest-success .market-product { animation: harvest-catch .65s ease-in both; }
+@keyframes harvest-burst { 0% { transform: scale(1); opacity: 1; } 45% { transform: scale(1.25) rotate(12deg); opacity: 1; } 100% { transform: scale(.2); opacity: 0; } }
+@keyframes harvest-puff { 0% { transform: scale(.2); opacity: 0; } 35% { transform: scale(1.15); opacity: 1; } 100% { transform: scale(1.4); opacity: 0; } }
+@keyframes harvest-catch { 0% { transform: translateY(0) scale(1); opacity: 1; } 30% { transform: translateY(-24px) scale(1.05); opacity: 1; } 100% { transform: translateY(100px) scale(.3); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .harvest-stage *, .harvest-puff { animation: none !important; } .harvest-puff { font-size: 70px; } }
