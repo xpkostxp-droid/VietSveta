@@ -57,7 +57,8 @@ export function AdjectiveTetris({onBack,variant='tetris'}:{onBack:()=>void;varia
   if(!animated||!round||round.phase!=='feedback'||round.success||paused)return;
   const id=setTimeout(()=>{setRevealed(true);speakVietnamese(words[round.tasks[round.at].word][0]);},700);
   const impact=setTimeout(()=>sound.current?.explode(),350);
-  return()=>{clearTimeout(id);clearTimeout(impact);};
+  const rebound=cannon?setTimeout(()=>sound.current?.rebound?.(),1400):undefined;
+  return()=>{clearTimeout(id);clearTimeout(impact);if(rebound)clearTimeout(rebound);};
  },[round,animated,paused]);
  useEffect(()=>{
   const hide=()=>{if(document.hidden&&round&&round.phase!=='end'&&!pausedRef.current){frozen.current=Math.max(0,deadline.current-Date.now());pausedRef.current=true;setPaused(true);sound.current?.stop();stopSpeaking();}};

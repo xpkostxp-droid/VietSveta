@@ -51,6 +51,25 @@ export function createCountdownSound() {
         source.start(now); source.stop(now + 0.35); tone = source;
       } catch { /* Visual explosion remains available if sound fails. */ }
     },
+    rebound() {
+      if (!context || context.state !== 'running') return;
+      try {
+        stop();
+        const now = context.currentTime;
+        const oscillator = context.createOscillator();
+        const gain = context.createGain();
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(170, now);
+        oscillator.frequency.exponentialRampToValueAtTime(420, now + 0.025);
+        oscillator.frequency.exponentialRampToValueAtTime(130, now + 0.12);
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.linearRampToValueAtTime(0.09, now + 0.008);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+        oscillator.connect(gain); gain.connect(context.destination);
+        oscillator.onended = () => { oscillator.disconnect(); gain.disconnect(); };
+        oscillator.start(now); oscillator.stop(now + 0.16); tone = oscillator;
+      } catch { /* Rebound remains visible when sound is unavailable. */ }
+    },
     stop,
     close() { stop(); if (context) void context.close().catch(() => {}); },
   };
