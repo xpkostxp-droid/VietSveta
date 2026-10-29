@@ -316,30 +316,34 @@ a:focus-visible {
   border: 1.5px solid rgba(255, 255, 255, 0.65);
   border-radius: var(--radius);
   text-align: left;
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background-position 0.12s ease;
+  background-image: linear-gradient(145deg, rgba(255,255,255,0.5), transparent 46%, rgba(56,69,64,0.12));
   /* A pale glass surface keeps labels readable over the illustrated background. */
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   box-shadow:
-    0 18px 30px -12px rgba(15, 10, 5, 0.55),
-    inset 0 1px 0 rgba(255, 255, 255, 0.65),
-    inset 0 -3px 8px rgba(15, 10, 5, 0.1);
+    0 5px 0 rgba(64, 65, 57, 0.28),
+    0 11px 15px -5px rgba(15, 10, 5, 0.42),
+    inset 2px 2px 3px rgba(255, 255, 255, 0.95),
+    inset -3px -4px 7px rgba(59, 69, 63, 0.18);
 }
 
 .home-tile:active {
-  transform: scale(0.98);
+  transform: translateY(4px) scale(0.985);
   box-shadow:
-    0 8px 16px -10px rgba(15, 10, 5, 0.5),
-    inset 0 1px 0 rgba(255, 255, 255, 0.45);
+    0 1px 0 rgba(64, 65, 57, 0.25),
+    0 3px 6px -2px rgba(15, 10, 5, 0.3),
+    inset 1px 2px 5px rgba(59, 69, 63, 0.18),
+    inset -1px -1px 2px rgba(255, 255, 255, 0.55);
 }
 
 .home-tile-blue {
-  background: rgba(250, 252, 253, 0.88);
+  background-color: rgba(250, 252, 253, 0.9);
   color: var(--color-blue-text);
 }
 
 .home-tile-teal {
-  background: rgba(248, 253, 251, 0.88);
+  background-color: rgba(248, 253, 251, 0.9);
   color: var(--color-primary-dark);
 }
 
@@ -1158,3 +1162,14 @@ a:focus-visible {
 .home-tiles .home-tile-listening { padding-inline: 8px; gap: 5px; }
 .home-tile-listening .home-tile-icon { width: 22px; height: 22px; }
 .home-tile-listening .home-tile-label { font-size: clamp(0.95rem, 4.7vw, 1.25rem); overflow-wrap: normal; }
+
+/* Whole words on home tiles; the test label keeps its explicit line break. */
+.home-tiles .home-tile-label { white-space: nowrap; overflow-wrap: normal; word-break: normal; }
+@media (max-width: 360px) {
+  .home-tiles .home-tile-label { font-size: 1rem; }
+  .home-tiles .home-tile-icon { width: 22px; height: 22px; }
+  .home-tiles .home-tile-listening .home-tile-label { font-size: 0.9rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-tile { transition: none; }
+}

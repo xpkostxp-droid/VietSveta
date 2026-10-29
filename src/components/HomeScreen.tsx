@@ -1,5 +1,5 @@
 import { MemberAvatar } from './MemberAvatar';
-import { BookIcon, CardsIcon, ChevronRightIcon, SpeakerOnIcon } from './icons';
+import { BookIcon, CardsIcon, SpeakerOnIcon } from './icons';
 
 interface Props {
   memberId?: string;
@@ -27,7 +27,6 @@ export function HomeScreen({ memberId, memberName, onOpenProfile, onOpenGame, on
         <button className="home-tile home-tile-blue home-tile-pronunciation" onClick={onOpenPronunciation}>
           <SpeakerOnIcon className="home-tile-icon" />
           <span className="home-tile-label">Фонетика</span>
-          <ChevronRightIcon className="home-tile-chevron" />
         </button>
         <button className="home-tile home-tile-teal home-tile-phonetics-test" onClick={onOpenPhoneticaTest}>
           <SpeakerOnIcon className="home-tile-icon" />
@@ -37,12 +36,10 @@ export function HomeScreen({ memberId, memberName, onOpenProfile, onOpenGame, on
         <button className="home-tile home-tile-blue home-tile-study" onClick={onOpenTheory}>
           <BookIcon className="home-tile-icon" />
           <span className="home-tile-label">Теория</span>
-          <ChevronRightIcon className="home-tile-chevron" />
         </button>
         <button className="home-tile home-tile-teal home-tile-study" onClick={onOpenCards}>
           <CardsIcon className="home-tile-icon" />
           <span className="home-tile-label">Карточки</span>
-          <ChevronRightIcon className="home-tile-chevron" />
         </button>
       </div>
     </div>
