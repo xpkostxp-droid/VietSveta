@@ -52,23 +52,29 @@ export function createCountdownSound() {
       } catch { /* Visual explosion remains available if sound fails. */ }
     },
     rebound() {
-      if (!context || context.state !== 'running') return;
-      try {
-        stop();
-        const now = context.currentTime;
-        const oscillator = context.createOscillator();
-        const gain = context.createGain();
-        oscillator.type = 'sine';
-        oscillator.frequency.setValueAtTime(170, now);
-        oscillator.frequency.exponentialRampToValueAtTime(420, now + 0.025);
-        oscillator.frequency.exponentialRampToValueAtTime(130, now + 0.12);
-        gain.gain.setValueAtTime(0.001, now);
-        gain.gain.linearRampToValueAtTime(0.09, now + 0.008);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
-        oscillator.connect(gain); gain.connect(context.destination);
-        oscillator.onended = () => { oscillator.disconnect(); gain.disconnect(); };
-        oscillator.start(now); oscillator.stop(now + 0.16); tone = oscillator;
-      } catch { /* Rebound remains visible when sound is unavailable. */ }
+      if (!context) return;
+      const play = () => {
+        if (!context || context.state !== 'running') return;
+        try {
+          stop();
+          const now = context.currentTime;
+          const oscillator = context.createOscillator();
+          const gain = context.createGain();
+          // Midrange harmonics remain audible on a small phone speaker.
+          oscillator.type = 'triangle';
+          oscillator.frequency.setValueAtTime(480, now);
+          oscillator.frequency.exponentialRampToValueAtTime(1100, now + 0.025);
+          oscillator.frequency.exponentialRampToValueAtTime(320, now + 0.22);
+          gain.gain.setValueAtTime(0.001, now);
+          gain.gain.linearRampToValueAtTime(0.32, now + 0.007);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.24);
+          oscillator.connect(gain); gain.connect(context.destination);
+          oscillator.onended = () => { oscillator.disconnect(); gain.disconnect(); };
+          oscillator.start(now); oscillator.stop(now + 0.25); tone = oscillator;
+        } catch { /* Keep the game running when audio is unavailable. */ }
+      };
+      if (context.state === 'running') play();
+      else void context.resume().then(play).catch(() => {});
     },
     stop,
     close() { stop(); if (context) void context.close().catch(() => {}); },
