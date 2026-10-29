@@ -50,8 +50,8 @@ it('has three choices, visits products once, explodes on a final error and clear
     if (i === products.length * 2 - 1) await time(700);
     await time(1700);
   }
-  expect(seen.size).toBe(products.length * 2); expect(node.textContent).toContain('Собрано 39 из 40');
-  expect(node.textContent).toContain('Лучшая серия: 39');
+  expect(seen.size).toBe(products.length * 2); expect(node.textContent).toContain('39 из 40');
+  expect(node.textContent).toContain('Лучшие попытки');
   await click('Добрать урожай — 1'); await chooseCorrect(); await time(1700);
   expect(node.textContent).toContain('Весь урожай спасён!');
   expect(JSON.parse(localStorage.getItem(key)!)).toEqual([]);

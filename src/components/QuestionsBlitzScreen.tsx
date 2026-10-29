@@ -1,3 +1,4 @@
+import { GameRanking } from './GameRanking';
 import { readGameRecord, updateGameRecord } from '../domain/gameRecord';
 import { createAnswerClock, formatAnswerTime, saveTimedAttempt } from '../domain/answerTime';
 import { basicQuestions } from '../content/basicQuestions';
@@ -52,6 +53,7 @@ export function QuestionsBlitzScreen({onBack, variant = 'super'}:{onBack:()=>voi
  const [answerTime, setAnswerTime] = useState(0);
  const correctTime = useRef(0);
  const finishedTime = useRef(0);
+ const [showRanking,setShowRanking]=useState(false);
  const [completed,setCompleted]=useState(false);
  const [started,setStarted]=useState(false);
  const [queue,setQueue]=useState<number[]>([]);
@@ -95,6 +97,7 @@ export function QuestionsBlitzScreen({onBack, variant = 'super'}:{onBack:()=>voi
   return base.flatMap((p,i)=>[p*2,base[(i+Math.floor(cards.length/2))%base.length]*2+1]);
  };
  const start=()=>{
+  setShowRanking(false);
   answerClock.current.reset(); setAnswerTime(0); correctTime.current=0; finishedTime.current=0;
   setCompleted(false);
   try{if(!audio.current)audio.current=new AudioContext();void audio.current.resume();}catch{}
@@ -143,12 +146,21 @@ export function QuestionsBlitzScreen({onBack, variant = 'super'}:{onBack:()=>voi
   if(!started || (!failed && !completed)) return;
   saveTimedAttempt({game:basic?'questions-15':'questions-24',correct:blocks.length,total:totalTasks,answerTimeMs:answerClock.current.value(),correctTimeMs:correctTime.current,completed});
  },[failed,completed]);
+ useEffect(()=>{
+  if(!failed&&!completed)return;
+  const timer=setTimeout(()=>setShowRanking(true),failed?1800:0);
+  return()=>clearTimeout(timer);
+ },[failed,completed]);
+ if(!started||showRanking)return <div className="screen ranking-screen"><BackButton onClick={onBack} label="К играм"/><h1 className="screen-title">⚖️ {basic?'Блиц · 15 слов':'Суперблиц · 24 слова'}</h1>
+  {!started&&<p>{cards.length} слов · {totalTasks} заданий · 5 секунд на ответ.<br/>Игра до первой ошибки.</p>}
+  {showRanking&&failed&&<p>{failed==='timeout'?'Время вышло.':'Ошибка.'} Правильно: <b>{cards[q][0]}</b> — {cards[q][1]}</p>}
+  <GameRanking game={gameId} total={totalTasks} onStart={start} startLabel={showRanking?'Играть снова':basic?'⚡ Начать блиц':'⚡ Начать суперблиц'} result={showRanking?{correct:blocks.length,time:correctTime.current}:undefined}/>
+ </div>;
  const promptText = !started ? '' : completed ? `Все ${totalTasks} заданий пройдены!` : failed ? (failed === 'timeout' ? 'Время вышло!' : 'Ошибка!') : cards[q][reverse ? 0 : 1];
  const promptParts = promptText.match(/^(.*?)\s*\((.*?)\)$/);
  return <div className={'screen qs-screen' + (started ? ' qs-playing' : '')}>
   <div className="qs-topbar"><BackButton onClick={started?()=>{deadline.current=null;if(pending.current)clearTimeout(pending.current);stopSpeaking();setStarted(false);}:onBack} label={started?'Назад':'К играм'}/>{started&&<div className="qs-score"><span>⚖️ {blocks.length}/{totalTasks}</span><span>🏆 {best}</span></div>}</div>
-  {!started&&<h1 className="screen-title">⚖️ {basic ? 'Блиц · 15 слов' : 'Суперблиц · 24 слова'}</h1>}
-  {!started?<div className="qs-intro"><p>{cards.length} слов · {totalTasks} заданий в двух направлениях · 5 секунд на ответ.</p><p>Правильный ответ уравновешивает чаши. Ошибка или время вышло — перевес, и кубики падают. Трудный вопрос появится первым при новой попытке.</p><p>🏆 Рекорд: {recordText}</p><button className="big-button" onClick={start}>{basic ? '⚡ Начать блиц' : '⚡ Начать суперблиц'}</button></div>:<>
+  <>
    <p className="qs-total-time" aria-label="Общее время ответов">⏱ {formatAnswerTime(answerTime)}</p>
    <div className="qs-timer-top"><div className={'qs-circle'+(seconds<=3?' qs-circle-urgent':'')} role="progressbar" aria-label="Время на ответ" aria-valuemin={0} aria-valuemax={5} aria-valuenow={failed||completed?0:Math.ceil(seconds)}>
       <svg viewBox="0 0 100 100" aria-hidden="true"><circle className="qs-ring-bg" cx="50" cy="50" r="43"/><circle className="qs-ring" cx="50" cy="50" r="43" pathLength="100" strokeDasharray="100" strokeDashoffset={100-(failed?0:seconds/5*100)}/></svg><span>{failed?'0':feedback||completed?'✓':Math.ceil(seconds)}</span>
@@ -163,6 +175,6 @@ export function QuestionsBlitzScreen({onBack, variant = 'super'}:{onBack:()=>voi
    {completed?<div className="qs-end"><p>{totalTasks} из {totalTasks} — отлично! 🎉</p><p>Время правильных ответов: {formatAnswerTime(correctTime.current)}</p><button className="big-button" onClick={start}>Играть снова</button></div>:failed?<div className="qs-end"><p>Правильно: <b>{cards[q][0]}</b> — {cards[q][1]}</p><p>Очки: {blocks.length} из {totalTasks} · Рекорд: {recordText}</p><p>Время правильных ответов: {formatAnswerTime(correctTime.current)}</p><button className="big-button" onClick={start}>Играть снова</button></div>:<div className="qs-answers">{options.map(i=><button key={i} className={'qs-answer'+(feedback&&i===q?' qs-correct':'')} disabled={feedback} onClick={()=>answer(i)}>{cards[i][reverse?1:0]}</button>)}</div>}
    </div>
 
-  </>}
+  </>
  </div>;
 }

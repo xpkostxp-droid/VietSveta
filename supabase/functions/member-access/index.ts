@@ -36,11 +36,13 @@ Deno.serve(async req=>{
   if(body.action==='profile')return reply({profile});
   if(body.action==='leaderboard'){
    if(!['questions-15','questions-24','harvest-40'].includes(body.game))return reply({error:'game'},400);
-   const {data:players}=await admin.from('participants').select('id,display_name,user_id').eq('active',true).eq('is_admin',false);
-   const ids=(players??[]).map(p=>p.user_id).filter(Boolean);
-   const {data:results,error}=await admin.from('game_attempts').select('user_id,correct,correct_time_ms').eq('game',body.game).in('user_id',ids).order('correct',{ascending:false}).order('correct_time_ms');
-   if(error)throw error;
-   const rows=(players??[]).map(p=>({id:p.id,name:p.display_name,best:results?.find(r=>r.user_id===p.user_id)??null}));
+   const {data:players,error:playersError}=await admin.from('participants').select('id,display_name,user_id').eq('active',true).eq('is_admin',false);
+   if(playersError)throw playersError;
+   const rows=await Promise.all((players??[]).map(async p=>{
+    const {data,error}=await admin.from('game_attempts').select('correct,correct_time_ms').eq('game',body.game).eq('user_id',p.user_id).order('correct',{ascending:false}).order('correct_time_ms').limit(1);
+    if(error)throw error;
+    return {id:p.id,name:p.display_name,best:data?.[0]??null};
+   }));
    rows.sort((a,b)=>!a.best?(b.best?1:0):!b.best?-1:b.best.correct-a.best.correct||a.best.correct_time_ms-b.best.correct_time_ms);
    return reply({rows});
   }
