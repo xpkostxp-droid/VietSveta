@@ -322,8 +322,9 @@ a:focus-visible {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   box-shadow:
-    0 5px 0 rgba(64, 65, 57, 0.28),
-    0 11px 15px -5px rgba(15, 10, 5, 0.42),
+    0 6px 0 rgba(39, 37, 30, 0.45),
+    0 10px 7px -2px rgba(15, 10, 5, 0.65),
+    0 18px 22px -5px rgba(15, 10, 5, 0.65),
     inset 2px 2px 3px rgba(255, 255, 255, 0.95),
     inset -3px -4px 7px rgba(59, 69, 63, 0.18);
 }
@@ -1172,4 +1173,13 @@ a:focus-visible {
 }
 @media (prefers-reduced-motion: reduce) {
   .home-tile { transition: none; }
+}
+
+/* Emoji glyphs need their own centered line box, unlike the SVG icons. */
+.home-tile-game .home-tile-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  transform: translateY(2px);
 }
