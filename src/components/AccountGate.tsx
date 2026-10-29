@@ -5,7 +5,7 @@ import { cachedMember, cacheMember, memberRequest, signInMember, startAccountSyn
 import { setStorageOwner } from '../domain/accountStorage';
 import { ProfileScreen } from './ProfileScreen';
 import './AccountGate.css';
-const roster=[['svetlana','Светлана'],['lesya','Леся'],['sergey-p','Сергей П'],['sergey-k','Сергей К'],['marina','Марина'],['konstantin','Константин']];
+const roster=[['svetlana','Светлана'],['lesya','Леся'],['sergey-p','Сергей П'],['sergey-k','Сергей К'],['marina','Марина'],['konstantin','Константин'],['artur','Артур']];
 function clearLegacyProgress() {
  if(localStorage.getItem('vietSveta.cleanStart.v1'))return;
  for(const key of Object.keys(localStorage))if(/^(vietCards\.|vietSveta\.|vietsveta\.)/.test(key)&&!/^vietSveta\.(auth\.|member\.|account\.|sentAttempts\.)/.test(key))localStorage.removeItem(key);
