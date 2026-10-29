@@ -35,7 +35,7 @@ Deno.serve(async req=>{
   if(!profile)return reply({error:'Учётная запись отключена'},403);
   if(body.action==='profile')return reply({profile});
   if(body.action==='leaderboard'){
-   if(!['questions-15','questions-24','harvest-40','adjectives-tetris','adjectives-rope','adjectives-cannon'].includes(body.game))return reply({error:'game'},400);
+   if(!['questions-15','questions-24','harvest-40','harvest-fruits','harvest-vegetables','adjectives-tetris','adjectives-rope','adjectives-cannon'].includes(body.game))return reply({error:'game'},400);
    const {data:players,error:playersError}=await admin.from('participants').select('id,display_name,user_id').eq('active',true).eq('is_admin',false);
    if(playersError)throw playersError;
    const rows=await Promise.all((players??[]).map(async p=>{

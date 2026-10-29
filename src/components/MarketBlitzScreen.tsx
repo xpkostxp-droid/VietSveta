@@ -31,7 +31,10 @@ function loadErrors(): number[] {
 function saveErrors(indices: number[]) { writeJSON(storageKey, indices.map(taskKey)); }
 type Phase = 'question' | 'success' | 'wrong' | 'timeout' | 'answer';
 
-export function MarketBlitzScreen({ onBack }: { onBack: () => void }) {
+export function MarketBlitzScreen({ onBack, category = 'all' }: { onBack: () => void; category?: 'all' | 'fruits' | 'vegetables' }) {
+  const tasks = allHarvestTasks.filter(t => category === 'all' || products[productForTask(t)][3] === category);
+  const game = category === 'all' ? 'harvest-40' : category === 'fruits' ? 'harvest-fruits' : 'harvest-vegetables';
+  const title = category === 'all' ? '⚡ Суперблиц · фрукты и овощи' : category === 'fruits' ? '🍉 Фрукты' : '🥕 Овощи';
   const isReview = useRef(false);
   const answerClock = useRef(createAnswerClock());
   const [answerTime, setAnswerTime] = useState(0);
@@ -149,14 +152,11 @@ export function MarketBlitzScreen({ onBack }: { onBack: () => void }) {
   }
   useEffect(() => {
     if (!started || active) return;
-    if (!isReview.current) updateGameRecord('harvest-40',{correct:collected.length,correctTimeMs:correctTime.current});
-    saveTimedAttempt({game:isReview.current ? 'harvest-review' : 'harvest-40',correct:collected.length,total:round.length,answerTimeMs:answerClock.current.value(),correctTimeMs:correctTime.current,completed:true});
+    if (!isReview.current) updateGameRecord(game,{correct:collected.length,correctTimeMs:correctTime.current});
+    saveTimedAttempt({game:isReview.current ? 'harvest-review' : game,correct:collected.length,total:round.length,answerTimeMs:answerClock.current.value(),correctTimeMs:correctTime.current,completed:true});
   }, [active]);
-  if(!started||(!active&&!isReview.current))return <div className="screen ranking-screen"><BackButton onClick={onBack} label="К выбору игры"/><h1 className="screen-title">🍉 Фрукты и овощи · Блиц</h1>
-    {!started&&<p>20 продуктов · 40 заданий в двух направлениях.<br/>Три варианта · 5 секунд на ответ.</p>}
-    <GameRanking game="harvest-40" total={40} onStart={()=>start(allHarvestTasks)} startLabel={started?'Новый блиц':'Начать проверку'} result={started?{correct:collected.length,time:correctTime.current}:undefined}>
-     {saved.length>0&&<button className="secondary-button" style={{width:'100%',marginTop:16}} onClick={()=>start(saved,true)}>Добрать урожай — {saved.length}</button>}
-    </GameRanking>
+  if(!started||(!active&&!isReview.current))return <div className="screen ranking-screen"><BackButton onClick={onBack} label="К выбору игры"/><h1 className="screen-title">{title}</h1>
+    <GameRanking game={game} total={tasks.length} onStart={()=>start(tasks)} startAtBottom startLabel={started?'Играть ещё':'Начать'} result={started?{correct:collected.length,time:correctTime.current}:undefined}/>
   </div>;
   const current = products[productForTask(round[position])];
   const pictureAnswers = isPictureAnswer(round[position]);
@@ -164,7 +164,7 @@ export function MarketBlitzScreen({ onBack }: { onBack: () => void }) {
   const showAnswer = phase === 'success' || phase === 'answer';
   return <div className={'screen market-screen harvest-screen' + (active ? ' harvest-playing' : '')}>
     <BackButton onClick={onBack} label="К выбору игры" />
-    <h1 className="screen-title">🍉 Спаси урожай</h1>
+    <h1 className="screen-title">{title}</h1>
     {active ? <>
       <div className="harvest-play-header"><span>Задание {position + 1}/{round.length}</span><span>⏱ {formatAnswerTime(answerTime)} · 🧺 {collected.length}</span></div>
       <div className="harvest-question-bar">
@@ -193,7 +193,7 @@ export function MarketBlitzScreen({ onBack }: { onBack: () => void }) {
       <p className="blitz-result">Собрано {collected.length} из {round.length}</p><p>Лучшая серия: {best} 🔥</p><p>Время правильных ответов: {formatAnswerTime(correctTime.current)}</p>
       {errors.length > 0 && <ul className="blitz-errors">{errors.map(i => <li key={i}>{products[productForTask(i)][0]} {products[productForTask(i)][2]} — <strong>{isPictureAnswer(i) ? 'узнать название' : 'вспомнить название'}</strong></li>)}</ul>}
       {saved.length > 0 && <button className="big-button" onClick={() => start(saved, true)}>Добрать урожай — {saved.length}</button>}
-      <button className="secondary-button" onClick={() => start(allHarvestTasks)}>Новый блиц</button>
+      <button className="secondary-button" onClick={() => start(tasks)}>Новый блиц</button>
     </div>}
   </div>;
 }

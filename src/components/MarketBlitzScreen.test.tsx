@@ -35,7 +35,7 @@ beforeEach(async () => {
 });
 afterEach(async () => { await act(async () => root.unmount()); node.remove(); vi.useRealTimers(); });
 it('has three choices, visits products once, explodes on a final error and clears it after a clean retry', async () => {
-  await click('Начать проверку'); const seen = new Set<string>();
+  await click('Начать'); const seen = new Set<string>();
   for(let i=0;i<products.length * 2;i++) {
     const correct = answer(); expect(seen.has(correct)).toBe(false); seen.add(correct);
     const options = [...node.querySelectorAll<HTMLButtonElement>('.blitz-option')];
@@ -52,12 +52,10 @@ it('has three choices, visits products once, explodes on a final error and clear
   }
   expect(seen.size).toBe(products.length * 2); expect(node.textContent).toContain('39 из 40');
   expect(node.textContent).toContain('Лучшие попытки');
-  await click('Добрать урожай — 1'); await chooseCorrect(); await time(1700);
-  expect(node.textContent).toContain('Весь урожай спасён!');
-  expect(JSON.parse(localStorage.getItem(key)!)).toEqual([]);
+  expect(node.textContent).not.toContain('Добрать урожай');
 });
 it('times out at five seconds, records the word, and starts the next card with a fresh timer', async () => {
-  await click('Начать проверку'); const word = answer(); await time(4900);
+  await click('Начать'); const word = answer(); await time(4900);
   expect(node.querySelector('.harvest-question')).toBeTruthy(); await time(100);
   expect(node.querySelector('.harvest-timeout')).toBeTruthy();
   expect(audio.explode).toHaveBeenCalledTimes(1);
@@ -66,7 +64,7 @@ it('times out at five seconds, records the word, and starts the next card with a
   expect(node.querySelector('[role="progressbar"]')?.getAttribute('aria-valuenow')).toBe('5');
 });
 it('pauses hidden tabs and requires explicit resume with the remaining time', async () => {
-  await click('Начать проверку'); await time(2000);
+  await click('Начать'); await time(2000);
   Object.defineProperty(document, 'hidden', { configurable: true, value: true });
   await act(async () => document.dispatchEvent(new Event('visibilitychange')));
   await time(20000); expect(node.textContent).toContain('Пауза');
@@ -75,7 +73,7 @@ it('pauses hidden tabs and requires explicit resume with the remaining time', as
   await time(100); expect(node.querySelector('.harvest-timeout')).toBeTruthy();
 });
 it('does not accept a rapid second answer or lose the saved error when leaving early', async () => {
-  await click('Начать проверку'); const correct = answer();
+  await click('Начать'); const correct = answer();
   const buttons = [...node.querySelectorAll<HTMLButtonElement>('.blitz-option')];
   const wrong = buttons.find(b=>b.textContent !== correct)!;
   const right = buttons.find(b=>b.textContent === correct)!;
@@ -86,7 +84,7 @@ it('does not accept a rapid second answer or lose the saved error when leaving e
 });
 
 it('warns only at three, two and one seconds and reveals the answer after the explosion', async () => {
-  await click('Начать проверку');
+  await click('Начать');
   await time(1900); expect(audio.beep).not.toHaveBeenCalled();
   await time(100); expect(audio.beep).toHaveBeenCalledTimes(1);
   await time(1000); expect(audio.beep).toHaveBeenCalledTimes(2);
@@ -98,4 +96,25 @@ it('warns only at three, two and one seconds and reveals the answer after the ex
   await time(699); expect(node.querySelector('.harvest-answer-slot strong')?.textContent).not.toBe(correct);
   await time(1); expect(node.querySelector('.harvest-answer-slot strong')?.textContent).toBe(correct);
   expect(audio.beep).toHaveBeenCalledTimes(3);
+});
+
+it.each([['fruits',22,'harvest-fruits'],['vegetables',18,'harvest-vegetables']] as const)('finishes %s only, continues after mistakes and saves a separate timed result', async (category,total,game) => {
+ await act(async()=>root.render(<MarketBlitzScreen category={category} onBack={()=>{}}/>));
+ await click('Начать');
+ const seen=new Set<string>();
+ for(let i=0;i<total;i++) {
+  const correct=answer(); seen.add(correct);
+  const word=node.querySelector('.harvest-word-prompt')?.textContent;
+  const ru=node.querySelector('[role="img"]')?.getAttribute('aria-label');
+  const product=products.find(p=>word?p[1]===word:p[2]===ru)!;
+  expect(product[3]).toBe(category);
+  await time(200);
+  if(i===0){await act(async()=>optionButtons().find(b=>b.getAttribute('aria-label')!==correct)!.click());await time(700);}
+  else await chooseCorrect();
+  await time(1700);
+ }
+ expect(seen.size).toBe(total);
+ const attempt=JSON.parse(localStorage.getItem('vietSveta.timedAttempts.v1')!).at(-1);
+ expect(attempt).toMatchObject({game,total,correct:total-1,correctTimeMs:(total-1)*200,completed:true});
+ expect(node.textContent).toContain(`${total-1} из ${total}`);
 });
