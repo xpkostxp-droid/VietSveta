@@ -42,7 +42,7 @@ type Screen =
   | { name: 'cards-setup'; lessonId: string }
   | { name: 'training'; lessonId: string; direction: Direction; order: CardOrder };
 
-function App({ memberId, memberName, syncStatus, onOpenProfile }: { isAdmin?: boolean; memberId?: string; memberName?: string; syncStatus?: string; onOpenProfile?: () => void } = {}) {
+function App({ memberId, memberName, syncStatus, onOpenProfile, courseGroup='advanced' }: { courseGroup?: 'beginner'|'advanced'; isAdmin?: boolean; memberId?: string; memberName?: string; syncStatus?: string; onOpenProfile?: () => void } = {}) {
   const [screen, setScreen] = useState<Screen>({ name: 'home' });
 
   switch (screen.name) {
@@ -63,7 +63,7 @@ function App({ memberId, memberName, syncStatus, onOpenProfile }: { isAdmin?: bo
       );
 
     case 'group-selection':
-      return <GroupSelection section={screen.section} onBack={()=>setScreen({name:'home'})} onChoose={group=>setScreen(group==='beginner'?{name:'beginner',section:screen.section}:screen.section==='games'?{name:'games-menu'}:screen.section==='theory'?{name:'theory-list'}:screen.section==='cards'?{name:'cards-lesson-list'}:{name:'listening'})}/>;
+      return <GroupSelection preferredGroup={courseGroup} section={screen.section} onBack={()=>setScreen({name:'home'})} onChoose={group=>setScreen(group==='beginner'?{name:'beginner',section:screen.section}:screen.section==='games'?{name:'games-menu'}:screen.section==='theory'?{name:'theory-list'}:screen.section==='cards'?{name:'cards-lesson-list'}:{name:'listening'})}/>;
     case 'beginner':
       return <Suspense fallback={<div className="screen"><BackButton onClick={()=>setScreen({name:'group-selection',section:screen.section})} label="К выбору группы"/><p role="status">Загружаем материалы…</p></div>}><div className="beginner-area"><BeginnerApp key={screen.section} section={screen.section} onBack={()=>setScreen({name:'group-selection',section:screen.section})}/></div></Suspense>;
 

@@ -23,7 +23,7 @@ Deno.serve(async req=>{
    const auth = createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}});
    const {data,error:authError}=await auth.auth.signInWithPassword({email:c.email,password:c.password});
    if(authError||!data.session)return reply({error:'Не удалось войти. Попробуй позже.'},503);
-   const {data:profile}=await admin.from('participants').select('id,display_name,is_admin,user_id').eq('user_id',data.user.id).eq('active',true).single();
+   const {data:profile}=await admin.from('participants').select('id,display_name,is_admin,user_id,course_group,ranking_since').eq('user_id',data.user.id).eq('active',true).single();
    if(!profile)return reply({error:'Нет доступа'},403);
    return reply({session:{access_token:data.session.access_token,refresh_token:data.session.refresh_token},profile});
   }
@@ -31,15 +31,15 @@ Deno.serve(async req=>{
   if(!token)return reply({error:'Войди в приложение'},401);
   const {data:{user},error:authError}=await admin.auth.getUser(token);
   if(authError||!user)return reply({error:'Войди снова'},401);
-  const {data:profile}=await admin.from('participants').select('id,display_name,is_admin,user_id').eq('user_id',user.id).eq('active',true).single();
+  const {data:profile}=await admin.from('participants').select('id,display_name,is_admin,user_id,course_group,ranking_since').eq('user_id',user.id).eq('active',true).single();
   if(!profile)return reply({error:'Учётная запись отключена'},403);
   if(body.action==='profile')return reply({profile});
   if(body.action==='leaderboard'){
    if(!['questions-15','questions-24','harvest-40','harvest-fruits','harvest-vegetables','adjectives-tetris','adjectives-rope','adjectives-cannon'].includes(body.game))return reply({error:'game'},400);
-   const {data:players,error:playersError}=await admin.from('participants').select('id,display_name,user_id').eq('active',true).eq('is_admin',false);
+   const {data:players,error:playersError}=await admin.from('participants').select('id,display_name,user_id,ranking_since').eq('active',true).eq('is_admin',false);
    if(playersError)throw playersError;
    const rows=await Promise.all((players??[]).map(async p=>{
-    const {data,error}=await admin.from('game_attempts').select('correct,correct_time_ms').eq('game',body.game).eq('user_id',p.user_id).order('correct',{ascending:false}).order('correct_time_ms').limit(1);
+    const {data,error}=await admin.from('game_attempts').select('correct,correct_time_ms').eq('game',body.game).eq('user_id',p.user_id).gte('created_at',p.ranking_since??'1970-01-01T00:00:00Z').order('correct',{ascending:false}).order('correct_time_ms').limit(1);
     if(error)throw error;
     return {id:p.id,name:p.display_name,best:data?.[0]??null};
    }));

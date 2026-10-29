@@ -1183,3 +1183,7 @@ a:focus-visible {
   line-height: 1;
   transform: translateY(2px);
 }
+
+/* The participant's course is emphasized without hiding the other group. */
+.group-choice { background: #fffdf8; color: #0b5f59; border: 2px solid #9fcfc8; }
+.group-choice.group-preferred { background: #0f7a72; color: white; border-color: #0b5f59; box-shadow: 0 0 0 3px #eed18d, 0 7px 14px -6px #174f4966; }

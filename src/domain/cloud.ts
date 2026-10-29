@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { accountEntries, applyAccountEntries, type AccountEntries } from './accountStorage';
 export const supabase = createClient('https://eqdlhipzjhbzfchwjazr.supabase.co','sb_publishable_TX1Cf_ARp8EGWs37lbP3Yw_o43pfuyU',{global:{fetch:(input,init)=>fetch(input,{...init,signal:init?.signal??AbortSignal.timeout(15000)})},auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,storageKey:'vietSveta.auth.v1'}});
-export interface Member { id:string; display_name:string; is_admin:boolean; user_id:string }
+export interface Member { id:string; display_name:string; is_admin:boolean; user_id:string; course_group?:'beginner'|'advanced'; ranking_since?:string|null }
 export async function memberRequest(body:Record<string,unknown>) {
  const {data:{session}}=await supabase.auth.getSession();
  const response=await fetch('https://eqdlhipzjhbzfchwjazr.supabase.co/functions/v1/member-access',{

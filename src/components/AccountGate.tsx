@@ -5,7 +5,7 @@ import { cachedMember, cacheMember, memberRequest, signInMember, startAccountSyn
 import { setStorageOwner } from '../domain/accountStorage';
 import { ProfileScreen } from './ProfileScreen';
 import './AccountGate.css';
-const roster=[['svetlana','Светлана'],['lesya','Леся'],['sergey-p','Сергей П'],['sergey-k','Сергей К'],['marina','Марина'],['konstantin','Константин · админ']];
+const roster=[['svetlana','Светлана'],['lesya','Леся'],['sergey-p','Сергей П'],['sergey-k','Сергей К'],['marina','Марина'],['konstantin','Константин']];
 function clearLegacyProgress() {
  if(localStorage.getItem('vietSveta.cleanStart.v1'))return;
  for(const key of Object.keys(localStorage))if(/^(vietCards\.|vietSveta\.|vietsveta\.)/.test(key)&&!/^vietSveta\.(auth\.|member\.|account\.|sentAttempts\.)/.test(key))localStorage.removeItem(key);
@@ -42,7 +42,7 @@ export function AccountGate() {
   await supabase.auth.signOut({scope:'local'});setStorageOwner(null);setMember(null);setProfile(false);setSelected('');setPin('');setBusy(false);
  };
  if(loading)return <div className="screen account-screen"><h1>VietSveta</h1><p role="status">Открываем приложение…</p></div>;
- if(member)return profile?<ProfileScreen member={member} status={status} onBack={()=>setProfile(false)} onLogout={logout} busy={busy}/>:<App isAdmin={member.is_admin} memberId={member.id} memberName={member.display_name+(member.is_admin?' · админ':'')} syncStatus={status} onOpenProfile={()=>setProfile(true)}/>;
+ if(member)return profile?<ProfileScreen member={member} status={status} onBack={()=>setProfile(false)} onLogout={logout} busy={busy}/>:<App courseGroup={member.course_group} isAdmin={member.is_admin} memberId={member.id} memberName={member.display_name+(member.is_admin?' · админ':'')} syncStatus={status} onOpenProfile={()=>setProfile(true)}/>;
  return <div className="screen account-screen"><div className="account-brand">🇻🇳 VietSveta</div><h1>{selected?'Введи свой код':'Вход в приложение'}</h1>
   {selected?<form onSubmit={e=>{e.preventDefault();if(pin.length===4&&!busy)void login();}}>
    <p className="account-person"><MemberAvatar id={selected} name={roster.find(p=>p[0]===selected)?.[1]??''} size={48}/>{roster.find(p=>p[0]===selected)?.[1]}</p>
