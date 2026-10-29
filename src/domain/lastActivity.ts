@@ -45,4 +45,8 @@ export function saveLastActivity(lessonId: LessonId, mode: ActivityMode): void {
     updatedAt: new Date().toISOString(),
   };
   writeJSON(STORAGE_KEY, activity);
+  if (mode === 'theory') {
+    const visits = readJSON('vietCards.theoryVisits.v1');
+    writeJSON('vietCards.theoryVisits.v1', { ...(visits && typeof visits === 'object' ? visits : {}), [lessonId]: activity.updatedAt });
+  }
 }

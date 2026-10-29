@@ -1,0 +1,3 @@
+[functions.member-access]
+# Login verifies PINs; all authenticated actions validate Supabase Auth tokens in the body.
+verify_jwt = false

@@ -1,6 +1,9 @@
 import { BookIcon, CardsIcon, ChevronRightIcon, SpeakerOnIcon } from './icons';
 
 interface Props {
+  memberName?: string;
+  syncStatus?: string;
+  onOpenProfile?: () => void;
   onOpenGame: () => void;
   onOpenListening: () => void;
   onOpenTheory: () => void;
@@ -9,9 +12,10 @@ interface Props {
   onOpenPhoneticaTest: () => void;
 }
 
-export function HomeScreen({ onOpenGame, onOpenListening, onOpenTheory, onOpenCards, onOpenPronunciation, onOpenPhoneticaTest }: Props) {
+export function HomeScreen({ memberName, syncStatus, onOpenProfile, onOpenGame, onOpenListening, onOpenTheory, onOpenCards, onOpenPronunciation, onOpenPhoneticaTest }: Props) {
   return (
     <div className="screen screen-home">
+      {memberName && <div className="home-account"><button onClick={onOpenProfile}>👤 {memberName}</button><small aria-live="polite">{syncStatus}</small></div>}
       <div className="home-tiles">
         <button className="home-tile home-tile-blue home-tile-game" onClick={onOpenGame}><span className="home-tile-icon" aria-hidden="true">🎮</span><span className="home-tile-label">Игра</span></button>
         <button className="home-tile home-tile-teal home-tile-listening" onClick={onOpenListening}>

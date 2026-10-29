@@ -34,7 +34,7 @@ type Screen =
   | { name: 'cards-setup'; lessonId: string }
   | { name: 'training'; lessonId: string; direction: Direction; order: CardOrder };
 
-function App() {
+function App({ memberName, syncStatus, onOpenProfile }: { memberName?: string; syncStatus?: string; onOpenProfile?: () => void } = {}) {
   const [screen, setScreen] = useState<Screen>({ name: 'home' });
 
   switch (screen.name) {
@@ -44,6 +44,7 @@ function App() {
       // по-прежнему запоминается через saveLastActivity ниже, на будущее.
       return (
         <HomeScreen
+          memberName={memberName} syncStatus={syncStatus} onOpenProfile={onOpenProfile}
           onOpenGame={() => setScreen({ name: 'games-menu' })}
           onOpenListening={() => setScreen({ name: 'listening' })}
           onOpenTheory={() => setScreen({ name: 'theory-list' })}

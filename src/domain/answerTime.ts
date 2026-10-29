@@ -30,5 +30,5 @@ export function saveTimedAttempt(attempt: TimedAttempt) {
   const key = 'vietSveta.timedAttempts.v1';
   const existing = readJSON(key);
   const rows = Array.isArray(existing) ? existing : [];
-  writeJSON(key, [...rows.slice(-99), { ...attempt, date: new Date().toISOString() }]);
+  writeJSON(key, [...rows.slice(-99), { ...attempt, id: crypto.randomUUID(), date: new Date().toISOString() }]);
 }
