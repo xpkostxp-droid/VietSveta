@@ -9,3 +9,15 @@
 @keyframes rope-dust-burst{0%{opacity:0;transform:scale(.3)}20%{opacity:1}100%{opacity:0;transform:scale(2.6)}}
 @media(max-height:650px){.rope-playing .rope-scene{height:150px}.rope-playing .rope-plaque span{font-size:clamp(1.35rem,5.8vw,1.8rem)}.rope-playing .at-feedback{height:66px;min-height:66px}.rope-playing .at-feedback strong{font-size:1.4rem}}
 @media(prefers-reduced-motion:reduce){.rope-failed .rope-hanger{animation:none;opacity:.3}.rope-shards i,.rope-dust{animation:none!important}.rope-shards{display:none}}
+
+/* Irregular wood fragments: broad splinters, triangular chips and narrow slivers. */
+.rope-shards i{width:24%;height:78%;left:1%;top:0;clip-path:polygon(0 7%,73% 0,100% 29%,62% 54%,89% 100%,12% 85%,27% 46%);--dx:-92px;--dy:-45px;--spin:-145deg;animation-duration:.82s;background:linear-gradient(20deg,#b38b50,#f0d196 48%,#d4a862);border-radius:2px}
+.rope-shards i:nth-child(2){width:15%;height:49%;left:20%;top:26%;clip-path:polygon(8% 0,100% 27%,67% 100%,0 64%,26% 39%);--dx:-55px;--dy:-64px;--spin:195deg;animation-duration:.68s}
+.rope-shards i:nth-child(3){width:28%;height:64%;left:32%;top:5%;clip-path:polygon(0 22%,41% 0,100% 18%,82% 53%,94% 91%,37% 100%,53% 58%);--dx:-14px;--dy:-38px;--spin:-70deg;animation-duration:.92s}
+.rope-shards i:nth-child(4){width:19%;height:89%;left:57%;top:-5%;clip-path:polygon(20% 0,100% 13%,75% 52%,91% 100%,0 69%,39% 36%);--dx:37px;--dy:-69px;--spin:155deg;animation-duration:.76s}
+.rope-shards i:nth-child(5){width:22%;height:43%;left:75%;top:24%;clip-path:polygon(0 15%,100% 0,77% 100%,31% 74%);--dx:92px;--dy:-28px;--spin:-210deg;animation-duration:.87s}
+.rope-shards i:nth-child(6){width:8%;height:55%;left:10%;top:33%;clip-path:polygon(43% 0,100% 81%,0 100%);--dx:-115px;--dy:-19px;--spin:260deg;animation-duration:.61s}
+.rope-shards i:nth-child(7){width:7%;height:24%;left:47%;top:45%;clip-path:polygon(0 0,100% 38%,26% 100%);--dx:59px;--dy:-91px;--spin:330deg;animation-duration:.73s}
+.rope-shards i:nth-child(8){width:5%;height:38%;left:84%;top:6%;clip-path:polygon(0 0,100% 61%,26% 100%);--dx:121px;--dy:-48px;--spin:-300deg;animation-duration:.66s}
+.rope-shards i:nth-child(9){width:10%;height:20%;left:36%;top:76%;clip-path:polygon(7% 0,100% 20%,41% 100%,0 62%);--dx:-41px;--dy:-84px;--spin:220deg;animation-duration:.79s}
+@keyframes rope-fragment{0%{opacity:1;transform:translate(0,0) rotate(0)}38%{opacity:1;transform:translate(calc(var(--dx)*.56),var(--dy)) rotate(calc(var(--spin)*.4))}78%{opacity:.85;transform:translate(calc(var(--dx)*.86),30px) rotate(calc(var(--spin)*.85))}100%{opacity:0;transform:translate(var(--dx),60px) rotate(var(--spin))}}
