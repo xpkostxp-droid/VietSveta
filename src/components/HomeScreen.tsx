@@ -31,7 +31,7 @@ export function HomeScreen({ memberId, memberName, onOpenProfile, onOpenGame, on
         </button>
         <button className="home-tile home-tile-teal home-tile-phonetics-test" onClick={onOpenPhoneticaTest}>
           <SpeakerOnIcon className="home-tile-icon" />
-          <span className="home-tile-label">Фонетика тест</span>
+          <span className="home-tile-label">Фонетика<br />Тест</span>
         </button>
 
         <button className="home-tile home-tile-blue home-tile-study" onClick={onOpenTheory}>

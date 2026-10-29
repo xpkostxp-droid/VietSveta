@@ -317,11 +317,9 @@ a:focus-visible {
   border-radius: var(--radius);
   text-align: left;
   transition: transform 0.12s ease, box-shadow 0.12s ease;
-  /* Стеклянные плитки: фон просвечивает, но чуть плотнее и с рамкой
-     поярче, чем в первой версии — на реальном iPhone совсем слабая
-     заливка и тонкая рамка были почти не видны поверх фото. */
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  /* A pale glass surface keeps labels readable over the illustrated background. */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   box-shadow:
     0 18px 30px -12px rgba(15, 10, 5, 0.55),
     inset 0 1px 0 rgba(255, 255, 255, 0.65),
@@ -336,12 +334,12 @@ a:focus-visible {
 }
 
 .home-tile-blue {
-  background: rgba(229, 241, 251, 0.4);
+  background: rgba(250, 252, 253, 0.88);
   color: var(--color-blue-text);
 }
 
 .home-tile-teal {
-  background: rgba(225, 245, 243, 0.4);
+  background: rgba(248, 253, 251, 0.88);
   color: var(--color-primary-dark);
 }
 
@@ -354,10 +352,11 @@ a:focus-visible {
 
 .home-tile-label {
   flex: 1;
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--color-text);
-  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.7), 0 0 7px rgba(255, 255, 255, 0.4);
+  font-size: clamp(1.05rem, 5vw, 1.25rem);
+  font-weight: 800;
+  line-height: 1.15;
+  color: #101817;
+  text-shadow: none;
 }
 
 .home-tile-chevron {
@@ -1154,3 +1153,8 @@ a:focus-visible {
 .learning-card button { margin: 0; min-height: 52px; padding: 8px; font-size: 1.15rem; font-weight: 800; line-height: 1.25; overflow-wrap: anywhere; }
 .learning-card .learning-ratings { display: grid; grid-template-rows: repeat(3, 1fr); gap: 8px; margin: 0; }
 @media (max-height: 720px) { .learning-card { grid-template-rows: 72px 28px 52px 62px 170px; gap: 6px; padding: 10px; } .learning-card .market-product { font-size: 62px; line-height: 72px; } .learning-card .market-answer { height: 52px; } .market-learning-active .screen-title { font-size: 1.15rem; } }
+
+/* Keep the longest home label whole on narrow phones. */
+.home-tiles .home-tile-listening { padding-inline: 8px; gap: 5px; }
+.home-tile-listening .home-tile-icon { width: 22px; height: 22px; }
+.home-tile-listening .home-tile-label { font-size: clamp(0.95rem, 4.7vw, 1.25rem); overflow-wrap: normal; }
