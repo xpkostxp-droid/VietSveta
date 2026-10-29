@@ -1,3 +1,4 @@
+import { MemberAvatar } from './MemberAvatar';
 import { useEffect, useState } from 'react';
 import App from '../App';
 import { cachedMember, cacheMember, memberRequest, signInMember, startAccountSync, supabase, syncAccount, type Member } from '../domain/cloud';
@@ -41,14 +42,14 @@ export function AccountGate() {
   await supabase.auth.signOut({scope:'local'});setStorageOwner(null);setMember(null);setProfile(false);setSelected('');setPin('');setBusy(false);
  };
  if(loading)return <div className="screen account-screen"><h1>VietSveta</h1><p role="status">Открываем приложение…</p></div>;
- if(member)return profile?<ProfileScreen member={member} status={status} onBack={()=>setProfile(false)} onLogout={logout} busy={busy}/>:<App memberName={member.display_name+(member.is_admin?' · админ':'')} syncStatus={status} onOpenProfile={()=>setProfile(true)}/>;
+ if(member)return profile?<ProfileScreen member={member} status={status} onBack={()=>setProfile(false)} onLogout={logout} busy={busy}/>:<App memberId={member.id} memberName={member.display_name+(member.is_admin?' · админ':'')} syncStatus={status} onOpenProfile={()=>setProfile(true)}/>;
  return <div className="screen account-screen"><div className="account-brand">🇻🇳 VietSveta</div><h1>{selected?'Введи свой код':'Вход в приложение'}</h1>
   {selected?<form onSubmit={e=>{e.preventDefault();if(pin.length===4&&!busy)void login();}}>
-   <p className="account-person">{roster.find(p=>p[0]===selected)?.[1]}</p>
+   <p className="account-person"><MemberAvatar id={selected} name={roster.find(p=>p[0]===selected)?.[1]??''} size={48}/>{roster.find(p=>p[0]===selected)?.[1]}</p>
    <label htmlFor="member-pin">Четыре цифры</label><input id="member-pin" type="password" inputMode="numeric" autoComplete="current-password" pattern="[0-9]{4}" maxLength={4} value={pin} onChange={e=>setPin(e.target.value.replace(/\D/g,''))} autoFocus disabled={busy}/>
    <button className="big-button" disabled={pin.length!==4||busy}>{busy?'Входим…':'Войти'}</button>
    <button className="account-back" type="button" disabled={busy} onClick={()=>{setSelected('');setPin('');setError('');}}>← Другое имя</button>
-  </form>:<><p className="account-description">Выбери своё имя. Вход запомнится на этом телефоне.</p><div className="account-roster">{roster.map(([id,name])=><button key={id} onClick={()=>{setSelected(id);setError('');}}>{id==='konstantin'?'⚙️':'👤'} {name}</button>)}</div></>}
+  </form>:<><p className="account-description">Выбери своё имя. Вход запомнится на этом телефоне.</p><div className="account-roster">{roster.map(([id,name])=><button key={id} onClick={()=>{setSelected(id);setError('');}}><MemberAvatar id={id} name={name}/><span>{name}</span></button>)}</div></>}
   {error&&<p className="account-error" role="alert">{error}</p>}
  </div>;
 }
