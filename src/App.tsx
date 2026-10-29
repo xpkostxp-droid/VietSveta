@@ -24,7 +24,7 @@ type Screen =
   | { name: 'game' }
   | { name: 'games-menu' }
   | { name: 'adjectives-menu' }
-  | { name: 'adjectives-tetris'; variant?:'tetris'|'rope' }
+  | { name: 'adjectives-tetris'; variant?:'tetris'|'rope'|'cannon' }
   | { name: 'questions-menu' }
   | { name: 'questions-blitz'; variant?: 'super' | 'basic' }
   | { name: 'listening' }
@@ -63,7 +63,7 @@ function App({ memberId, memberName, syncStatus, onOpenProfile, isAdmin = false 
 
     case 'adjectives-menu':
       if(!isAdmin)return null;
-      return <div className="screen"><BackButton onClick={()=>setScreen({name:'games-menu'})} label="К играм"/><h1 className="screen-title">Прилагательные</h1><p>🧪 Тестовый режим · только для администратора</p>{adjectiveSets.map((set,i)=><button key={set.title} className="lesson-item" disabled={i>1} onClick={()=>setScreen({name:'adjectives-tetris',variant:i===1?'rope':'tetris'})}><span style={{fontSize:'1.2rem',fontWeight:800,lineHeight:1.4}}>{i+1}. {set.title}<br/><small>{set.words.length} слов · {set.words.length*2} заданий · {i===0?'Тетрис':i===1?'Удержи слово':'Скоро'}</small></span></button>)}</div>;
+      return <div className="screen"><BackButton onClick={()=>setScreen({name:'games-menu'})} label="К играм"/><h1 className="screen-title">Прилагательные</h1><p>🧪 Тестовый режим · только для администратора</p>{adjectiveSets.map((set,i)=><button key={set.title} className="lesson-item" onClick={()=>setScreen({name:'adjectives-tetris',variant:i===2?'cannon':i===1?'rope':'tetris'})}><span style={{fontSize:'1.2rem',fontWeight:800,lineHeight:1.4}}>{i+1}. {set.title}<br/><small>{set.words.length} слов · {set.words.length*2} заданий · {i===0?'Тетрис':i===1?'Удержи слово':'Словесная пушка'}</small></span></button>)}</div>;
     case 'adjectives-tetris':
       return isAdmin?<AdjectiveTetris key={screen.variant??'tetris'} variant={screen.variant} onBack={()=>setScreen({name:'adjectives-menu'})}/>:null;
 

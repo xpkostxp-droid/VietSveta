@@ -51,3 +51,17 @@ it('rope breaks before revealing a wrong answer and continues after a timeout',a
  await time(1300);expect(node.querySelector('.at-top')!.textContent).toContain('2/36');
  await time(5000);expect(node.querySelector('.rope-failed')).toBeTruthy();await time(700);expect(node.querySelector('.at-right')).toBeTruthy();await time(1300);expect(node.querySelector('.at-top')!.textContent).toContain('3/36');
 });
+async function cannonMode(){await act(async()=>root.unmount());root=createRoot(node);await act(async()=>root.render(<AdjectiveTetris variant="cannon" onBack={()=>{}}/>));expect(node.textContent).toContain('17 слов · 34 заданий');await click('Начать тест');}
+it('cannon covers all 34 third-set tasks and keeps results private',async()=>{
+ await cannonMode();const seen=new Set<string>();
+ for(let i=0;i<34;i++){
+  const prompt=node.querySelector('.cannon-word span')!.textContent!,reverse=i%2===1;
+  seen.add(`${prompt}:${reverse}`);const pair=adjectiveSets[2].words.find(w=>w[reverse?0:1]===prompt)!;
+  expect(pair).toBeTruthy();await time(100);await click(pair[reverse?1:0]);expect(node.querySelector('.cannon-ball')).toBeTruthy();await time(1300);
+ }
+ expect(seen.size).toBe(34);expect(node.textContent).toContain('34 из 34');expect(localStorage.length).toBe(0);
+});
+it('cannon gets crushed before revealing the translation and then continues',async()=>{
+ await cannonMode();await time(5000);expect(node.querySelector('.cannon-failed')).toBeTruthy();expect(node.querySelector('.at-right')).toBeNull();
+ await time(700);expect(node.querySelector('.at-right')).toBeTruthy();await time(1300);expect(node.querySelector('.at-top')!.textContent).toContain('2/34');expect(node.querySelector('.cannon-question')).toBeTruthy();
+});
