@@ -12,10 +12,10 @@ interface Props {
   onOpenPhoneticaTest: () => void;
 }
 
-export function HomeScreen({ memberName, syncStatus, onOpenProfile, onOpenGame, onOpenListening, onOpenTheory, onOpenCards, onOpenPronunciation, onOpenPhoneticaTest }: Props) {
+export function HomeScreen({ memberName, onOpenProfile, onOpenGame, onOpenListening, onOpenTheory, onOpenCards, onOpenPronunciation, onOpenPhoneticaTest }: Props) {
   return (
     <div className="screen screen-home">
-      {memberName && <div className="home-account"><button onClick={onOpenProfile}>👤 {memberName}</button><small aria-live="polite">{syncStatus}</small></div>}
+      {memberName && <div className="home-account"><button onClick={onOpenProfile} aria-label={`Профиль: ${memberName}`}><span className="home-avatar" aria-hidden="true">{memberName.trim().charAt(0)}</span><span>{memberName}</span></button></div>}
       <div className="home-tiles">
         <button className="home-tile home-tile-blue home-tile-game" onClick={onOpenGame}><span className="home-tile-icon" aria-hidden="true">🎮</span><span className="home-tile-label">Игра</span></button>
         <button className="home-tile home-tile-teal home-tile-listening" onClick={onOpenListening}>
