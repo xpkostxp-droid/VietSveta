@@ -38,7 +38,7 @@ type Screen =
   | { name: 'cards-setup'; lessonId: string }
   | { name: 'training'; lessonId: string; direction: Direction; order: CardOrder };
 
-function App({ memberId, memberName, syncStatus, onOpenProfile, isAdmin = false }: { isAdmin?: boolean; memberId?: string; memberName?: string; syncStatus?: string; onOpenProfile?: () => void } = {}) {
+function App({ memberId, memberName, syncStatus, onOpenProfile }: { isAdmin?: boolean; memberId?: string; memberName?: string; syncStatus?: string; onOpenProfile?: () => void } = {}) {
   const [screen, setScreen] = useState<Screen>({ name: 'home' });
 
   switch (screen.name) {
@@ -59,13 +59,12 @@ function App({ memberId, memberName, syncStatus, onOpenProfile, isAdmin = false 
       );
 
     case 'games-menu':
-      return <div className="screen"><BackButton onClick={() => setScreen({ name: 'home' })} label="На главную"/><h1 className="screen-title">Игры</h1><button className="lesson-item" onClick={() => setScreen({ name: 'game' })}><span className="lesson-title" style={{ fontSize: '1.35rem', fontWeight: 800, color: '#174f49', lineHeight: 1.35 }}>🍎 Овощи-фрукты</span></button><button className="lesson-item" onClick={() => setScreen({ name: 'questions-menu' })}><span className="lesson-title" style={{ fontSize: '1.35rem', fontWeight: 800, color: '#174f49', lineHeight: 1.35 }}>❓ Вопросительные слова</span></button>{isAdmin&&<button className="lesson-item" onClick={()=>setScreen({name:'adjectives-menu'})}><span className="lesson-title" style={{fontSize:'1.35rem',fontWeight:800,color:'#174f49'}}>🧪 Прилагательные</span></button>}</div>;
+      return <div className="screen"><BackButton onClick={() => setScreen({ name: 'home' })} label="На главную"/><h1 className="screen-title">Игры</h1><button className="lesson-item" onClick={() => setScreen({ name: 'game' })}><span className="lesson-title" style={{ fontSize: '1.35rem', fontWeight: 800, color: '#174f49', lineHeight: 1.35 }}>🍎 Овощи-фрукты</span></button><button className="lesson-item" onClick={() => setScreen({ name: 'questions-menu' })}><span className="lesson-title" style={{ fontSize: '1.35rem', fontWeight: 800, color: '#174f49', lineHeight: 1.35 }}>❓ Вопросительные слова</span></button>{<button className="lesson-item" onClick={()=>setScreen({name:'adjectives-menu'})}><span className="lesson-title" style={{fontSize:'1.35rem',fontWeight:800,color:'#174f49'}}>🧪 Прилагательные</span></button>}</div>;
 
     case 'adjectives-menu':
-      if(!isAdmin)return null;
-      return <div className="screen"><BackButton onClick={()=>setScreen({name:'games-menu'})} label="К играм"/><h1 className="screen-title">Прилагательные</h1><p>🧪 Тестовый режим · только для администратора</p>{adjectiveSets.map((set,i)=><button key={set.title} className="lesson-item" onClick={()=>setScreen({name:'adjectives-tetris',variant:i===2?'cannon':i===1?'rope':'tetris'})}><span style={{fontSize:'1.2rem',fontWeight:800,lineHeight:1.4}}>{i+1}. {set.title}<br/><small>{set.words.length} слов · {set.words.length*2} заданий · {i===0?'Тетрис':i===1?'Удержи слово':'Словесная пушка'}</small></span></button>)}</div>;
+      return <div className="screen"><BackButton onClick={()=>setScreen({name:'games-menu'})} label="К играм"/><h1 className="screen-title">Прилагательные</h1><div className="market-options" style={{gap:16}}>{adjectiveSets.map((set,i)=><button key={set.title} className="big-button" onClick={()=>setScreen({name:'adjectives-tetris',variant:i===2?'cannon':i===1?'rope':'tetris'})}><span style={{fontSize:'1.2rem',fontWeight:800,lineHeight:1.4}}>{i+1}. {set.title}<br/><small>{set.words.length} слов · {set.words.length*2} заданий · {i===0?'Тетрис':i===1?'Удержи слово':'Словесная пушка'}</small></span></button>)}</div></div>;
     case 'adjectives-tetris':
-      return isAdmin?<AdjectiveTetris key={screen.variant??'tetris'} variant={screen.variant} onBack={()=>setScreen({name:'adjectives-menu'})}/>:null;
+      return <AdjectiveTetris key={screen.variant??'tetris'} variant={screen.variant} onBack={()=>setScreen({name:'adjectives-menu'})}/>;
 
     case 'questions-menu':
       return <div className="screen market-screen"><BackButton onClick={() => setScreen({ name: 'games-menu' })} label="К играм"/><h1 className="screen-title">Вопросительные слова</h1><div className="market-options"><button className="big-button" style={{ minHeight: 100, fontSize: '1.35rem' }} onClick={() => setScreen({ name: 'questions-blitz', variant: 'super' })}>⚖️ Суперблиц · 24 слова</button><button className="big-button" style={{ minHeight: 100, fontSize: '1.35rem' }} onClick={() => setScreen({ name: 'questions-blitz', variant: 'basic' })}>⚡ Блиц · 15 слов</button></div></div>;

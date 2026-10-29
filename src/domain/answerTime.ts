@@ -19,7 +19,7 @@ export function createAnswerClock() {
   };
 }
 export interface TimedAttempt {
-  game: 'questions-24' | 'questions-15' | 'harvest-40' | 'harvest-review';
+  game: 'questions-24' | 'questions-15' | 'harvest-40' | 'harvest-review' | 'adjectives-tetris' | 'adjectives-rope' | 'adjectives-cannon';
   correct: number;
   total: number | null;
   answerTimeMs: number;

@@ -5,7 +5,7 @@ import { MemberAvatar } from './MemberAvatar';
 import './GameRanking.css';
 type Result={correct:number;time:number};
 const before=new Map<string,ReturnType<typeof rankPlayers>>();
-export function GameRanking({game,total,onStart,startLabel='Начать игру',result,children}:{game:string;total:number;onStart:()=>void;startLabel?:string;result?:Result;children?:React.ReactNode}) {
+export function GameRanking({game,total,onStart,startLabel='Начать игру',result,children,startAtBottom=false}:{game:string;total:number;onStart:()=>void;startLabel?:string;result?:Result;children?:React.ReactNode;startAtBottom?:boolean}) {
  const member=cachedMember();
  const key=`${member?.user_id}:${game}`;
  const [rows,setRows]=useState<ReturnType<typeof rankPlayers>>([]);
@@ -39,7 +39,7 @@ export function GameRanking({game,total,onStart,startLabel='Начать игр�
  const seconds=(ms:number)=>(ms/1000).toFixed(2).replace('.',',');
  return <section className="game-ranking">
   {result&&<div className="ranking-result" aria-live="polite"><h2>Твоя попытка</h2><strong>{result.correct} из {total} · {seconds(result.time)} сек</strong>{notice&&<p>{notice}</p>}{member?.is_admin&&<p>Тест администратора · вне рейтинга</p>}</div>}
-  <button className="big-button ranking-start" onClick={()=>{if(rows.length)before.set(key,rows);onStart();}}>{startLabel}</button>
+  {!startAtBottom&&(<button className="big-button ranking-start" onClick={()=>{if(rows.length)before.set(key,rows);onStart();}}>{startLabel}</button>)}
   <h2 className="ranking-heading">🏆 Лучшие попытки</h2><p className="ranking-caption">За всё время · больше ответов, затем быстрее</p>
   {busy&&<p role="status">Обновляем рейтинг…</p>}
   {error&&<div role="status"><p>{error}</p><button className="secondary-button" onClick={()=>setRetry(n=>n+1)}>Обновить рейтинг</button></div>}
@@ -49,5 +49,6 @@ export function GameRanking({game,total,onStart,startLabel='Начать игр�
    <div className="ranking-person"><strong>{row.name}{row.id===member?.id?' · ты':''}</strong><span>{row.best?`${row.best.correct} из ${total} · ${seconds(row.best.correct_time_ms)} сек`:'Пока нет результата'}</span></div>
   </li>)}</ol>}
   {children}
+  {startAtBottom&&(<button className="big-button ranking-start" onClick={()=>{if(rows.length)before.set(key,rows);onStart();}}>{startLabel}</button>)}
  </section>;
 }

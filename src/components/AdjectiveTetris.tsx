@@ -1,3 +1,6 @@
+import { GameRanking } from './GameRanking';
+import { saveTimedAttempt } from '../domain/answerTime';
+import { updateGameRecord } from '../domain/gameRecord';
 import { CannonWordScene } from './CannonWordScene';
 import { RopeWordScene } from './RopeWordScene';
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
@@ -7,13 +10,15 @@ import { createCountdownSound } from '../domain/countdownSound';
 import { speakVietnamese,stopSpeaking } from '../domain/speech';
 import './AdjectiveTetris.css';
 type Task={word:number;reverse:boolean};
-type Round={tasks:Task[];at:number;options:number[];board:WordBlock[];correct:number;time:number;lines:number;phase:'question'|'feedback'|'end';success:boolean;chosen:number|null;clearing:boolean};
+type Round={tasks:Task[];at:number;options:number[];board:WordBlock[];correct:number;time:number;answerTime:number;lines:number;phase:'question'|'feedback'|'end';success:boolean;chosen:number|null;clearing:boolean};
 export function AdjectiveTetris({onBack,variant='tetris'}:{onBack:()=>void;variant?:'tetris'|'rope'|'cannon'}){
  const rope=variant==='rope';
  const cannon=variant==='cannon';
  const animated=rope||cannon;
  const set=adjectiveSets[cannon?2:rope?1:0];
  const words=set.words;
+ const gameId=cannon?'adjectives-cannon':rope?'adjectives-rope':'adjectives-tetris';
+ const attemptSaved=useRef(false);
  const choices=(word:number)=>shuffleItems([word,...shuffleItems(words.map((_,i)=>i).filter(i=>i!==word)).slice(0,2)]);
  const [revealed,setRevealed]=useState(false);
  const [round,setRound]=useState<Round|null>(null);
@@ -22,10 +27,11 @@ export function AdjectiveTetris({onBack,variant='tetris'}:{onBack:()=>void;varia
  const sound=useRef<ReturnType<typeof createCountdownSound>|null>(null),lastBeep=useRef(5);
  const task=round?.tasks[round.at];
  function begin(){
+  attemptSaved.current=false;
   sound.current??=createCountdownSound();sound.current.unlock();stopSpeaking();
   setRevealed(false);
   const tasks=adjectiveTasks(words.length);locked.current=false;pausedRef.current=false;setPaused(false);setLeft(5000);lastBeep.current=5;deadline.current=Date.now()+5000;
-  setRound({tasks,at:0,options:choices(tasks[0].word),board:[],correct:0,time:0,lines:0,phase:'question',success:false,chosen:null,clearing:false});
+  setRound({tasks,at:0,options:choices(tasks[0].word),board:[],correct:0,time:0,answerTime:0,lines:0,phase:'question',success:false,chosen:null,clearing:false});
  }
  function answer(choice:number|null){
   if(!round||!task||round.phase!=='question'||locked.current||pausedRef.current)return;
@@ -36,7 +42,7 @@ export function AdjectiveTetris({onBack,variant='tetris'}:{onBack:()=>void;varia
   const landed=landWordBlock(round.board,{correct:success,label});
   setRevealed(!animated||success);
   if(!animated||success)speakVietnamese(label);
-  setLeft(0);setRound({...round,chosen:choice,success,correct:round.correct+(success?1:0),time:round.time+(success?elapsed:0),lines:round.lines+(landed.clear?1:0),board:[...round.board,{correct:success,label}],clearing:landed.clear,phase:'feedback'});
+  setLeft(0);setRound({...round,chosen:choice,success,correct:round.correct+(success?1:0),time:round.time+(success?elapsed:0),answerTime:round.answerTime+elapsed,lines:round.lines+(landed.clear?1:0),board:[...round.board,{correct:success,label}],clearing:landed.clear,phase:'feedback'});
  }
  useEffect(()=>{
   if(!round||paused)return;
@@ -66,8 +72,13 @@ export function AdjectiveTetris({onBack,variant='tetris'}:{onBack:()=>void;varia
  },[round]);
  useEffect(()=>()=>{stopSpeaking();sound.current?.close();},[]);
  const resume=()=>{if(document.hidden)return;deadline.current=Date.now()+frozen.current;sound.current?.unlock();pausedRef.current=false;setPaused(false);};
- if(!round)return <div className="screen at-screen"><BackButton onClick={onBack} label="К наборам"/><p className="at-test">🧪 Тест · только для администратора</p><h1>{cannon?'Словесная пушка':rope?'Удержи слово':'Тетрис прилагательных'}</h1><h2>{set.title}</h2><p>{words.length} слов · {words.length*2} заданий · 5 секунд на ответ</p><div className="at-instructions">{cannon?<><p>Слово медленно падает на пушку. Выбери правильный перевод — пушка выстрелит и разобьёт табличку!</p><p>Ошибка или время вышло — табличка сплющит пушку. Затем появится правильный перевод, пушка расправится и игра продолжится.</p></>:rope?<><p>Табличка со словом качается на тросах. Выбери перевод — и спаси слово!</p><p>Верный ответ поднимет табличку. Ошибка или время вышло — тросы оборвутся, а затем появится правильный перевод. Игра продолжается до конца.</p></>:<><p>Выбери перевод из трёх вариантов. Правильный ответ — цветной кубик, ошибка — серый.</p><p>Собери ряд из пяти цветных кубиков — он исчезнет! После ошибки игра продолжается до конца.</p></>}</div><button className="big-button" onClick={begin}>Начать тест</button><p className="at-note">Результат этой игры не сохраняется и не участвует в рейтинге.</p></div>;
- if(round.phase==='end')return <div className="screen at-screen"><BackButton onClick={onBack} label="К наборам"/><p className="at-test">🧪 Тест завершён</p><h1>Раунд закончен!</h1><div className="at-summary"><strong>{round.correct} из {round.tasks.length}</strong>{!animated&&<p>Собрано рядов: {round.lines}</p>}<p>Время правильных ответов: {(round.time/1000).toFixed(2).replace('.',',')} сек</p></div><button className="big-button" onClick={begin}>Попробовать ещё</button><p className="at-note">Тестовый результат · без сохранения и рейтинга</p></div>;
+ useEffect(()=>{
+  if(round?.phase!=='end'||attemptSaved.current)return;
+  attemptSaved.current=true;
+  updateGameRecord(gameId,{correct:round.correct,correctTimeMs:round.time});
+  saveTimedAttempt({game:gameId,correct:round.correct,total:round.tasks.length,answerTimeMs:round.answerTime,correctTimeMs:round.time,completed:true});
+ },[round,gameId]);
+ if(!round||round.phase==='end')return <div className="screen ranking-screen"><BackButton onClick={onBack} label="К наборам"/><h1 className="screen-title">{set.title}</h1><GameRanking game={gameId} total={words.length*2} onStart={begin} startAtBottom startLabel={round?'Играть ещё':'Начать'} result={round?{correct:round.correct,time:round.time}:undefined}/></div>;
  const current=task!;const row=5-Math.floor(round.board.length/5),col=round.board.length%5;
  return <div className={'screen at-screen at-playing'+(animated?' rope-playing':'')}>
   <div className="at-top"><BackButton onClick={onBack} label="Назад"/><span>{round.at+1}/{round.tasks.length} · ✓ {round.correct}</span><div className={'at-clock'+(left<=3000?' at-urgent':'')} aria-label="Время на ответ"><svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="25" className="at-track"/><circle cx="30" cy="30" r="25" pathLength="100" strokeDasharray="100" strokeDashoffset={100-left/50}/></svg><strong>{paused?'Ⅱ':round.phase==='feedback'?(round.success?'✓':'×'):Math.ceil(left/1000)}</strong></div></div>
@@ -82,7 +93,6 @@ export function AdjectiveTetris({onBack,variant='tetris'}:{onBack:()=>void;varia
   <div className={animated?'rope-instruction':'at-prompt'}><small>{current.reverse?'Выбери перевод':'Переведи на вьетнамский'}</small>{!animated&&<strong>{words[current.word][current.reverse?0:1]}</strong>}</div>
   <div className="at-feedback" aria-live="polite">{round.phase==='feedback'&&revealed?<><b>{round.success?(cannon?'Попадание!':rope?'Слово спасено!':round.clearing?'Ряд собран! ✨':'Верно!'):'Правильный ответ:'}</b><strong>{words[current.word][current.reverse?1:0]}</strong></>:' '}</div>
   <div className="at-options">{round.options.map(i=><button key={i} disabled={round.phase!=='question'||paused} className={round.phase==='feedback'&&revealed?(i===current.word?'at-right':i===round.chosen?'at-wrong':''):''} onClick={()=>answer(i)}>{words[i][current.reverse?1:0]}</button>)}</div>
-  <p className="at-note">🧪 Тест администратора · без рейтинга</p>
   {paused&&<div className="at-pause"><h2>Пауза</h2><button className="big-button" onClick={resume}>Продолжить</button></div>}
  </div>;
 }
