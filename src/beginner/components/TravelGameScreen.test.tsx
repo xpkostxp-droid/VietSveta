@@ -31,7 +31,7 @@ it('has two groups, every word twice, three options and only question distractor
   expect(host.textContent).not.toContain('Обучение');
   for (const group of ['countries', 'travel'] as const) {
     const tasks = travelBlitzTasks(group);
-    expect(tasks).toHaveLength(group === 'countries' ? 30 : 40);
+    expect(tasks).toHaveLength(group === 'countries' ? 30 : 34);
     expect(new Set(tasks.map(t => `${t.index}:${t.reverse}`)).size).toBe(tasks.length);
     for (const task of tasks) {
       const options = travelBlitzOptions(task, group);
@@ -71,7 +71,7 @@ it('pauses a hidden question until explicit resume and excludes the pause from t
   Object.defineProperty(document, 'hidden', { configurable: true, value: false });
   click('Продолжить'); act(() => vi.advanceTimersByTime(1000)); click(correctAnswer());
   expect(host.textContent).toContain('Верно!');
-  act(() => vi.advanceTimersByTime(1600)); expect(host.querySelector('.work-status')!.textContent).toContain('2/40 · ✓ 1');
+  act(() => vi.advanceTimersByTime(1600)); expect(host.querySelector('.work-status')!.textContent).toContain('2/34 · ✓ 1');
 });
 
 it('beeps once on 3, 2, 1 and stops after an answer', () => {
@@ -82,13 +82,13 @@ it('beeps once on 3, 2, 1 and stops after an answer', () => {
   act(() => vi.advanceTimersByTime(1500));
   expect(sounds.beep).toHaveBeenCalledTimes(3);
 });
-it('finishes all forty city and travel tasks and saves its separate ranking result', () => {
+it('finishes all thirty-four city and travel tasks and saves its separate ranking result', () => {
   start('Города и путешествия');
-  for (let i = 0; i < 40; i++) {
+  for (let i = 0; i < 34; i++) {
     act(() => vi.advanceTimersByTime(500)); click(correctAnswer());
     act(() => vi.advanceTimersByTime(1600));
   }
-  expect(host.textContent).toContain('Правильно: 40 из 40');
+  expect(host.textContent).toContain('Правильно: 34 из 34');
   expect(attempts.save).toHaveBeenCalledTimes(1);
-  expect(attempts.save).toHaveBeenCalledWith(expect.objectContaining({ game: 'lesson7-travel', correct: 40, total: 40, correctTimeMs: 20000 }));
+  expect(attempts.save).toHaveBeenCalledWith(expect.objectContaining({ game: 'lesson7-travel', correct: 34, total: 34, correctTimeMs: 17000 }));
 });

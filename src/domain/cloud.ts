@@ -27,7 +27,7 @@ export async function syncAccount(id:string) {
  const ackKey=`vietSveta.sentAttempts.${id}`;
  let sent:string[]=[];try{sent=JSON.parse(localStorage.getItem(ackKey)??'[]');}catch{/* retry */}
  if(Array.isArray(attempts)){
-  const pending=attempts.filter(a=>a?.id&&a.game!=='harvest-review'&&!sent.includes(a.id));
+  const pending=attempts.filter(a=>a?.id&&a.game!=='harvest-review'&&!(a.game==='lesson7-travel'&&a.total!==34)&&!sent.includes(a.id));
   if(pending.length){
    const rows=pending.map(a=>({id:a.id,user_id:id,game:a.game,correct:a.correct,total:a.total,correct_time_ms:Math.round(a.correctTimeMs),created_at:a.date}));
    const {error:e}=await supabase.from('game_attempts').upsert(rows,{onConflict:'id',ignoreDuplicates:true});if(e)throw e;
