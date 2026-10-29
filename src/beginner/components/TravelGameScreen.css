@@ -1,0 +1,2 @@
+.beginner-area .travel-blitz .work-prompt div.family-picture { display: flex; align-items: center; justify-content: center; height: 148px; max-height: 148px; width: min(100%, 270px); line-height: 1 !important; font-size: 92px !important; margin: 0 auto; }
+@media (max-height: 740px) { .beginner-area .travel-blitz .work-prompt div.family-picture { height: 118px; max-height: 118px; font-size: 78px !important; } }

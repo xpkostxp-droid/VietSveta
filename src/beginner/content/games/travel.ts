@@ -25,3 +25,22 @@ export const travelWords = [
 ] as const;
 export function travelIndices(category: TravelCategory) { return travelWords.map((_,i)=>i).filter(i=>category==='all'||travelWords[i][3]===category); }
 export function travelOptions(index: number, pool: number[]) { return shuffled([index,...shuffled(pool.filter(i=>i!==index)).slice(0,5)]); }
+
+export type TravelBlitzGroup = 'countries' | 'travel';
+export type TravelTask = { index: number; reverse: boolean };
+export const travelBlitzGroups = [
+ { id: 'countries' as const, label: 'Страны', words: 15 },
+ { id: 'travel' as const, label: 'Города и путешествия', words: 20 },
+];
+export function travelBlitzPool(group: TravelBlitzGroup) {
+ return travelIndices('all').filter(i => group === 'countries' ? travelWords[i][3] === 'countries' : travelWords[i][3] !== 'countries');
+}
+export function travelBlitzTasks(group: TravelBlitzGroup): TravelTask[] {
+ return shuffled(travelBlitzPool(group).flatMap(index => [{ index, reverse: false }, { index, reverse: true }]));
+}
+export function travelBlitzAnswer(task: TravelTask): string { return travelWords[task.index][task.reverse ? 2 : 1]; }
+export function travelBlitzOptions(task: TravelTask, group: TravelBlitzGroup): string[] {
+ const question = travelWords[task.index][1].endsWith('?');
+ const candidates = travelBlitzPool(group).filter(i => i !== task.index && travelWords[i][1].endsWith('?') === question);
+ return shuffled([travelBlitzAnswer(task), ...shuffled(candidates).slice(0, 2).map(i => travelWords[i][task.reverse ? 2 : 1])]);
+}
