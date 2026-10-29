@@ -32,9 +32,9 @@ it('times out, shows the translation, and continues instead of ending the round'
 
 async function ropeMode(){await act(async()=>root.unmount());root=createRoot(node);await act(async()=>root.render(<AdjectiveTetris variant="rope" onBack={()=>{}}/>));await click('Начать тест');}
 it('rope mode tests all 18 second-set words both ways without saving results',async()=>{
- await ropeMode();const seen=new Set<string>();
+ await ropeMode();expect(node.querySelector('.at-prompt')).toBeNull();const seen=new Set<string>();
  for(let i=0;i<36;i++){
-  const prompt=node.querySelector('.at-prompt strong')!.textContent!,reverse=i%2===1;
+  const prompt=node.querySelector('.rope-plaque span')!.textContent!,reverse=i%2===1;
   seen.add(`${prompt}:${reverse}`);const pair=adjectiveSets[1].words.find(w=>w[reverse?0:1]===prompt)!;
   expect(pair).toBeTruthy();await time(100);await click(pair[reverse?1:0]);
   expect(node.querySelector('.rope-success')).toBeTruthy();await time(1300);
@@ -42,7 +42,7 @@ it('rope mode tests all 18 second-set words both ways without saving results',as
  expect(seen.size).toBe(36);expect(node.textContent).toContain('36 из 36');expect(node.textContent).not.toContain('Собрано рядов');expect(localStorage.length).toBe(0);
 });
 it('rope breaks before revealing a wrong answer and continues after a timeout',async()=>{
- await ropeMode();const prompt=node.querySelector('.at-prompt strong')!.textContent!;
+ await ropeMode();const prompt=node.querySelector('.rope-plaque span')!.textContent!;
  const pair=adjectiveSets[1].words.find(w=>w[1]===prompt)!;
  const wrong=[...node.querySelectorAll<HTMLButtonElement>('.at-options button')].find(b=>b.textContent!==pair[0])!;
  await act(async()=>wrong.click());expect(node.querySelector('.rope-failed')).toBeTruthy();
