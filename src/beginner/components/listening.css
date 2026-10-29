@@ -1,0 +1,47 @@
+.beginner-area .screen-listening { max-width: 760px; }
+.beginner-area .listening-lessons { display: grid; gap: 12px; }
+.beginner-area .listening-heading { font-size: 1.15rem; margin: 8px 0; }
+.beginner-area .listening-vocabulary { margin: 0; border: 1px solid var(--color-border); border-radius: 18px; overflow: hidden; background: var(--color-surface); }
+.beginner-area .listening-vocabulary > div { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 16px; padding: 14px 16px; }
+.beginner-area .listening-vocabulary > div + div { border-top: 1px solid var(--color-border); }
+.beginner-area .listening-vocabulary dt { color: var(--color-primary-dark); font-weight: 700; }
+.beginner-area .listening-vocabulary dd { margin: 0; }
+.beginner-area .listening-vocabulary dt, .beginner-area .listening-vocabulary dd { overflow-wrap: break-word; }
+.beginner-area .listening-start { position: sticky; bottom: 0; padding: 12px 0 calc(12px + env(safe-area-inset-bottom, 0px)); background: var(--color-bg); }
+.beginner-area .listening-start button { width: 100%; }
+.beginner-area .listening-progress { width: 100%; height: 10px; accent-color: var(--color-primary); }
+.beginner-area .listening-player { background: var(--color-primary-soft); border-radius: 24px; padding: 22px 16px; text-align: center; }
+.beginner-area .listening-player p { margin: 8px 0 18px; font-weight: 600; }
+.beginner-area .listening-sound { font-size: 3rem; color: var(--color-primary-dark); }
+.beginner-area .listening-sound.is-playing { animation: beginner-listening-pulse 1s ease-in-out infinite alternate; }
+.beginner-area .listening-controls { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; }
+.beginner-area .listening-controls button { min-height: 48px; }
+.beginner-area .listening-feedback { min-height: 48px; font-size: .95rem; }
+.beginner-area .listening-choices { display: grid; gap: 12px; }
+.beginner-area .listening-choice { min-height: 62px; border: 2px solid var(--color-border); border-radius: 999px; padding: 16px 24px; background: var(--color-surface); color: var(--color-text); font: inherit; font-size: 1rem; line-height: 1.4; }
+.beginner-area .listening-choice:disabled { opacity: .65; }
+.beginner-area .listening-choice.is-wrong { background: #fff0eb; border-color: var(--color-alert-text); opacity: 1; }
+.beginner-area .listening-choice.is-correct { background: var(--color-primary-soft); border-color: var(--color-primary); opacity: 1; }
+.beginner-area .listening-error { color: var(--color-alert-text); margin: 0; }
+.beginner-area .listening-transcript { padding-left: 2rem; background: var(--color-surface); border-radius: 18px; margin: 0; }
+.beginner-area .listening-transcript li { padding: 12px 16px 12px 0; line-height: 1.6; }
+@keyframes beginner-listening-pulse { from { opacity: .5; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .beginner-area .listening-sound.is-playing { animation: none; } }
+@media (max-width: 360px) { .beginner-area .listening-vocabulary > div { gap: 10px; padding: 12px; } .beginner-area .listening-choice { padding: 14px 18px; } }
+
+.beginner-area .course-audio-player { position: sticky; top: 0; z-index: 5; padding: 12px 0; background: var(--bg, #f8faf9); }
+.beginner-area .course-audio-player audio { display: block; width: 100%; }
+.beginner-area .course-dialogue { display: grid; gap: 12px; padding-bottom: 24px; }
+.beginner-area .course-dialogue-line { display: grid; gap: 8px; width: 100%; padding: 18px; text-align: left; color: inherit; font: inherit; border: 2px solid transparent; border-radius: 16px; background: rgba(255,255,255,.65); cursor: pointer; scroll-margin-block: 100px 24px; }
+.beginner-area .course-dialogue-line.is-current { border-color: #168c96; background: #dff5f4; color: #123e43; }
+.beginner-area .course-dialogue-line:focus-visible { outline: 3px solid #168c96; outline-offset: 2px; }
+.beginner-area .course-dialogue-vi { font-size: 1.15rem; font-weight: 650; line-height: 1.6; }
+.beginner-area .course-dialogue-ru { font-size: 1rem; line-height: 1.5; opacity: .8; }
+@media (prefers-reduced-motion: reduce) { .beginner-area .course-dialogue-line { scroll-behavior: auto; } }
+
+.beginner-area .course-word { border-radius: 5px; }
+.beginner-area .course-word.is-speaking { color: #fff; background: #087981; box-shadow: 0 0 0 3px #087981; }
+
+.beginner-area .course-translation-controls [aria-pressed="true"] { border-color: var(--color-primary); background: var(--color-primary-soft); }
+
+.beginner-area .song-player { background: var(--color-bg); padding-top: max(12px, env(safe-area-inset-top, 0px)); }

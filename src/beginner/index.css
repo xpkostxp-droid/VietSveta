@@ -1,0 +1,1316 @@
+/* ==========================================================================
+   Палитра: тёплый кремовый фон + бирюзовые акценты (вариант «Бирюзовый»).
+   Основной бирюзовый цвет подобран так, чтобы белый текст на кнопках
+   проходил проверку контраста (≈5:1, что выше требуемых 4.5:1 для AA).
+   Тёмно-зелёные и оранжевые заливки кнопок сознательно не используются.
+   ========================================================================== */
+.beginner-area {
+  color-scheme: light;
+
+  --color-bg: #fbf3e6;
+  --color-surface: #ffffff;
+  --color-surface-alt: #fffdf8;
+
+  --color-text: #23313a;
+  --color-muted: #6c7a86;
+
+  /* Основной бирюзовый — кнопки, активные состояния. */
+  --color-primary: #0f7a72;
+  --color-primary-dark: #0b5f59;
+  --color-primary-soft: #e1f5f3;
+  --color-primary-soft-border: #bfe3df;
+
+  /* Светло-голубой — плитка «Теория» и её акцент. */
+  --color-blue-soft: #e5f1fb;
+  --color-blue-soft-border: #c9e2f6;
+  --color-blue-text: #1c6fa0;
+
+  /* Мягкий акцент для «нужно повторить» — только текст, не заливка кнопки. */
+  --color-alert-text: #b0524a;
+
+  --color-border: #ecdfc4;
+  --radius: 18px;
+  --radius-lg: 24px;
+  --shadow-soft: 0 10px 24px -12px rgba(52, 38, 15, 0.28);
+  --shadow-tile: 0 6px 16px -8px rgba(52, 38, 15, 0.22);
+}
+
+.beginner-area * {
+  box-sizing: border-box;
+}
+
+.beginner-area, .beginner-area {
+  margin: 0;
+  padding: 0;
+}
+
+.beginner-area {
+  background-color: var(--color-bg);
+  /* Лёгкая бумажная фактура: тонкий шум поверх кремового фона. */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.035 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  color: var(--color-text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    'Noto Sans', sans-serif;
+  font-size: 18px;
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+}
+
+.beginner-area {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  justify-content: center;
+}
+
+.beginner-area button {
+  font-family: inherit;
+  font-size: 1rem;
+  /* Без явного color кнопки в Safari на iPhone показывают текст
+     системным синим (акцентный цвет iOS), а не чёрным, как на
+     компьютере, — цвет текста кнопки по умолчанию не наследуется
+     от родителя, если не сказать это явно. */
+  color: inherit;
+  cursor: pointer;
+}
+
+.beginner-area button:focus-visible, .beginner-area a:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* ==========================================================================
+   Общий каркас экрана
+   ========================================================================== */
+
+.beginner-area .screen {
+  width: 100%;
+  max-width: 560px;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: calc(env(safe-area-inset-top, 0px) + 20px) 20px calc(env(safe-area-inset-bottom, 0px) + 24px);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.beginner-area .screen-training {
+  gap: 12px;
+}
+
+.beginner-area .screen-title {
+  font-size: clamp(1.3rem, 4.5vw, 1.7rem);
+  margin: 4px 0;
+  overflow-wrap: break-word;
+}
+
+.beginner-area .back-button {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  color: var(--color-muted);
+  font-size: 1rem;
+  padding: 8px 0;
+  min-height: 44px;
+}
+
+/* ==========================================================================
+   Фоновые иллюстрации на остальных экранах (не главном).
+   Сама картинка задаётся переменной --photo-url в модификаторе экрана;
+   поверх неё — кремовая вуаль, которая почти прозрачна вверху (там у всех
+   картинок небо/пустое место, как раз под заголовок) и уплотняется книзу,
+   чтобы список уроков и карточки не спорили с рисунком за читаемость.
+   Карточки уроков, кнопки выбора и итоговый блок — тоже стеклянные,
+   полупрозрачные, чтобы фото было видно сквозь них; читаемость текста
+   держится на белой подсветке (text-shadow) и небольшом размытии подложки.
+   Важно: селектор написан как .screen.screen-photo (а не просто
+   .screen-photo) — иначе его перебивает правило для широких экранов
+   ниже по файлу (.screen { background: transparent }), из-за чего фон
+   не показывался на десктопе. */
+.beginner-area .screen.screen-photo {
+  background-image: linear-gradient(
+      180deg,
+      rgba(251, 243, 230, 0.12) 0px,
+      rgba(251, 243, 230, 0.55) 320px,
+      rgba(251, 243, 230, 0.72) 480px
+    ),
+    var(--photo-url);
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+}
+
+.beginner-area .screen-photo .screen-title, .beginner-area .screen-photo .back-button {
+  text-shadow: 0 1px 3px rgba(255, 255, 255, 0.75);
+}
+
+.beginner-area .screen-photo .setup-heading, .beginner-area .screen-photo .hint-text, .beginner-area .screen-photo .counter {
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.7);
+}
+
+/* Стеклянные карточки/кнопки поверх фото: сама заливка полупрозрачная,
+   лёгкое размытие держит текст читаемым, белая подсветка текста —
+   дополнительная подстраховка на пёстрых участках картинки. */
+.beginner-area .screen-photo .lesson-item, .beginner-area .screen-photo .choice-button, .beginner-area .screen-photo .summary-box, .beginner-area .screen-photo .placeholder-box, .beginner-area .screen-photo .sound-toggle {
+  background: rgba(255, 255, 255, 0.4);
+  border-color: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.beginner-area .screen-photo .choice-button-active {
+  background: rgba(225, 245, 243, 0.55);
+  border-color: var(--color-primary);
+}
+
+.beginner-area .screen-photo .lesson-title, .beginner-area .screen-photo .lesson-number, .beginner-area .screen-photo .lesson-meta, .beginner-area .screen-photo .lesson-progress-item, .beginner-area .screen-photo .choice-button, .beginner-area .screen-photo .summary-box p {
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.65);
+}
+
+.beginner-area .screen-theory-list {
+  --photo-url: url('/beginner/images/theory-hero.png');
+}
+
+.beginner-area .screen-cards-list {
+  --photo-url: url('/beginner/images/cards-hero.png');
+}
+
+.beginner-area .screen-cards-setup {
+  --photo-url: url('/beginner/images/setup-hero.png');
+}
+
+.beginner-area .screen-summary {
+  --photo-url: url('/beginner/images/summary-hero.png');
+}
+
+/* ==========================================================================
+   Главный экран
+   ========================================================================== */
+
+/* Фото на главном экране — задний фон на весь экран. Поверх — только
+   две полупрозрачные плитки, отбрасывающие тень на фон; больше ничего
+   не перекрывает картинку. */
+.beginner-area .screen.screen-home {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
+  background-image: url('/beginner/images/home-hero-tieng-viet.png');
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+}
+
+.beginner-area .home-tiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.beginner-area .home-tile-pronunciation { grid-column: 1; grid-row: 2; min-width: 0; }
+.beginner-area .home-tile-pronunciation .home-tile-label {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.beginner-area .home-tile-study { grid-row: 3; }
+.beginner-area .home-tile-phonetics-test { grid-column: 2; grid-row: 2; min-width: 0; padding: 10px; gap: 6px; }
+.beginner-area .home-tile-phonetics-test .home-tile-icon { width: 26px; height: 26px; }
+.beginner-area .home-tile-phonetics-test .home-tile-label { min-width: 0; overflow-wrap: anywhere; }
+.beginner-area .phonetics-test-options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.beginner-area .phonetics-test-options button { font-size: 1.6rem; font-weight: 700; min-height: 90px; }
+.beginner-area .phonetics-test-options button:disabled { opacity: 1; cursor: default; }
+.beginner-area .phonetics-test-options .is-correct { border: 2px solid var(--color-primary); background: var(--color-primary-soft); }
+.beginner-area .phonetics-test-options .is-wrong { border: 2px solid var(--color-alert-text); background: #fff0eb; }
+.beginner-area .phonetics-test-feedback { min-height: 48px; font-weight: 600; }
+@media (max-width: 600px) {
+  .beginner-area .home-tile-pronunciation .home-tile-chevron { display: none; }
+  .beginner-area .home-tile-pronunciation { padding: 10px; gap: 6px; }
+  .beginner-area .home-tile-pronunciation .home-tile-icon { width: 26px; height: 26px; }
+  .beginner-area .home-tile-study { padding: 10px; gap: 6px; min-width: 0; }
+  .beginner-area .home-tile-study .home-tile-icon { width: 26px; height: 26px; }
+  .beginner-area .home-tile-study .home-tile-chevron { width: 14px; height: 14px; }
+  .beginner-area .home-tile-study .home-tile-label { min-width: 0; overflow-wrap: anywhere; }
+}
+
+.beginner-area .screen-pronunciation { max-width: 1000px; }
+.beginner-area .pronunciation-controls {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 12px 0;
+  background: var(--color-bg);
+}
+.beginner-area .pronunciation-repeat {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  font-size: .9rem;
+}
+.beginner-area .pronunciation-repeat input { width: 22px; height: 22px; accent-color: var(--color-primary); }
+.beginner-area .pronunciation-rows { display: grid; gap: 18px; }
+.beginner-area .pronunciation-row {
+  padding: 16px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+.beginner-area .pronunciation-row-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 14px; }
+.beginner-area .pronunciation-row-heading h2 { margin: 0; font-size: 1rem; }
+.beginner-area .pronunciation-row-heading h2 span { color: var(--color-primary-dark); font-size: 1.3rem; }
+.beginner-area .pronunciation-row-heading button { min-height: 44px; padding: 8px 12px; font-size: .85rem; }
+.beginner-area .pronunciation-syllables { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; }
+.beginner-area .pronunciation-syllable {
+  min-width: 0;
+  min-height: 68px;
+  padding: 6px 1px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  background: var(--color-primary-soft);
+  font-size: clamp(1rem, 4.3vw, 1.35rem);
+  font-weight: 700;
+}
+.beginner-area .pronunciation-vowel { font-size: .7rem; font-weight: 400; color: var(--color-muted); }
+.beginner-area .pronunciation-syllable-long { font-size: clamp(.8rem, 3.8vw, 1.15rem); }
+.beginner-area .pronunciation-syllable.is-current { background: #ffe49a; border-color: #aa7400; color: #493200; }
+.beginner-area .pronunciation-syllable.is-current .pronunciation-vowel { color: #70500c; }
+.beginner-area .pronunciation-error { color: var(--color-alert-text); margin: 0; }
+@media (min-width: 800px) {
+  .beginner-area .pronunciation-syllables { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+}
+@media (max-width: 360px) {
+  .beginner-area .screen-pronunciation { padding-left: 12px; padding-right: 12px; }
+  .beginner-area .pronunciation-row { padding-left: 8px; padding-right: 8px; }
+  .beginner-area .pronunciation-syllables { gap: 4px; }
+}
+
+.beginner-area .home-tile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 84px;
+  padding: 16px 16px;
+  border: 1.5px solid rgba(255, 255, 255, 0.65);
+  border-radius: var(--radius);
+  text-align: left;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  /* Стеклянные плитки: фон стал плотнее, а рамка заметнее — это держит
+     подписи «Уроки» и «Карточки» читаемыми поверх пёстрого фото, но
+     само размытие почти не трогаем, чтобы фото оставалось живым. */
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  box-shadow:
+    0 18px 30px -12px rgba(15, 10, 5, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65),
+    inset 0 -3px 8px rgba(15, 10, 5, 0.1);
+}
+
+.beginner-area .home-tile:active {
+  transform: scale(0.98);
+  box-shadow:
+    0 8px 16px -10px rgba(15, 10, 5, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+
+.beginner-area .home-tile-blue {
+  background: rgba(229, 241, 251, 0.4);
+  color: var(--color-blue-text);
+}
+
+.beginner-area .home-tile-teal {
+  background: rgba(225, 245, 243, 0.4);
+  color: var(--color-primary-dark);
+}
+
+.beginner-area .home-tile-icon {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  filter: drop-shadow(0 1px 2px rgba(255, 255, 255, 0.7));
+}
+
+.beginner-area .home-tile-label {
+  flex: 1;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-text);
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.7), 0 0 7px rgba(255, 255, 255, 0.4);
+}
+
+.beginner-area .home-tile-chevron {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  opacity: 0.55;
+}
+
+/* ==========================================================================
+   Кнопки общего назначения
+   ========================================================================== */
+
+.beginner-area .big-button {
+  min-height: 60px;
+  padding: 16px 20px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #ffffff;
+  background: var(--color-primary);
+  border: none;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-tile);
+  transition: background-color 0.15s ease;
+}
+
+.beginner-area .big-button:active {
+  background: var(--color-primary-dark);
+}
+
+.beginner-area .secondary-button {
+  min-height: 54px;
+  padding: 14px 20px;
+  font-size: 1.02rem;
+  font-weight: 500;
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+/* ==========================================================================
+   Списки уроков (Теория и Карточки)
+   ========================================================================== */
+
+.beginner-area .lesson-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.beginner-area .lesson-item {
+  width: 100%;
+  text-align: left;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 16px;
+  min-height: 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  box-shadow: var(--shadow-tile);
+}
+
+.beginner-area .lesson-number {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+
+.beginner-area .lesson-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  overflow-wrap: break-word;
+}
+
+.beginner-area .lesson-meta {
+  font-size: 0.9rem;
+  color: var(--color-muted);
+}
+
+.beginner-area .lesson-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 4px;
+}
+
+.beginner-area .lesson-progress-item {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+
+.beginner-area .lesson-progress-alert {
+  color: var(--color-alert-text);
+}
+
+.beginner-area .badge {
+  display: inline-block;
+  align-self: flex-start;
+  background: var(--color-primary-soft);
+  color: var(--color-primary-dark);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.beginner-area .placeholder-box {
+  background: var(--color-surface);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius);
+  padding: 24px 16px;
+  color: var(--color-muted);
+  text-align: center;
+}
+
+/* ==========================================================================
+   Теория урока: блоки конспекта (таблицы, слова, конструкции, диалоги).
+   Специально сделаны не настоящими HTML-таблицами, а списками карточек —
+   на узком экране телефона обычная таблица либо сжимается до нечитаемого
+   размера, либо требует горизонтальной прокрутки. Карточки со значениями
+   друг под другом читаются на телефоне так же удобно, как и на компьютере.
+   ========================================================================== */
+
+.beginner-area .theory-body {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.beginner-area .theory-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.beginner-area .theory-heading {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-primary-dark);
+  margin: 0;
+  overflow-wrap: break-word;
+}
+
+.beginner-area .theory-note {
+  font-size: 0.88rem;
+  color: var(--color-muted);
+  line-height: 1.45;
+  margin: 0;
+}
+
+/* Таблица -> список карточек-строк. */
+.beginner-area .theory-table {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.beginner-area .theory-row-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: var(--shadow-tile);
+}
+
+.beginner-area .theory-row-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.beginner-area .theory-row-cell:first-child .theory-row-value {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-primary-dark);
+}
+
+.beginner-area .theory-row-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--color-muted);
+}
+
+.beginner-area .theory-row-value {
+  font-size: 0.95rem;
+  line-height: 1.4;
+  overflow-wrap: break-word;
+}
+
+/* Словарные карточки. */
+.beginner-area .theory-vocab-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.beginner-area .theory-vocab-item {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  box-shadow: var(--shadow-tile);
+}
+
+.beginner-area .theory-vocab-main {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.beginner-area .theory-vocab-vi {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-primary-dark);
+  overflow-wrap: break-word;
+}
+
+.beginner-area .theory-vocab-flag {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.beginner-area .theory-vocab-pron {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+
+.beginner-area .theory-vocab-ru {
+  font-size: 0.95rem;
+  color: var(--color-text);
+  overflow-wrap: break-word;
+}
+
+.beginner-area .theory-vocab-example {
+  margin-top: 4px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* Конструкции фраз (формулы). */
+.beginner-area .theory-pattern-box {
+  background: var(--color-primary-soft);
+  border: 1px solid var(--color-primary-soft-border);
+  border-radius: var(--radius);
+  padding: 16px;
+  text-align: center;
+}
+
+.beginner-area .theory-pattern-formula {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-primary-dark);
+  margin: 0;
+  overflow-wrap: break-word;
+}
+
+.beginner-area .theory-pattern-note {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+  margin: 6px 0 0;
+}
+
+.beginner-area .theory-example-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.beginner-area .theory-example-item {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.beginner-area .theory-example-vi {
+  font-size: 0.95rem;
+  font-weight: 600;
+  overflow-wrap: break-word;
+}
+
+.beginner-area .theory-example-ru {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+  overflow-wrap: break-word;
+}
+
+/* Мини-диалоги — чат-пузыри, реплики поочерёдно слева/справа. */
+.beginner-area .theory-dialogue {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.beginner-area .theory-dialogue-line {
+  max-width: 85%;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.beginner-area .theory-dialogue-a {
+  align-self: flex-start;
+}
+
+.beginner-area .theory-dialogue-b {
+  align-self: flex-end;
+  background: var(--color-primary-soft);
+  border-color: var(--color-primary-soft-border);
+}
+
+.beginner-area .theory-dialogue-speaker {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--color-muted);
+}
+
+.beginner-area .theory-dialogue-vi {
+  font-size: 1rem;
+  font-weight: 600;
+  overflow-wrap: break-word;
+}
+
+.beginner-area .theory-dialogue-ru {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+  overflow-wrap: break-word;
+}
+
+/* Короткие подсказки/памятки. */
+.beginner-area .theory-tip-box {
+  margin: 0;
+  padding: 14px 18px 14px 34px;
+  background: var(--color-blue-soft);
+  border: 1px solid var(--color-blue-soft-border);
+  border-radius: var(--radius);
+  list-style: disc;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: var(--color-blue-text);
+  font-size: 0.95rem;
+}
+
+.beginner-area .theory-tip-box li {
+  overflow-wrap: break-word;
+}
+
+/* Обычный текст конспекта (пояснения, тексты для практики). */
+.beginner-area .theory-text-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.beginner-area .theory-text-paragraph {
+  margin: 0;
+  font-size: 0.97rem;
+  line-height: 1.5;
+  overflow-wrap: break-word;
+}
+
+.beginner-area .theory-text-vi {
+  font-weight: 600;
+}
+
+.beginner-area .theory-text-ru {
+  color: var(--color-muted);
+}
+
+/* ==========================================================================
+   Настройка тренировки
+   ========================================================================== */
+
+.beginner-area .setup-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.beginner-area .setup-heading {
+  font-size: 1rem;
+  margin: 0;
+  color: var(--color-muted);
+}
+
+.beginner-area .choice-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.beginner-area .choice-button {
+  min-height: 54px;
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 1rem;
+  text-align: left;
+}
+
+.beginner-area .choice-button-active {
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+  color: var(--color-primary-dark);
+  font-weight: 600;
+}
+
+.beginner-area .hint-text {
+  font-size: 0.9rem;
+  color: var(--color-muted);
+  line-height: 1.4;
+}
+
+/* ==========================================================================
+   Тренировка: карточка и переворот
+   ========================================================================== */
+
+.beginner-area .training-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.beginner-area .sound-toggle {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.beginner-area .sound-toggle svg {
+  width: 22px;
+  height: 22px;
+}
+
+.beginner-area .sound-toggle[aria-pressed='true'] {
+  color: var(--color-muted);
+}
+
+.beginner-area .counter {
+  text-align: center;
+  color: var(--color-muted);
+  margin: 0;
+}
+
+.beginner-area .flashcard-scene {
+  perspective: 1200px;
+}
+
+.beginner-area .flashcard-card {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-height: clamp(170px, 30vh, 230px);
+  padding: 0;
+  border: none;
+  background: none;
+  text-align: center;
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.beginner-area .flashcard-card.is-flipped {
+  transform: rotateY(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .beginner-area .flashcard-card {
+    transition: none;
+  }
+}
+
+.beginner-area .flashcard-face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 24px 20px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  box-shadow: var(--shadow-soft);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.beginner-area .flashcard-face-back {
+  transform: rotateY(180deg);
+}
+
+.beginner-area .flashcard-text {
+  font-size: clamp(1.5rem, 6.5vw, 2.2rem);
+  font-weight: 700;
+  line-height: 1.35;
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: none;
+}
+
+.beginner-area .flashcard-flag {
+  display: inline-block;
+  margin-right: 8px;
+  font-size: 0.85em;
+}
+
+.beginner-area .flashcard-hint {
+  font-size: 0.88rem;
+  color: var(--color-muted);
+}
+
+/* Кнопка «Подсказка» под карточкой — открывает картинку-мнемонику
+   поверх экрана, чтобы можно было угадать слово до переворота. */
+.beginner-area .hint-button {
+  align-self: center;
+  margin-top: 4px;
+  padding: 10px 22px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.beginner-area .hint-button:active {
+  transform: scale(0.97);
+}
+
+/* Полноэкранная подсказка: картинка во весь экран, тап по ней возвращает
+   обратно к карточке. */
+.beginner-area .hint-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(15, 10, 5, 0.85);
+  border: none;
+}
+
+.beginner-area .hint-overlay-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 16px;
+}
+
+.beginner-area .flashcard-text-secondary {
+  font-size: clamp(1.05rem, 4.5vw, 1.3rem);
+  font-weight: 500;
+  color: var(--color-muted);
+  overflow-wrap: break-word;
+}
+
+.beginner-area .flashcard-placeholder-icon {
+  width: 48px;
+  height: 48px;
+  color: var(--color-muted);
+  opacity: 0.5;
+}
+
+/* Ряд «карточка + кнопка озвучки сбоку» в режиме аудирования. */
+.beginner-area .flashcard-row {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+}
+
+.beginner-area .flashcard-row .flashcard-scene {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Кнопка озвучки — отдельная от самой карточки (не переворачивает её),
+   поэтому стоит сбоку узкой колонкой на всю высоту карточки. */
+.beginner-area .listen-button {
+  flex: 0 0 auto;
+  width: 76px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+  color: #ffffff;
+  background: var(--color-primary);
+  border: none;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-tile);
+}
+
+.beginner-area .listen-button:active {
+  background: var(--color-primary-dark);
+}
+
+.beginner-area .listen-button svg {
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+}
+
+.beginner-area .answer-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.beginner-area .answer-button {
+  flex: 1;
+  min-height: 58px;
+  border-radius: var(--radius);
+  font-size: 1.02rem;
+  font-weight: 600;
+}
+
+.beginner-area .answer-no {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 2px solid var(--color-border);
+}
+
+.beginner-area .answer-no:active {
+  background: var(--color-bg);
+}
+
+.beginner-area .answer-yes {
+  background: var(--color-primary);
+  color: #ffffff;
+  border: 2px solid var(--color-primary);
+}
+
+.beginner-area .answer-yes:active {
+  background: var(--color-primary-dark);
+}
+
+/* ==========================================================================
+   Итоги тренировки
+   ========================================================================== */
+
+.beginner-area .summary-box {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 1.05rem;
+  box-shadow: var(--shadow-tile);
+}
+
+.beginner-area .summary-box p {
+  margin: 0;
+}
+
+.beginner-area .summary-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ==========================================================================
+   Адаптация под более широкий экран (планшет/компьютер)
+   ========================================================================== */
+
+@media (min-width: 640px) {
+  .beginner-area .screen {
+    min-height: auto;
+    margin: 32px 0;
+    border-radius: var(--radius-lg);
+    background: transparent;
+  }
+}
+
+.beginner-area .home-tile-game { grid-column: 1 / -1; grid-row: 1; justify-self: center; width: calc((100% - 14px) / 2); min-width: 0; }
+.beginner-area .screen-number-game { max-width: 600px; }
+.beginner-area .number-game-progress { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; font-weight: 600; margin: 18px 0; }
+.beginner-area .number-game-progress progress { width: 100%; height: 12px; accent-color: var(--color-primary); }
+.beginner-area .number-game-stage { border: 1px solid var(--color-border); border-radius: var(--radius); background: var(--color-surface); padding: 24px 16px; text-align: center; }
+.beginner-area .number-game-speaker { width: 58px; height: 58px; color: var(--color-primary); }
+.beginner-area .number-game-word { font-size: 1.4rem; font-weight: 700; min-height: 34px; margin: 12px 0; }
+.beginner-area .number-game-options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 18px; }
+.beginner-area .number-game-options button { min-height: 100px; font-size: 2.4rem; font-weight: 700; }
+.beginner-area .number-game-options button:disabled { opacity: 1; }
+.beginner-area .number-game-options .number-game-correct { background: var(--color-primary-soft); border: 2px solid var(--color-primary); }
+.beginner-area .number-game-options .number-game-wrong { background: #fff0eb; border: 2px solid var(--color-alert-text); }
+.beginner-area .number-game-feedback { min-height: 28px; font-weight: 600; text-align: center; }
+@media (max-width: 600px) {
+  .beginner-area .home-tile-game { padding: 10px; gap: 6px; }
+  .beginner-area .home-tile-game .home-tile-icon { width: 26px; height: 26px; }
+  .beginner-area .home-tile-game .home-tile-chevron { width: 14px; height: 14px; }
+}
+
+.beginner-area .screen-cubes-game { max-width: 460px; text-align: center; }
+.beginner-area .screen-cubes-game > .back-button { text-align: left; }
+.beginner-area .cube-game-score { display: flex; justify-content: space-between; gap: 10px; font-weight: 700; margin: 16px 0; }
+.beginner-area .cube-game-instruction { font-size: .95rem; min-height: 40px; margin: 8px 0; }
+.beginner-area .cube-well { position: relative; width: 100%; flex-shrink: 0; height: 328px; margin: 0 auto; max-width: 320px; border: 3px solid #487b80; border-top: 0; border-radius: 0 0 22px 22px; background: linear-gradient(180deg, #eff9f7, #dbece9); box-shadow: inset 0 -6px 14px #487b8020; overflow: hidden; }
+.beginner-area .cube-position { position: absolute; top: 8px; width: 50%; height: 100px; padding: 4px 8px; transition: transform 400ms cubic-bezier(.35,.1,.7,1); }
+.beginner-area .number-cube { display: block; width: 100%; height: 92px; border: 2px solid #ffffffb0; border-radius: 16px; font-size: 2.5rem; font-weight: 800; color: #173e43; box-shadow: inset 0 -6px 0 #00000012, 0 4px 6px #123c4320; touch-action: manipulation; }
+.beginner-area .number-cube:disabled { opacity: 1; cursor: default; }
+.beginner-area .cube-color-0 { background: #aadcd5; }
+.beginner-area .cube-color-1 { background: #ffe1a0; }
+.beginner-area .cube-color-2 { background: #bcd9f3; }
+.beginner-area .cube-color-3 { background: #dac8ec; }
+.beginner-area .cube-clearing { animation: beginner-cube-clear 300ms ease-out forwards; }
+.beginner-area .cube-entering { animation: beginner-cube-drop 450ms cubic-bezier(.35,.1,.7,1); }
+.beginner-area .cube-wrong { animation: beginner-cube-shake 350ms ease-in-out; border-color: #bd5845; }
+.beginner-area .cube-game-feedback { min-height: 28px; margin: 16px 0 10px; font-weight: 700; color: var(--color-primary-dark); }
+@keyframes beginner-cube-clear { to { transform: scale(.35); opacity: 0; } }
+@keyframes beginner-cube-drop { from { transform: translateY(-230px); } to { transform: translateY(0); } }
+@keyframes beginner-cube-shake { 25%,75% { transform: translateX(-6px); } 50% { transform: translateX(6px); } }
+@media (prefers-reduced-motion: reduce) {
+  .beginner-area .cube-position { transition: none; }
+  .beginner-area .cube-clearing, .beginner-area .cube-entering, .beginner-area .cube-wrong { animation-duration: 1ms; }
+}
+
+.beginner-area .cube-word { font-size: clamp(1.2rem, 5.4vw, 1.8rem); }
+.beginner-area .cube-game-direction { margin: -8px 0 0; color: var(--color-muted); font-size: .9rem; }
+
+.beginner-area .cube-game-score { align-items: center; }
+.beginner-area .cube-current-number { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; width: 60px; height: 60px; border-radius: 14px; background: var(--color-primary-soft); color: var(--color-primary-dark); font-size: 2.8rem; line-height: 1; font-weight: 800; }
+
+.beginner-area .cube-show-word { animation-delay: 450ms; }
+@media (prefers-reduced-motion: reduce) {
+  .beginner-area .cube-show-word { animation-delay: 450ms; }
+}
+
+.beginner-area .cube-long-number.cube-word { font-size: clamp(.9rem, 4.2vw, 1.1rem); line-height: 1.2; padding: 6px; overflow-wrap: normal; }
+
+.beginner-area .cube-game-score-with-number { display: grid; grid-template-columns: minmax(0, 1fr) 60px minmax(0, 1.5fr); gap: 8px; font-size: .9rem; }
+.beginner-area .cube-game-score-with-number > span:first-child, .beginner-area .cube-score-count { white-space: nowrap; }
+.beginner-area .cube-score-count { display: inline-block; }
+
+.beginner-area .screen-hotel-game { max-width: 760px; padding-left: 12px; padding-right: 12px; gap: 10px; }
+.beginner-area .hotel-plaques { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(3, minmax(150px, 1fr)); gap: 16px 12px; width: 100%; }
+.beginner-area .hotel-plaque-slot { min-width: 0; overflow: hidden; padding: 4px; }
+.beginner-area .number-cube.hotel-plaque { position: relative; width: 100%; height: 150px; border: 6px double #18828b; border-radius: 18px; background: linear-gradient(150deg, #fffdf4, #f1e6c8); color: #123f48; box-shadow: inset 0 0 0 3px #fffdf6, inset 0 -7px 14px #bdab7e30, 0 3px 4px #23444a26; font-family: Georgia, serif; font-size: 2.6rem; padding: 25px 10px 16px; }
+.beginner-area .hotel-plaque::before, .beginner-area .hotel-plaque::after { content: ''; position: absolute; top: 10px; width: 13px; height: 13px; border: 1px solid #7c807b; border-radius: 50%; background: linear-gradient(130deg, #d8dad4 42%, #606963 44%, #606963 54%, #e6e8df 56%); box-shadow: 0 1px 2px #0003; }
+.beginner-area .hotel-plaque::before { left: 10px; } .beginner-area .hotel-plaque::after { right: 10px; }
+.beginner-area .hotel-plaque.cube-word { font-size: clamp(.95rem, 4.3vw, 1.4rem); line-height: 1.3; overflow-wrap: normal; }
+.beginner-area .hotel-plaque.cube-clearing { animation-name: beginner-hotel-sign-fall; transform-origin: top right; }
+.beginner-area .hotel-plaque.cube-entering { animation: beginner-hotel-sign-arrive 450ms ease-out; }
+.beginner-area .hotel-plaque.cube-wrong { border-color: #bf755a; }
+.beginner-area .screen-hotel-game .cube-current-number { width: 76px; font-size: 2.2rem; }
+.beginner-area .screen-hotel-game .cube-game-score-with-number { grid-template-columns: minmax(0, 1fr) 76px minmax(0, 1.5fr); }
+@keyframes beginner-hotel-sign-fall { 35% { transform: rotate(-12deg); opacity: 1; } to { transform: translateY(180px) rotate(-25deg); opacity: 0; } }
+@keyframes beginner-hotel-sign-arrive { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .beginner-area .hotel-plaque.cube-clearing, .beginner-area .hotel-plaque.cube-entering { animation-duration: 1ms; } }
+
+.beginner-area .screen-hotel-game { gap: 8px; }
+.beginner-area .screen-hotel-game .cube-game-score { margin: 6px 0; }
+.beginner-area .screen-hotel-game .cube-game-instruction { margin: 2px 0; min-height: 28px; }
+.beginner-area .screen-hotel-game .hotel-plaques { grid-template-rows: repeat(3, minmax(130px, 1fr)); gap: 10px 8px; }
+.beginner-area .screen-hotel-game .hotel-plaque { height: 130px; }
+.beginner-area .screen-hotel-game .cube-game-feedback { margin: 6px 0; }
+
+.beginner-area .hotel-plaque.cube-show-word { animation-delay: 975ms; animation-duration: 400ms; }
+@media (prefers-reduced-motion: reduce) {
+  .beginner-area .hotel-plaque.cube-show-word { animation-delay: 975ms; animation-duration: 1ms; }
+}
+
+.beginner-area .screen-banknotes-game { max-width: 700px; gap: 10px; }
+.beginner-area .banknote-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+.beginner-area .banknote-slot { min-width: 0; overflow: hidden; }
+.beginner-area .number-cube.banknote-choice { height: 130px; padding: 8px; border-radius: 12px; background: #fff; color: var(--color-text); font-size: 1.05rem; line-height: 1.3; }
+.beginner-area .banknote-choice img { width: 100%; height: 100%; object-fit: contain; }
+.beginner-area .banknote-featured { width: 100%; max-height: 220px; object-fit: contain; border-radius: 8px; }
+
+.beginner-area .banknote-view { display: block; position: relative; width: 100%; perspective: 900px; }
+.beginner-area .banknote-flipper { display: block; position: absolute; inset: 0; transform-style: preserve-3d; transition: transform 450ms ease-in-out; }
+.beginner-area .banknote-flipped { transform: rotateY(180deg); }
+.beginner-area .banknote-face { display: block; position: absolute; inset: 0; overflow: hidden; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.beginner-area .banknote-back { transform: rotateY(180deg); }
+.beginner-area .banknote-face img { position: absolute; left: 0; width: 100%; max-width: none; object-fit: fill; pointer-events: none; }
+.beginner-area .number-cube.banknote-photo { display: block; height: auto; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: 0 3px 8px #213d3026; font-size: inherit; }
+.beginner-area .banknote-slot { overflow: visible; }
+.beginner-area .banknote-photo.cube-clearing { animation: beginner-banknote-fly 450ms ease-in 1000ms forwards; }
+.beginner-area .banknote-featured { max-width: 440px; margin: 0 auto; max-height: none; }
+.beginner-area .banknote-source { color: var(--color-muted); font-size: .7rem; margin-top: 4px; }
+@keyframes beginner-banknote-fly { to { transform: translateY(-65px) rotate(12deg) scale(.75); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .beginner-area .banknote-flipper { transition: none; }
+  .beginner-area .banknote-photo.cube-clearing { animation-duration: 1ms; }
+}
+
+.beginner-area .banknote-featured-leaving { animation: beginner-banknote-fly 450ms ease-in 1000ms forwards; }
+@media (prefers-reduced-motion: reduce) {
+  .beginner-area .banknote-featured-leaving { animation-duration: 1ms; }
+}
+
+.beginner-area .screen-phone-game { max-width: 460px; gap: 12px; }
+.beginner-area .phone-direction { color: var(--color-muted); margin: 0; }
+.beginner-area .phone-progress { display: flex; justify-content: space-between; font-size: .9rem; font-weight: 600; }
+.beginner-area .phone-display { display: flex; align-items: center; gap: 10px; background: #e3f1e9; border: 2px solid #9ebbae; border-radius: 16px; padding: 18px 10px; }
+.beginner-area .phone-handset { width: 32px; height: 32px; color: var(--color-primary-dark); flex-shrink: 0; }
+.beginner-area .phone-digits { display: flex; flex: 1; justify-content: center; font-size: clamp(1rem,5vw,1.4rem); font-weight: 700; font-variant-numeric: tabular-nums; }
+.beginner-area .phone-digits span { min-width: .65em; text-align: center; }
+.beginner-area .phone-digit-group { margin-left: 8px; }
+.beginner-area .phone-digit-current { border-bottom: 2px solid var(--color-primary); }
+.beginner-area .phone-keypad { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; }
+.beginner-area .phone-key { min-height: 64px; border: 1px solid var(--color-border); background: var(--color-surface); border-radius: 16px; box-shadow: 0 3px 0 #e2d6c5; font-size: 1.8rem; font-weight: 700; touch-action: manipulation; }
+.beginner-area .phone-keypad-words .phone-key { font-size: 1.2rem; }
+.beginner-area .phone-key:disabled { opacity: .7; }
+.beginner-area .phone-key-zero { grid-column: 2; }
+.beginner-area .phone-key-correct { background: var(--color-primary-soft); border-color: var(--color-primary); }
+.beginner-area .phone-key-wrong { animation: beginner-cube-shake 250ms; background: #fff0ea; border-color: #bd5845; }
+.beginner-area .phone-feedback { min-height: 44px; margin: 0; font-weight: 600; }
+.beginner-area .phone-ringing .phone-handset { animation: beginner-phone-ring 180ms infinite alternate; }
+@keyframes beginner-phone-ring { from { transform: rotate(-15deg); } to { transform: rotate(15deg); } }
+@media (prefers-reduced-motion: reduce) { .beginner-area .phone-ringing .phone-handset { animation: none; } }
+
+.beginner-area .phone-digit-dialing { background: var(--color-primary); color: white; border-radius: 5px; box-shadow: 0 0 0 3px var(--color-primary); }
+
+.beginner-area .game-menu-item { display: flex; align-items: center; gap: 16px; }
+.beginner-area .game-menu-icon { display: grid; place-items: center; flex: 0 0 52px; height: 52px; font-size: 30px; background: #e0f3ef; border-radius: 16px; }
+
+.beginner-area .screen-big-numbers { max-width: 700px; }
+.beginner-area .big-number-progress { color: var(--color-muted); }
+.beginner-area .big-number-value { text-align: center; font-size: clamp(1.6rem, 7vw, 2.6rem); font-weight: 800; color: var(--color-primary-dark); padding: 18px 8px; border-radius: 22px; background: var(--color-primary-soft); white-space: nowrap; }
+.beginner-area .big-number-answer { display: flex; flex-wrap: wrap; gap: 8px; padding: 14px; border: 2px solid var(--color-border); border-radius: 20px; background: white; min-height: 90px; }
+.beginner-area .big-number-slot { border-radius: 24px; padding: 6px 12px; min-width: 52px; text-align: center; background: #f3ecdf; }
+.beginner-area .big-number-next { outline: 2px solid var(--color-primary); }
+.beginner-area .big-number-complete { border-color: var(--color-primary); }
+.beginner-area .big-number-feedback { min-height: 28px; margin: 0; font-weight: 600; color: var(--color-primary-dark); }
+.beginner-area .big-number-tiles { display: flex; flex-wrap: wrap; gap: 8px; }
+.beginner-area .big-number-tile { font: inherit; font-weight: 600; border-radius: 28px; min-height: 48px; padding: 8px 16px; border: 1px solid var(--color-primary-soft-border); background: var(--color-primary-soft); color: var(--color-primary-dark); cursor: pointer; }
+.beginner-area .big-number-tile:disabled { opacity: .65; }
+.beginner-area .big-number-wrong { animation: beginner-cube-shake .35s ease; background: #fff0e8; border-color: var(--color-alert-text); color: var(--color-alert-text); }
+@media (prefers-reduced-motion: reduce) { .beginner-area .big-number-wrong { animation: none; } }
+
+.beginner-area .big-number-value-words { white-space: normal; font-size: clamp(1.25rem, 5vw, 1.8rem); line-height: 1.5; }
+.beginner-area .big-number-digit-tiles { display: grid; grid-template-columns: repeat(3, 1fr); }
+.beginner-area .big-number-digit-tiles .big-number-tile { font-size: 1.5rem; min-height: 58px; }
+.beginner-area .big-number-digit-tiles .big-number-tile:last-child { grid-column: 2; }
+
+.beginner-area .big-number-digit-slot { min-width: 0; padding: 6px 5px; flex: 1 1 0; font-variant-numeric: tabular-nums; }
+.beginner-area .big-number-group-start { margin-left: 10px; }
+
+.beginner-area .big-number-answer-digits { flex-wrap: nowrap; gap: 4px; align-items: center; }
+
+.beginner-area .big-number-answer-digits { justify-content: center; padding: 16px 8px; gap: 3px; }
+.beginner-area .big-number-answer-digits .big-number-digit-slot {
+  flex: 0 1 24px;
+  width: 24px;
+  min-width: 19px;
+  height: 54px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 18px;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+.beginner-area .big-number-answer-digits .big-number-group-start { margin-left: 12px; }
+
+.beginner-area .game-section-heading { margin: 8px 0 0; font-size: 1.1rem; color: var(--color-primary-dark); }
+.beginner-area .game-dialogues-section { display: grid; gap: 14px; border-top: 1px solid var(--color-border); padding-top: 20px; margin-top: 10px; }
+
+.beginner-area .screen-dialogue-game { max-width: 760px; }
+.beginner-area .dialogue-translation { background: var(--color-primary-soft); border-radius: 18px; padding: 16px; margin: 0; font-weight: 600; }
+.beginner-area .dialogue-controls { display: flex; flex-wrap: wrap; gap: 10px; }
+.beginner-area .dialogue-controls button { flex: 1; min-width: 130px; }
+.beginner-area .dialogue-word-groups { display: grid; gap: 16px; }
+.beginner-area .dialogue-word-groups h2 { font-size: .85rem; color: var(--color-muted); margin: 0 0 8px; }
+.beginner-area .dialogue-answer { align-content: flex-start; }
+
+/* Аудирование справа от игры в первой строке. */
+.beginner-area .home-tile-game { grid-column: 1; justify-self: stretch; width: 100%; }
+.beginner-area .home-tile-listening { grid-column: 2; grid-row: 1; min-width: 0; padding: 10px; gap: 6px; }
+.beginner-area .home-tile-listening .home-tile-label { min-width: 0; font-size: clamp(.75rem, 3.2vw, 1.05rem); }
+.beginner-area .home-tile-listening .home-tile-icon { width: 26px; height: 26px; flex-shrink: 0; }
+
+.beginner-area .app-refresh { display: block; margin: 16px auto; padding: 10px 18px; border: 1px solid rgba(15,122,114,.25); border-radius: 22px; color: #0f7a72; background: rgba(255,255,255,.85); font: inherit; cursor: pointer; }
+
+/* Lesson 10: family learning and blitz */
+.beginner-area .family-screen { max-width: 720px; }
+.beginner-area .family-picture { display: block; width: min(100%, 320px); max-height: 200px; margin: 0 auto; }
+.beginner-area .family-mode { display: flex; flex-direction: column; gap: 10px; text-align: left; }
+.beginner-area .family-mode strong { font-size: 1.25rem; }
+.beginner-area .family-mode span { line-height: 1.5; }
+.beginner-area .family-card { padding: 12px 16px; background: #fffdf8; border: 1px solid #d5e9e4; border-radius: 24px; text-align: center; }
+.beginner-area .family-card h2 { margin: 8px 0; font-size: clamp(1.2rem, 5vw, 1.7rem); }
+.beginner-area .family-card p { margin: 8px 0; }
+.beginner-area .family-choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 16px; }
+.beginner-area .family-choices button { min-height: 58px; white-space: normal; overflow-wrap: anywhere; font-size: clamp(1rem, 4.5vw, 1.3rem); padding: 12px 8px; }
+.beginner-area .family-choices .family-wrong { background: #fce9e7; border-color: #ce6b62; color: #92473e; opacity: .65; }
+.beginner-area .family-choices .family-correct { background: #d4eee4; border-color: #287d67; color: #205e4f; opacity: 1; }
+.beginner-area .family-feedback { min-height: 46px; text-align: center; }
+.beginner-area .family-counter, .beginner-area .family-note { text-align: center; }
+.beginner-area .family-note { font-size: .85rem; opacity: .75; }
+.beginner-area .family-result { text-align: center; }
+.beginner-area .family-result button { margin-top: 12px; }
+
+/* Readable green lesson menu. */
+.beginner-area .games-menu-screen .lesson-item {
+  color: #246448;
+  background: #f2faf4;
+  border: 2px solid #73ae88;
+  box-shadow: 0 3px 10px rgb(48 112 73 / 10%);
+  cursor: pointer;
+}
+.beginner-area .games-menu-screen .lesson-number {
+  color: #236343;
+  font-size: 1.05rem;
+  font-weight: 650;
+  line-height: 1.4;
+}
+.beginner-area .games-menu-screen .game-section-heading { color: #236343; }
+.beginner-area .games-menu-screen .lesson-item:hover { background: #e3f3e7; border-color: #40865c; }
+.beginner-area .games-menu-screen .lesson-item:focus-visible { outline: 3px solid #246448; outline-offset: 3px; }
+.beginner-area .games-menu-screen .game-lesson-group { margin-bottom: 14px; }
+.beginner-area .games-menu-screen .game-lesson-group[open] > summary { background: #dcefe2; border-color: #40865c; margin-bottom: 12px; }
+.beginner-area .games-menu-screen .game-lesson-group > button { margin-bottom: 10px; }
+
+/* Lesson 11: edge-to-edge illustration with only the translation below. */
+.beginner-area .house-game-card { padding: 0; overflow: hidden; }
+.beginner-area .house-game-card .family-picture { display: block; width: 100%; max-width: none; height: auto; max-height: none; margin: 0; border-radius: 0 !important; }
+.beginner-area .house-game-card h2 { margin: 0; padding: 14px 16px 18px; }
+
+.beginner-area { width:100%; min-height:100dvh; display:flex; justify-content:center; }

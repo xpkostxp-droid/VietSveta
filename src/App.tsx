@@ -2,7 +2,9 @@ import { AdjectiveTetris } from './components/AdjectiveTetris';
 import { adjectiveSets } from './content/adjectiveSets';
 import { QuestionsBlitzScreen } from './components/QuestionsBlitzScreen';
 import { MarketGameScreen } from './components/MarketGameScreen';
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
+import { GroupSelection, type CourseSection } from './components/GroupSelection';
+const BeginnerApp = lazy(() => import('./beginner/App'));
 import type { CardOrder, Direction } from './types';
 import { saveLastActivity } from './domain/lastActivity';
 import { BackButton } from './components/BackButton';
@@ -21,6 +23,8 @@ import type { PhoneticsTestId } from './content/phonetics/tests';
 
 type Screen =
   | { name: 'home' }
+  | { name: 'group-selection'; section: CourseSection }
+  | { name: 'beginner'; section: CourseSection }
   | { name: 'game' }
   | { name: 'games-menu' }
   | { name: 'adjectives-menu' }
@@ -49,17 +53,22 @@ function App({ memberId, memberName, syncStatus, onOpenProfile }: { isAdmin?: bo
       return (
         <HomeScreen
           memberId={memberId} memberName={memberName} syncStatus={syncStatus} onOpenProfile={onOpenProfile}
-          onOpenGame={() => setScreen({ name: 'games-menu' })}
-          onOpenListening={() => setScreen({ name: 'listening' })}
-          onOpenTheory={() => setScreen({ name: 'theory-list' })}
-          onOpenCards={() => setScreen({ name: 'cards-lesson-list' })}
+          onOpenGame={() => setScreen({ name: 'group-selection', section: 'games' })}
+          onOpenListening={() => setScreen({ name: 'group-selection', section: 'listening' })}
+          onOpenTheory={() => setScreen({ name: 'group-selection', section: 'theory' })}
+          onOpenCards={() => setScreen({ name: 'group-selection', section: 'cards' })}
           onOpenPronunciation={() => setScreen({ name: 'pronunciation' })}
           onOpenPhoneticaTest={() => setScreen({ name: 'phonetics-test-list' })}
         />
       );
 
+    case 'group-selection':
+      return <GroupSelection section={screen.section} onBack={()=>setScreen({name:'home'})} onChoose={group=>setScreen(group==='beginner'?{name:'beginner',section:screen.section}:screen.section==='games'?{name:'games-menu'}:screen.section==='theory'?{name:'theory-list'}:screen.section==='cards'?{name:'cards-lesson-list'}:{name:'listening'})}/>;
+    case 'beginner':
+      return <Suspense fallback={<div className="screen"><BackButton onClick={()=>setScreen({name:'group-selection',section:screen.section})} label="К выбору группы"/><p role="status">Загружаем материалы…</p></div>}><div className="beginner-area"><BeginnerApp key={screen.section} section={screen.section} onBack={()=>setScreen({name:'group-selection',section:screen.section})}/></div></Suspense>;
+
     case 'games-menu':
-      return <div className="screen"><BackButton onClick={() => setScreen({ name: 'home' })} label="На главную"/><h1 className="screen-title">Игры</h1><button className="lesson-item" onClick={() => setScreen({ name: 'game' })}><span className="lesson-title" style={{ fontSize: '1.35rem', fontWeight: 800, color: '#174f49', lineHeight: 1.35 }}>🍎 Овощи-фрукты</span></button><button className="lesson-item" onClick={() => setScreen({ name: 'questions-menu' })}><span className="lesson-title" style={{ fontSize: '1.35rem', fontWeight: 800, color: '#174f49', lineHeight: 1.35 }}>❓ Вопросительные слова</span></button>{<button className="lesson-item" onClick={()=>setScreen({name:'adjectives-menu'})}><span className="lesson-title" style={{fontSize:'1.35rem',fontWeight:800,color:'#174f49'}}>🧪 Прилагательные</span></button>}</div>;
+      return <div className="screen"><BackButton onClick={() => setScreen({ name: 'group-selection', section: 'games' })} label="К выбору группы"/><h1 className="screen-title">Игры</h1><button className="lesson-item" onClick={() => setScreen({ name: 'game' })}><span className="lesson-title" style={{ fontSize: '1.35rem', fontWeight: 800, color: '#174f49', lineHeight: 1.35 }}>🍎 Овощи-фрукты</span></button><button className="lesson-item" onClick={() => setScreen({ name: 'questions-menu' })}><span className="lesson-title" style={{ fontSize: '1.35rem', fontWeight: 800, color: '#174f49', lineHeight: 1.35 }}>❓ Вопросительные слова</span></button>{<button className="lesson-item" onClick={()=>setScreen({name:'adjectives-menu'})}><span className="lesson-title" style={{fontSize:'1.35rem',fontWeight:800,color:'#174f49'}}>🧪 Прилагательные</span></button>}</div>;
 
     case 'adjectives-menu':
       return <div className="screen"><BackButton onClick={()=>setScreen({name:'games-menu'})} label="К играм"/><h1 className="screen-title">Прилагательные</h1><div className="market-options" style={{gap:16}}>{adjectiveSets.map((set,i)=><button key={set.title} className="big-button" onClick={()=>setScreen({name:'adjectives-tetris',variant:i===2?'cannon':i===1?'rope':'tetris'})}><span style={{fontSize:'1.2rem',fontWeight:800,lineHeight:1.4}}>{i+1}. {set.title}<br/><small>{set.words.length} слов · {set.words.length*2} заданий · {i===0?'Тетрис':i===1?'Удержи слово':'Словесная пушка'}</small></span></button>)}</div></div>;
@@ -75,7 +84,7 @@ function App({ memberId, memberName, syncStatus, onOpenProfile }: { isAdmin?: bo
       return <MarketGameScreen onBack={() => setScreen({ name: 'games-menu' })} />;
 
     case 'listening':
-      return <div className="screen"><BackButton onClick={() => setScreen({ name: 'home' })} label="На главную" /><h1 className="screen-title">Аудирование</h1><button className="lesson-item" onClick={() => setScreen({ name: 'listening-lesson' })}><span className="lesson-number">Урок 1</span><span>Поездка в Вунгтау</span></button><button className="lesson-item" onClick={() => setScreen({ name: 'listening-lesson', lesson: 2 })}><span className="lesson-number">Урок 2</span><span>На рынке · 4 диалога</span></button></div>;
+      return <div className="screen"><BackButton onClick={() => setScreen({ name: 'group-selection', section: 'listening' })} label="К выбору группы" /><h1 className="screen-title">Аудирование</h1><button className="lesson-item" onClick={() => setScreen({ name: 'listening-lesson' })}><span className="lesson-number">Урок 1</span><span>Поездка в Вунгтау</span></button><button className="lesson-item" onClick={() => setScreen({ name: 'listening-lesson', lesson: 2 })}><span className="lesson-number">Урок 2</span><span>На рынке · 4 диалога</span></button></div>;
 
     case 'listening-lesson':
       return <ListeningLessonScreen key={screen.lesson ?? 1} lesson={screen.lesson} onBack={() => setScreen({ name: 'listening' })} />;
@@ -92,7 +101,7 @@ function App({ memberId, memberName, syncStatus, onOpenProfile }: { isAdmin?: bo
     case 'theory-list':
       return (
         <TheoryListScreen
-          onBack={() => setScreen({ name: 'home' })}
+          onBack={() => setScreen({ name: 'group-selection', section: 'theory' })}
           onOpenLesson={(lessonId) => {
             saveLastActivity(lessonId, 'theory');
             setScreen({ name: 'theory-lesson', lessonId });
@@ -111,7 +120,7 @@ function App({ memberId, memberName, syncStatus, onOpenProfile }: { isAdmin?: bo
     case 'cards-lesson-list':
       return (
         <CardsLessonListScreen
-          onBack={() => setScreen({ name: 'home' })}
+          onBack={() => setScreen({ name: 'group-selection', section: 'cards' })}
           onOpenLesson={(lessonId) => {
             saveLastActivity(lessonId, 'cards');
             setScreen({ name: 'cards-setup', lessonId });

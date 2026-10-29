@@ -9,7 +9,7 @@ interface Props {
 export function TheoryListScreen({ onBack, onOpenLesson }: Props) {
   return (
     <div className="screen screen-photo screen-theory-list">
-      <BackButton onClick={onBack} label="На главную" />
+      <BackButton onClick={onBack} label="К выбору группы" />
       <h1 className="screen-title">Теория</h1>
       <ul className="lesson-list">
         {lessons.map((lesson) => (

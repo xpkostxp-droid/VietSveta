@@ -41,7 +41,7 @@ export function CardsLessonListScreen({ onBack, onOpenLesson }: Props) {
 
   return (
     <div className="screen screen-photo screen-cards-list">
-      <BackButton onClick={onBack} label="На главную" />
+      <BackButton onClick={onBack} label="К выбору группы" />
       <h1 className="screen-title">Карточки</h1>
       <ul className="lesson-list">
         {lessons.map((lesson) => {

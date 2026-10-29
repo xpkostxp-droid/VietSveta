@@ -22,6 +22,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Checkout beginner media at the imported revision
+        uses: actions/checkout@v4
+        with:
+          repository: xpkostxp-droid/AlexViet
+          ref: 1f46b3d4114fbd1a574ccf000b1d6129877c4b14
+          path: _beginner_source
+          persist-credentials: false
+      - name: Include beginner audio and images in the same site
+        run: |
+          mkdir -p public/beginner
+          cp -a _beginner_source/public/. public/beginner/
+          rm -rf _beginner_source
       - uses: actions/setup-node@v4
         with:
           node-version: 20
