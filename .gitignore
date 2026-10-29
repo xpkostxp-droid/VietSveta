@@ -14,5 +14,3 @@ vite.config.d.ts
 /output/
 /tmp/
 
-/public/beginner/
-/_beginner_source/
