@@ -97,9 +97,10 @@ it('opens the profile-linked subgroup directly and returns to the profile',()=>{
  expect(back).toHaveBeenCalledOnce();
 });
 
-it('keeps the Russian caption within the image for correct, wrong and timeout answers; reverse tasks have no image',()=>{
- start();let pictures=0,reverses=0;
- for(let i=0;i<30;i++){
+it.each([['Профессии',15],['Места, действия и вопросы',14]] as const)('keeps photos and captions for every word in %s, including mistakes and timeouts; reverse tasks have no image',(group,words)=>{
+ start(group);let pictures=0,reverses=0;
+ expect(host.querySelector('.profession-session')).toBeTruthy();
+ for(let i=0;i<words*2;i++){
   const photo=host.querySelector<HTMLImageElement>('.profession-photo');const right=correctAnswer();
   if(photo){
    const word=professionWords.find(w=>w[1]===right)!;
@@ -117,5 +118,5 @@ it('keeps the Russian caption within the image for correct, wrong and timeout an
   }
   act(()=>vi.advanceTimersByTime(1600));
  }
- expect(pictures).toBe(15);expect(reverses).toBe(15);
+ expect(pictures).toBe(words);expect(reverses).toBe(words);
 });

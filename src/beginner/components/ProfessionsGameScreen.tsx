@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { professionWords, workBlitzGroups, workBlitzTasks, workBlitzAnswer, workBlitzOptions, type WorkBlitzGroup, type WorkTask } from '../content/games/professions';
+import { professionWords, workBlitzGroups, workBlitzTasks, workBlitzAnswer, workBlitzOptions, workBlitzPool, type WorkBlitzGroup, type WorkTask } from '../content/games/professions';
 import { GameRanking } from '../../components/GameRanking';
 import { saveTimedAttempt } from '../../domain/answerTime';
 import { speakVietnamese, stopSpeaking } from '../domain/speech';
@@ -79,12 +79,12 @@ export function ProfessionsGameScreen({ onBack, initialGroup = null }: { onBack:
     return () => clearTimeout(timer);
   }, [phase, position, group, tasks, score]);
   useEffect(() => () => { stopSpeaking(); audio.current.close(); }, []);
-  useEffect(()=>{if(group==='professions')Object.values(professionPhotos).forEach(src=>{const image=new Image();image.src=src;});},[group]);
+  useEffect(()=>{if(group)workBlitzPool(group).forEach(index=>{const image=new Image();image.src=professionPhotos[professionWords[index][0]];});},[group]);
   const back = () => {
     stopSpeaking(); locked.current = true; setPhase('intro'); setTasks([]); setPaused(false);
     if (phase === 'intro') { if (initialGroup) onBack(); else if (group) setGroup(null); else onBack(); }
   };
-  return <div className={"screen family-screen work-blitz" + (phase === 'playing' || phase === 'feedback' ? ' work-active'+(group==='professions'?' profession-session':'') : '')}>
+  return <div className={"screen family-screen work-blitz" + (phase === 'playing' || phase === 'feedback' ? ' work-active profession-session' : '')}>
     <BackButton onClick={back} label={group ? 'Назад' : 'К играм'} />
     <span className="badge">Урок 5 · Профессии и работа</span>
     <h1 className="screen-title">{title?.label ?? 'Профессии и работа'}</h1>
@@ -98,11 +98,11 @@ export function ProfessionsGameScreen({ onBack, initialGroup = null }: { onBack:
         <div className="work-status"><strong>{position + 1}/{tasks.length} · ✓ {score.correct}</strong><span className="work-clock" aria-label="Осталось секунд">{Math.ceil(remaining / 1000)}</span></div>
         <div className="work-timebar"><div style={{ width: `${remaining / 50}%` }} /></div>
         <div className={'family-card work-prompt ' + (current.reverse ? 'work-prompt-text' : '')}>
-          {!current.reverse && (group==='professions' ? <div className="profession-illustration"><ProfessionPicture id={word[0]} /><h2 className="profession-caption" lang="ru">{word[2]}</h2></div> : <ProfessionPicture id={word[0]} />)}
-          {current.reverse ? <h2 lang="vi">{word[1]}</h2> : group!=='professions'&&<h2 lang="ru">{word[2]}</h2>}
+          {!current.reverse && <div className="profession-illustration"><ProfessionPicture id={word[0]} /><h2 className="profession-caption" lang="ru">{word[2]}</h2></div>}
+          {current.reverse && <h2 lang="vi">{word[1]}</h2>}
         </div>
         {paused ? <button className="big-button" onClick={() => { audio.current.ready(); started.current = performance.now(); setPaused(false); }}>Продолжить</button> : <div className="family-choices work-options">{options.map(option => <button key={option} lang={current.reverse ? 'ru' : 'vi'} disabled={phase !== 'playing'} className={'choice-button ' + (phase === 'feedback' ? option === answer ? 'family-correct' : option === selected ? 'family-wrong' : '' : '')} onClick={() => finishAnswer(option)}>{option}</button>)}</div>}
-        {group!=='professions'&&<p className="family-feedback work-feedback" role="status">{paused ? 'Игра на паузе' : '\u00a0'}</p>}
+        {paused&&<p className="family-feedback work-feedback" role="status">Игра на паузе</p>}
       </>}
 
   </div>;
