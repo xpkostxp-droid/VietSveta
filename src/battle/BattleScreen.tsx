@@ -13,17 +13,16 @@ import type { Snapshot } from './battleTypes';
 import { primeBattleSpeech, speakBattleWord } from './battleSpeech';
 import { hasVietnameseVoice, onVoicesChanged, stopSpeaking } from '../domain/speech';
 import { botVocabulary } from './botVocabulary';
-import { createBotBattle } from './botBattle';
-type BattleAudio={sound:ReturnType<typeof makeGameSound>;court:ReturnType<typeof makeCourtSound>};
+import { OnlineNinjaBattle } from '../ninja/OnlineNinjaBattle';
+import { createNinjaSound } from '../ninja/ninjaSound';
+type BattleAudio={sound:ReturnType<typeof makeGameSound>;court:ReturnType<typeof makeCourtSound>;ninja:ReturnType<typeof createNinjaSound>};
 export function BattleScreen({onBack}:{onBack:()=>void}){
- const [audio]=useState<BattleAudio>(()=>({sound:makeGameSound(),court:makeCourtSound()}));
- useEffect(()=>()=>{audio.sound.close();audio.court.close();},[audio]);
- const [session,setSession]=useState(0);
- const [botTopic,setBotTopic]=useState<string|null>(null);
- return <BattleSession key={`${botTopic??'online'}:${session}`} botTopic={botTopic} audio={audio} onStartBot={topic=>{setBotTopic(topic);setSession(n=>n+1);}} onBack={botTopic?()=>setBotTopic(null):onBack}/>;
+ const [audio]=useState<BattleAudio>(()=>({sound:makeGameSound(),court:makeCourtSound(),ninja:createNinjaSound()}));
+ useEffect(()=>()=>{audio.sound.close();audio.court.close();audio.ninja.close();},[audio]);
+ return <BattleSession audio={audio} onBack={onBack}/>;
 }
-function BattleSession({onBack,botTopic,onStartBot,audio}:{onBack:()=>void;botTopic:string|null;onStartBot:(topic:string)=>void;audio:BattleAudio}){
- const [bot]=useState(()=>botTopic?createBotBattle(botTopic):null);
+function BattleSession({onBack,audio}:{onBack:()=>void;audio:BattleAudio}){
+ const [assetsReady,setAssetsReady]=useState('');
  const [view,setView]=useState<'stats'|'lobby'>('stats');
  const device=useRef(crypto.randomUUID());
  const courtSound=useRef(audio.court);
@@ -36,8 +35,7 @@ function BattleSession({onBack,botTopic,onStartBot,audio}:{onBack:()=>void;botTo
  const request=async(action='poll',payload:Record<string,unknown>={})=>{
   const seq=++sequence.current,start=Date.now();
   let snapshot:Snapshot;
-  if(bot) snapshot=bot.request(action,payload);
-  else {
+  {
    const {data,error:failure}=await supabase.rpc('battle_preview',{p_action:action,p_device:device.current,p_payload:payload});
    if(failure)throw new Error(failure.message);
    snapshot=data as Snapshot;
@@ -48,20 +46,21 @@ function BattleSession({onBack,botTopic,onStartBot,audio}:{onBack:()=>void;botTo
   return snapshot;
  };
  const act=async(action:string,payload:Record<string,unknown>={})=>{
-  primeBattleSpeech();sound.current?.ready();courtSound.current?.ready();setBusy(true);try{await request(action,payload);}catch(e){if(alive.current)setError((e as Error).message);}finally{if(alive.current)setBusy(false);}
+  primeBattleSpeech();sound.current?.ready();courtSound.current?.ready();audio.ninja.ready();setBusy(true);try{await request(action,payload);}catch(e){if(alive.current)setError((e as Error).message);}finally{if(alive.current)setBusy(false);}
  };
  useEffect(()=>{
-  alive.current=true;if(bot){sound.current?.ready();courtSound.current?.ready();}void preloadCourt().catch(()=>{});let timer:ReturnType<typeof setTimeout>;
+  alive.current=true;void preloadCourt().catch(()=>{});let timer:ReturnType<typeof setTimeout>;
   const loop=async()=>{if(!alive.current)return;try{if(!document.hidden)await request();}catch(e){if(alive.current)setError((e as Error).message);}if(alive.current)timer=setTimeout(loop,latest.current?.match?.status==='active'?250:1800);};
   void loop();const tick=setInterval(()=>setNow(Date.now()+offset.current),50);
   const visibility=()=>{setHidden(document.hidden);if(document.hidden)void request('leave').catch(()=>{});};
   document.addEventListener('visibilitychange',visibility);
-  return()=>{alive.current=false;stopSpeaking();clearTimeout(timer);clearInterval(tick);document.removeEventListener('visibilitychange',visibility);if(!bot)void supabase.rpc('battle_preview',{p_action:'leave',p_device:device.current,p_payload:{}});};
+  return()=>{alive.current=false;stopSpeaking();clearTimeout(timer);clearInterval(tick);document.removeEventListener('visibilitychange',visibility);void supabase.rpc('battle_preview',{p_action:'leave',p_device:device.current,p_payload:{}});};
  },[]);
  const match=state?.match;
+ const isNinja=match?.mode==='ninja';
  useEffect(()=>{
-  if(match?.status==='active'&&!match.starts_at&&ready.current!==match.id){ready.current=match.id;void request('ready',{match:match.id}).catch(e=>{ready.current='';if(alive.current)setError((e as Error).message);});}
- },[match]);
+  if(match?.status==='active'&&!match.starts_at&&ready.current!==match.id&&(!isNinja||assetsReady===match.id)){ready.current=match.id;void request('ready',{match:match.id}).catch(e=>{ready.current='';if(alive.current)setError((e as Error).message);});}
+ },[match,isNinja,assetsReady]);
  const baseRounds=match?.base_rounds??Math.min(10,botVocabulary[match?.topic??topic]?.words.length??10)*2;
  const starts=match?.starts_at?Date.parse(match.starts_at):Infinity;
  const running=match?.status==='active'&&now>=starts&&now<starts+5000;
@@ -70,11 +69,12 @@ function BattleSession({onBack,botTopic,onStartBot,audio}:{onBack:()=>void;botTo
  const preparing=match?.status==='active'&&match.round===0&&Number.isFinite(starts)&&now<starts;
  const prepareSeconds=Math.ceil((starts-now)/1000);
  useEffect(()=>{
+  if(isNinja)return;
   const digit=preparing?prepareSeconds:seconds;
   const enabled=preparing||(running&&!match?.answered);
   const key=`${roundKey}:${preparing?'prepare':'answer'}:${digit}`;
   if(enabled&&digit>=1&&digit<=3&&beeped.current!==key){beeped.current=key;sound.current?.beep(digit);}
- },[roundKey,seconds,prepareSeconds,preparing,running,match?.answered]);
+ },[roundKey,seconds,prepareSeconds,preparing,running,match?.answered,isNinja]);
  useEffect(()=>{
   if(hidden||match?.status==='cancelled'){stopSpeaking();return;}
   const pending=answerSpeech.current;
@@ -83,15 +83,15 @@ function BattleSession({onBack,botTopic,onStartBot,audio}:{onBack:()=>void;botTo
   }
  },[roundKey,voiceReady,hidden,match?.status]);
  useEffect(()=>{
-  if(!match)return;
+  if(!match||isNinja)return;
   const previous=scoreSeen.current;
   if(previous?.id===match.id&&(match.score_host>previous.host||match.score_guest>previous.guest))courtSound.current?.point();
   scoreSeen.current={id:match.id,host:match.score_host,guest:match.score_guest};
- },[match?.id,match?.score_host,match?.score_guest]);
+ },[match?.id,match?.score_host,match?.score_guest,isNinja]);
  const choose=(choice:number)=>{
   if(!match||!running||busy||match.answered||locked.current===roundKey)return;
   locked.current=roundKey;
-  if(match.task){
+  if(!isNinja&&match.task){
    const pending={key:roundKey,topic:match.topic,word:match.task.word};
    answerSpeech.current=pending;primeBattleSpeech();
    if(hasVietnameseVoice()){spoken.current=roundKey;speakBattleWord(pending.topic,pending.word);}
@@ -106,7 +106,8 @@ function BattleSession({onBack,botTopic,onStartBot,audio}:{onBack:()=>void;botTo
  const showCinema=!!state&&!hidden;
  const shownWord=running?(match?.task?.word??''):now<starts?(match?.last_result?.word??'Приготовьтесь!'):'Время!';
 
- return <div className={`screen battle-screen${playing||finished?' is-playing':''}${finished?' is-finished':''}`}><div className="battle-topbar"><BackButton onClick={!bot&&!playing&&!finished&&view==='lobby'?()=>setView('stats'):onBack} label={bot?'К батлу':!playing&&!finished&&view==='lobby'?'К статистике':'К играм'}/>{(playing||finished)&&!hidden&&<div className="battle-round">{match.round>=baseRounds&&!finished?'Дополнительный раунд '+(match.round-baseRounds+1):`Раунд ${Math.min(baseRounds,match.round+1)}/${baseRounds}`} <b>{finished?'✓':!match.starts_at?'…':now<starts?Math.ceil((starts-now)/1000):Math.max(0,Math.ceil((starts+5000-now)/1000))}</b></div>}</div><div className="battle-heading"><h1>{bot?'🤖 Батл с ботом':'⚔️ Батл'}</h1>{!playing&&<span>{bot?'Тренировка · без рейтинга':'Пробный · продвинутая группа'}</span>}</div>
+ if(isNinja&&inMatch&&(playing||finished)&&!hidden)return <OnlineNinjaBattle key={match.id} match={match} now={now} busy={busy} locked={locked.current===roundKey} error={error} sound={audio.ninja} onReady={()=>setAssetsReady(match.id)} onAnswer={choose} onCancel={()=>void act('cancel',{match:match.id})} onBack={onBack} onReplay={()=>void act('rematch',{match:match.id})} onStatistics={()=>{setDismissed(match.id);ready.current='';setView('stats');}}/>;
+ return <div className={`screen battle-screen${playing||finished?' is-playing':''}${finished?' is-finished':''}`}><div className="battle-topbar"><BackButton onClick={!playing&&!finished&&view==='lobby'?()=>setView('stats'):onBack} label={!playing&&!finished&&view==='lobby'?'К статистике':'К играм'}/>{(playing||finished)&&!hidden&&<div className="battle-round">{match.round>=baseRounds&&!finished?'Дополнительный раунд '+(match.round-baseRounds+1):`Раунд ${Math.min(baseRounds,match.round+1)}/${baseRounds}`} <b>{finished?'✓':!match.starts_at?'…':now<starts?Math.ceil((starts-now)/1000):Math.max(0,Math.ceil((starts+5000-now)/1000))}</b></div>}</div><div className="battle-heading"><h1>⚔️ Батл</h1>{!playing&&<span>Онлайн · с участниками</span>}</div>
 
  {(playing||(finished&&!outcome))&&!hidden&&<BattleCourt state={{key:roundKey,round:finished?Math.max(0,match.round-1):match.round,now,starts:finished?Infinity:starts,winner:ownWinner(match.last_result?.winner??'none',match.side),nearBlue:match.side==='host'}} onHit={(kind,near)=>courtSound.current?.hit(kind,near)}/>}
 
@@ -118,13 +119,11 @@ function BattleSession({onBack,botTopic,onStartBot,audio}:{onBack:()=>void;botTo
  <div className="battle-feedback" aria-live="polite">{now<starts&&match.last_result?<>✓ {match.last_result.options[match.last_result.answer]} · {match.last_result.winner==='none'?'Без очков':match.last_result.winner==='both'?'По очку обоим':`Очко: ${match.last_result.winner==='host'?match.host_name:match.guest_name}`}</>:match.answered||locked.current===roundKey?'Ответ принят. Ждём результат…':'Выбери перевод'}</div>
  <div className="battle-answers">{(match.task?.options??[]).map((option,i)=><button key={`${roundKey}:${i}`} disabled={!running||busy||match.answered||locked.current===roundKey} onClick={()=>choose(i)}>{option}</button>)}</div>
  <button className="battle-secondary" disabled={busy} onClick={()=>void act('cancel',{match:match.id})}>Завершить батл</button>
- </>:inMatch&&['finished','cancelled'].includes(match.status)?<section className={`battle-panel${finished?' battle-result':''}`}><h2>{match.status==='finished'?'🏆 Батл завершён':'Батл отменён'}</h2><p>{match.status==='finished'?(match.score_host===match.score_guest?'Ничья!':`Победитель: ${match.score_host>match.score_guest?match.host_name:match.guest_name}`):'Приглашение истекло, участник вышел или свернул приложение.'}</p><div className="battle-result-actions">{finished&&<button className="big-button" disabled={busy} onClick={()=>{if(bot){onStartBot(match.topic);}else void act('rematch',{match:match.id});}}>Реванш</button>}<button className="battle-return-button" onClick={()=>{if(bot)onBack();else{setDismissed(match.id);ready.current='';setView('stats');}}}>← К статистике</button></div></section>:!bot&&view==='stats'?<BattleStatistics onPlay={()=>{setView('lobby');if(match)setDismissed(match.id);}}/>:<>
+ </>:inMatch&&['finished','cancelled'].includes(match.status)?<section className={`battle-panel${finished?' battle-result':''}`}><h2>{match.status==='finished'?'🏆 Батл завершён':'Батл отменён'}</h2><p>{match.status==='finished'?(match.score_host===match.score_guest?'Ничья!':`Победитель: ${match.score_host>match.score_guest?match.host_name:match.guest_name}`):'Приглашение истекло, участник вышел или свернул приложение.'}</p><div className="battle-result-actions">{finished&&<button className="big-button" disabled={busy} onClick={()=>void act('rematch',{match:match.id})}>Реванш</button>}<button className="battle-return-button" onClick={()=>{setDismissed(match.id);ready.current='';setView('stats');}}>← К статистике</button></div></section>:view==='stats'?<BattleStatistics onPlay={()=>{setView('lobby');if(match)setDismissed(match.id);}}/>:<>
  <div className="battle-label">Выбери тему</div><TopicWheel items={state.topics} value={topic} onChange={setTopic}/>
- <p className="battle-rules">До 10 слов в каждом направлении · 5 секунд · 3 ответа</p>
- <button className="big-button" disabled={busy} onClick={()=>{primeBattleSpeech();sound.current.ready();courtSound.current.ready();onStartBot(topic);}}>🤖 Сыграть с ботом</button>
- <p className="battle-note" style={{marginTop:0}}>Случайные ответы · {baseRounds} вопросов · без рейтинга</p>
+ <p className="battle-rules">{['fruits','vegetables','harvest'].includes(topic)?'🥷 Ниндзя · картинки → вьетнамский · до 10 раундов':'🏓 Пиклбол · до 10 слов в каждом направлении'} · 5 секунд · до победы</p>
  <h2>Сейчас в сети</h2>{state.online.length?state.online.map(p=><div className="battle-person" key={p.device}><span>🟢 {p.name}</span><button disabled={busy||p.busy} onClick={()=>{setDismissed('');void act('invite',{opponent:p.device,topic});}}>{p.busy?'Занят':'Вызвать'}</button></div>):<p>Пока никого. Откройте этот раздел под второй учётной записью на другом устройстве.</p>}
- <p className="battle-note">Доступно только админу и Светлане. Пробные результаты не влияют на рейтинги обычных игр.</p>
+ <p className="battle-note">Результаты сохраняются в статистике батлов и не влияют на рейтинги обычных игр.</p>
  </>}
  {error&&<p role="alert" className="battle-error">{error} <button onClick={()=>void act('poll')}>Повторить</button></p>}
  </div>;

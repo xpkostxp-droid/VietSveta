@@ -28,7 +28,7 @@ export function NinjaStage({state,now,human,bot}:{state:NinjaSnapshot;now:number
    {sliced?<><img className="ninja-half ninja-half-left" src={fruit} alt=""/><img className="ninja-half ninja-half-right" src={fruit} alt=""/><span className="ninja-juice" aria-hidden="true"/></>:<img src={fruit} alt=""/>}
   </div>}
   {hit&&elapsed>=160&&elapsed<450&&<i className={`ninja-cut${(hit.side==='human'?human:bot).startsWith('red')?' is-horizontal':''}`} style={fruitStyle} aria-hidden="true"/>}
-  {state.phase==='ready'&&state.round===0&&<div className="ninja-prepare" role="status"><small>Приготовься!</small>{Math.max(1,Math.ceil((state.startsAt-now)/1000))}</div>}
-  {state.phase==='finished'&&<div className="ninja-finish-banner">{state.scoreHuman>state.scoreBot?'🏆 Твоя победа!':'Победа бота'}<small>Батл завершён</small></div>}
+  {state.phase==='ready'&&state.round===0&&Number.isFinite(state.startsAt)&&<div className="ninja-prepare" role="status"><small>Приготовься!</small>{Math.max(1,Math.ceil((state.startsAt-now)/1000))}</div>}
+  {state.phase==='finished'&&<div className="ninja-finish-banner">{state.scoreHuman>state.scoreBot?'🏆 Твоя победа!':'Победа соперника'}<small>Батл завершён</small></div>}
  </div>;
 }
