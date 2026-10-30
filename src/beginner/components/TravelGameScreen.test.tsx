@@ -92,3 +92,12 @@ it('finishes all thirty-four city and travel tasks and saves its separate rankin
   expect(attempts.save).toHaveBeenCalledTimes(1);
   expect(attempts.save).toHaveBeenCalledWith(expect.objectContaining({ game: 'lesson7-travel', correct: 34, total: 34, correctTimeMs: 17000 }));
 });
+
+it('opens the profile-linked subgroup directly and returns to the profile',()=>{
+ const back=vi.fn();
+ act(()=>root.render(<TravelGameScreen key="profile-link" initialGroup="travel" onBack={back}/>));
+ expect(host.querySelector('[data-game="lesson7-travel"]')).toBeTruthy();
+ expect(host.querySelector('.work-group-list')).toBeNull();
+ act(()=>host.querySelector<HTMLButtonElement>('button')!.click());
+ expect(back).toHaveBeenCalledOnce();
+});

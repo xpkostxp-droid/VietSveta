@@ -8,8 +8,8 @@ import { ProfessionPicture } from './ProfessionPicture';
 import './ProfessionsGameScreen.css';
 import { makeGameSound } from './gameSounds';
 type Result = { correct: number; time: number };
-export function ProfessionsGameScreen({ onBack }: { onBack: () => void }) {
-  const [group, setGroup] = useState<WorkBlitzGroup | null>(null);
+export function ProfessionsGameScreen({ onBack, initialGroup = null }: { onBack: () => void; initialGroup?: WorkBlitzGroup | null }) {
+  const [group, setGroup] = useState<WorkBlitzGroup | null>(initialGroup);
   const [tasks, setTasks] = useState<WorkTask[]>([]);
   const [position, setPosition] = useState(0);
   const [options, setOptions] = useState<string[]>([]);
@@ -80,7 +80,7 @@ export function ProfessionsGameScreen({ onBack }: { onBack: () => void }) {
   useEffect(() => () => { stopSpeaking(); audio.current.close(); }, []);
   const back = () => {
     stopSpeaking(); locked.current = true; setPhase('intro'); setTasks([]); setPaused(false);
-    if (phase === 'intro') { if (group) setGroup(null); else onBack(); }
+    if (phase === 'intro') { if (initialGroup) onBack(); else if (group) setGroup(null); else onBack(); }
   };
   return <div className={"screen family-screen work-blitz" + (phase === 'playing' || phase === 'feedback' ? ' work-active' : '')}>
     <BackButton onClick={back} label={group ? 'Назад' : 'К играм'} />

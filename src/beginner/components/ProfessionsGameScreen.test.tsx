@@ -82,3 +82,12 @@ it('beeps once on 3, 2, 1 and stops after an answer', () => {
   act(() => vi.advanceTimersByTime(1500));
   expect(sounds.beep).toHaveBeenCalledTimes(3);
 });
+
+it('opens the profile-linked subgroup directly and returns to the profile',()=>{
+ const back=vi.fn();
+ act(()=>root.render(<ProfessionsGameScreen key="profile-link" initialGroup="work" onBack={back}/>));
+ expect(host.querySelector('[data-game="lesson5-work"]')).toBeTruthy();
+ expect(host.querySelector('.work-group-list')).toBeNull();
+ act(()=>host.querySelector<HTMLButtonElement>('button')!.click());
+ expect(back).toHaveBeenCalledOnce();
+});

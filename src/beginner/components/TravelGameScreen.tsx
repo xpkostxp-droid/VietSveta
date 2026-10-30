@@ -9,8 +9,8 @@ import './ProfessionsGameScreen.css';
 import './TravelGameScreen.css';
 import { makeGameSound } from './gameSounds';
 type Result = { correct: number; time: number };
-export function TravelGameScreen({ onBack }: { onBack: () => void }) {
-  const [group, setGroup] = useState<TravelBlitzGroup | null>(null);
+export function TravelGameScreen({ onBack, initialGroup = null }: { onBack: () => void; initialGroup?: TravelBlitzGroup | null }) {
+  const [group, setGroup] = useState<TravelBlitzGroup | null>(initialGroup);
   const [tasks, setTasks] = useState<TravelTask[]>([]);
   const [position, setPosition] = useState(0);
   const [options, setOptions] = useState<string[]>([]);
@@ -81,7 +81,7 @@ export function TravelGameScreen({ onBack }: { onBack: () => void }) {
   useEffect(() => () => { stopSpeaking(); audio.current.close(); }, []);
   const back = () => {
     stopSpeaking(); locked.current = true; setPhase('intro'); setTasks([]); setPaused(false);
-    if (phase === 'intro') { if (group) setGroup(null); else onBack(); }
+    if (phase === 'intro') { if (initialGroup) onBack(); else if (group) setGroup(null); else onBack(); }
   };
   return <div className={"screen family-screen work-blitz travel-blitz" + (phase === 'playing' || phase === 'feedback' ? ' work-active' : '')}>
     <BackButton onClick={back} label={group ? 'Назад' : 'К играм'} />
