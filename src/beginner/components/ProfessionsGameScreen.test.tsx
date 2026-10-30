@@ -21,6 +21,8 @@ afterEach(() => { act(() => root.unmount()); host.remove(); vi.useRealTimers(); 
 function click(text: string) { act(() => Array.from(host.querySelectorAll('button')).find(b => b.textContent?.trim() === text || b.querySelector('strong')?.textContent === text)!.click()); }
 function start(group = 'Профессии') { click(group); expect(host.textContent).toContain('Рейтинг участников'); click('Начать'); }
 function correctAnswer() {
+  const photo=host.querySelector<HTMLImageElement>('.profession-photo');
+  if(photo){const id=photo.getAttribute('src')!.split('/').pop()!.replace('.webp','');return professionWords.find(w=>w[0]===id)![1];}
   const prompt = host.querySelector('.work-prompt h2')!.textContent;
   const reverse = host.querySelector('.work-prompt h2')!.getAttribute('lang') === 'vi';
   const word = professionWords.find(w => w[reverse ? 1 : 2] === prompt)!;
@@ -44,6 +46,8 @@ it('continues after mistakes and timeout, locks double answers, stores isolated 
   start();
   for (let i = 0; i < 30; i++) {
     const correct = correctAnswer();
+    if(host.querySelector('.profession-photo')){expect(host.querySelector('.profession-caption')).toBeNull();expect(host.querySelector('.work-prompt h2')).toBeNull();}
+    else expect(host.querySelector('.work-prompt img')).toBeNull();
     if (i === 0) {
       act(() => vi.advanceTimersByTime(1000));
       const wrong = Array.from(host.querySelectorAll<HTMLButtonElement>('.work-options button')).find(b => b.textContent !== correct)!;
@@ -90,4 +94,16 @@ it('opens the profile-linked subgroup directly and returns to the profile',()=>{
  expect(host.querySelector('.work-group-list')).toBeNull();
  act(()=>host.querySelector<HTMLButtonElement>('button')!.click());
  expect(back).toHaveBeenCalledOnce();
+});
+
+it('shows only the picture before an answer, reveals the Vietnamese caption, and uses no picture in reverse tasks',()=>{
+ start();
+ let foundPicture=false,foundReverse=false;
+ for(let i=0;i<30&&(!foundPicture||!foundReverse);i++){
+  const photo=host.querySelector<HTMLImageElement>('.profession-photo');const right=correctAnswer();
+  if(photo){foundPicture=true;expect(host.querySelector('.work-prompt h2')).toBeNull();click(right);expect(host.querySelector('.profession-caption')?.textContent).toBe(right);}
+  else {foundReverse=true;expect(host.querySelector('.work-prompt h2')?.getAttribute('lang')).toBe('vi');click(right);expect(host.querySelector('.work-prompt img')).toBeNull();}
+  act(()=>vi.advanceTimersByTime(1600));
+ }
+ expect(foundPicture&&foundReverse).toBe(true);
 });

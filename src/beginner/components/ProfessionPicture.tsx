@@ -1,4 +1,21 @@
 import type { ReactNode } from 'react';
+export const professionPhotos:Record<string,string> = {
+ 'doctor':import.meta.env.BASE_URL+'professions/doctor.webp',
+ 'nurse':import.meta.env.BASE_URL+'professions/nurse.webp',
+ 'engineer':import.meta.env.BASE_URL+'professions/engineer.webp',
+ 'driver':import.meta.env.BASE_URL+'professions/driver.webp',
+ 'teacher':import.meta.env.BASE_URL+'professions/teacher.webp',
+ 'teacher-woman':import.meta.env.BASE_URL+'professions/teacher-woman.webp',
+ 'teacher-man':import.meta.env.BASE_URL+'professions/teacher-man.webp',
+ 'student':import.meta.env.BASE_URL+'professions/student.webp',
+ 'secretary':import.meta.env.BASE_URL+'professions/secretary.webp',
+ 'director':import.meta.env.BASE_URL+'professions/director.webp',
+ 'boss':import.meta.env.BASE_URL+'professions/boss.webp',
+ 'employee':import.meta.env.BASE_URL+'professions/employee.webp',
+ 'manager':import.meta.env.BASE_URL+'professions/manager.webp',
+ 'police':import.meta.env.BASE_URL+'professions/police.webp',
+ 'traffic-police':import.meta.env.BASE_URL+'professions/traffic-police.webp',
+};
 const ink = '#385464';
 function Worker({ kind }: { kind: string }) {
  const female = ['nurse', 'teacher-woman', 'secretary'].includes(kind);
@@ -31,6 +48,7 @@ function Building({ kind }: { kind: string }) {
 function Car() { return <g stroke={ink} strokeWidth="3"><path d="M67 152V117L93 109L116 80H208L232 109L253 119V152Z" fill="#e4b86d"/><path d="M108 108L123 88H199L216 108Z" fill="#d6edeb"/><circle cx="109" cy="151" r="17" fill={ink}/><circle cx="213" cy="151" r="17" fill={ink}/><circle cx="109" cy="151" r="7" fill="white"/><circle cx="213" cy="151" r="7" fill="white"/></g>; }
 function Desk({ doing = false }: { doing?: boolean }) { return <g stroke={ink} strokeWidth="3"><path d="M66 153H254M83 154V184M237 154V184"/><rect x="103" y="91" width="105" height="57" rx="5" fill="#82b9b4"/><path d="M97 148H217" strokeWidth="7"/>{doing ? <><path d="M235 78L245 89L226 109L216 98Z" fill="#e5b56e"/><path d="M216 98L211 115L226 109" fill="#f0c8a4"/></> : <path d="M131 105H180M131 117H168M131 129H176" stroke="white"/>}</g>; }
 export function ProfessionPicture({ id }: { id: string }) {
+ if(professionPhotos[id])return <img className="family-picture profession-photo" src={professionPhotos[id]} alt="Иллюстрация профессии" decoding="async"/>;
  const places = ['bank','company','construction-company','hospital','restaurant','school','university'];
  let scene: ReactNode;
  if (places.includes(id)) scene = <Building kind={id}/>;
