@@ -11,6 +11,7 @@ beforeEach(()=>{vi.spyOn(HTMLMediaElement.prototype,'pause').mockImplementation(
 afterEach(async()=>{await act(async()=>root.unmount());host.remove();vi.useRealTimers();vi.restoreAllMocks();});
 it('shows online opponent, selected topic and sends an invitation',async()=>{
  await act(async()=>root.render(<BattleScreen onBack={()=>{}}/>));
+ await act(async()=>[...host.querySelectorAll('button')].find(b=>b.textContent==='Играть')!.click());
  expect(host.textContent).toContain('Светлана');expect(host.textContent).toContain('не влияют');
  const button=[...host.querySelectorAll('button')].find(b=>b.textContent==='Вызвать')!;
  await act(async()=>button.click());
@@ -43,6 +44,7 @@ it('shows a draw without a victory smash after 15 questions',async()=>{
 });
 it('starts a local bot match without sending bot answers to the server',async()=>{
  await act(async()=>root.render(<BattleScreen onBack={()=>{}}/>));
+ await act(async()=>[...host.querySelectorAll('button')].find(b=>b.textContent==='Играть')!.click());
  const button=[...host.querySelectorAll('button')].find(b=>b.textContent?.includes('Сыграть с ботом'))!;
  await act(async()=>button.click());
  expect(host.textContent).toContain('Бот');
@@ -78,5 +80,23 @@ it('keeps the final score below the smash and preserves the match layout',async(
  expect(cinema.compareDocumentPosition(score)&Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
  expect(cinema.classList.contains('battle-cinema-compact')).toBe(true);
  expect(host.querySelectorAll('.battle-score')).toHaveLength(1);
- expect(host.querySelector('.battle-result')?.textContent).toContain('В лобби');
+ expect(host.querySelector('.battle-result')?.textContent).toContain('К статистике');
+});
+it('opens statistics first and enters the lobby through Play',async()=>{
+ await act(async()=>root.render(<BattleScreen onBack={()=>{}}/>));
+ expect(host.textContent).toContain('Статистика батлов');expect(host.querySelector('.topic-wheel')).toBeNull();
+ await act(async()=>[...host.querySelectorAll('button')].find(b=>b.textContent==='Играть')!.click());
+ expect(host.textContent).toContain('Выбери тему');
+ await act(async()=>[...host.querySelectorAll('button')].find(b=>b.textContent?.includes('К статистике'))!.click());
+ expect(host.textContent).toContain('Статистика батлов');
+});
+it('offers a rematch with the same opponent and a return to statistics',async()=>{
+ const match={id:'ended',topic:'fruits',status:'finished',side:'host',round:20,starts_at:null,task:null,answered:true,score_host:12,score_guest:5,host_name:'Админ',guest_name:'Светлана',last_result:null};
+ rpc.mockResolvedValue({data:{...base,match},error:null});
+ await act(async()=>root.render(<BattleScreen onBack={()=>{}}/>));
+ await act(async()=>[...host.querySelectorAll('button')].find(b=>b.textContent==='Реванш')!.click());
+ expect(rpc).toHaveBeenCalledWith('battle_preview',expect.objectContaining({p_action:'rematch',p_payload:{match:'ended'}}));
+ await act(async()=>[...host.querySelectorAll('button')].find(b=>b.textContent==='К статистике')!.click());
+ expect(host.textContent).toContain('Статистика батлов');
+ expect(host.querySelector('.battle-score')).toBeNull();
 });

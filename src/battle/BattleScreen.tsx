@@ -6,6 +6,7 @@ import { BattleCinema, type CinemaResult } from './BattleCinema';
 import { BattleCourt, preloadCourt } from './BattleCourt';
 import { makeCourtSound } from './courtSound';
 import { finalOutcome, ownWinner } from './battleScene';
+import { BattleStatistics } from './BattleStatistics';
 import { TopicWheel } from './TopicWheel';
 import { makeGameSound } from '../beginner/components/gameSounds';
 import type { Snapshot } from './battleTypes';
@@ -17,11 +18,13 @@ type BattleAudio={sound:ReturnType<typeof makeGameSound>;court:ReturnType<typeof
 export function BattleScreen({onBack}:{onBack:()=>void}){
  const [audio]=useState<BattleAudio>(()=>({sound:makeGameSound(),court:makeCourtSound()}));
  useEffect(()=>()=>{audio.sound.close();audio.court.close();},[audio]);
+ const [session,setSession]=useState(0);
  const [botTopic,setBotTopic]=useState<string|null>(null);
- return <BattleSession key={botTopic??'online'} botTopic={botTopic} audio={audio} onStartBot={setBotTopic} onBack={botTopic?()=>setBotTopic(null):onBack}/>;
+ return <BattleSession key={`${botTopic??'online'}:${session}`} botTopic={botTopic} audio={audio} onStartBot={topic=>{setBotTopic(topic);setSession(n=>n+1);}} onBack={botTopic?()=>setBotTopic(null):onBack}/>;
 }
 function BattleSession({onBack,botTopic,onStartBot,audio}:{onBack:()=>void;botTopic:string|null;onStartBot:(topic:string)=>void;audio:BattleAudio}){
  const [bot]=useState(()=>botTopic?createBotBattle(botTopic):null);
+ const [view,setView]=useState<'stats'|'lobby'>('stats');
  const device=useRef(crypto.randomUUID());
  const courtSound=useRef(audio.court);
  const sound=useRef(audio.sound),beeped=useRef('');
@@ -103,7 +106,7 @@ function BattleSession({onBack,botTopic,onStartBot,audio}:{onBack:()=>void;botTo
  const showCinema=!!state&&!hidden;
  const shownWord=running?(match?.task?.word??''):now<starts?(match?.last_result?.word??'Приготовьтесь!'):'Время!';
 
- return <div className={`screen battle-screen${playing||finished?' is-playing':''}${finished?' is-finished':''}`}><div className="battle-topbar"><BackButton onClick={onBack} label={bot?'К батлу':'К играм'}/>{(playing||finished)&&!hidden&&<div className="battle-round">{match.round>=baseRounds&&!finished?'Дополнительный раунд '+(match.round-baseRounds+1):`Раунд ${Math.min(baseRounds,match.round+1)}/${baseRounds}`} <b>{finished?'✓':!match.starts_at?'…':now<starts?Math.ceil((starts-now)/1000):Math.max(0,Math.ceil((starts+5000-now)/1000))}</b></div>}</div><div className="battle-heading"><h1>{bot?'🤖 Батл с ботом':'⚔️ Батл'}</h1>{!playing&&<span>{bot?'Тренировка · без рейтинга':'Пробный · продвинутая группа'}</span>}</div>
+ return <div className={`screen battle-screen${playing||finished?' is-playing':''}${finished?' is-finished':''}`}><div className="battle-topbar"><BackButton onClick={!bot&&!playing&&!finished&&view==='lobby'?()=>setView('stats'):onBack} label={bot?'К батлу':!playing&&!finished&&view==='lobby'?'К статистике':'К играм'}/>{(playing||finished)&&!hidden&&<div className="battle-round">{match.round>=baseRounds&&!finished?'Дополнительный раунд '+(match.round-baseRounds+1):`Раунд ${Math.min(baseRounds,match.round+1)}/${baseRounds}`} <b>{finished?'✓':!match.starts_at?'…':now<starts?Math.ceil((starts-now)/1000):Math.max(0,Math.ceil((starts+5000-now)/1000))}</b></div>}</div><div className="battle-heading"><h1>{bot?'🤖 Батл с ботом':'⚔️ Батл'}</h1>{!playing&&<span>{bot?'Тренировка · без рейтинга':'Пробный · продвинутая группа'}</span>}</div>
 
  {(playing||(finished&&!outcome))&&!hidden&&<BattleCourt state={{key:roundKey,round:finished?Math.max(0,match.round-1):match.round,now,starts:finished?Infinity:starts,winner:ownWinner(match.last_result?.winner??'none',match.side),nearBlue:match.side==='host'}} onHit={(kind,near)=>courtSound.current?.hit(kind,near)}/>}
 
@@ -115,7 +118,7 @@ function BattleSession({onBack,botTopic,onStartBot,audio}:{onBack:()=>void;botTo
  <div className="battle-feedback" aria-live="polite">{now<starts&&match.last_result?<>✓ {match.last_result.options[match.last_result.answer]} · {match.last_result.winner==='none'?'Без очков':match.last_result.winner==='both'?'По очку обоим':`Очко: ${match.last_result.winner==='host'?match.host_name:match.guest_name}`}</>:match.answered||locked.current===roundKey?'Ответ принят. Ждём результат…':'Выбери перевод'}</div>
  <div className="battle-answers">{(match.task?.options??[]).map((option,i)=><button key={`${roundKey}:${i}`} disabled={!running||busy||match.answered||locked.current===roundKey} onClick={()=>choose(i)}>{option}</button>)}</div>
  <button className="battle-secondary" disabled={busy} onClick={()=>void act('cancel',{match:match.id})}>Завершить батл</button>
- </>:inMatch&&['finished','cancelled'].includes(match.status)?<section className={`battle-panel${finished?' battle-result':''}`}><h2>{match.status==='finished'?'🏆 Батл завершён':'Батл отменён'}</h2><p>{match.status==='finished'?(match.score_host===match.score_guest?'Ничья!':`Победитель: ${match.score_host>match.score_guest?match.host_name:match.guest_name}`):'Приглашение истекло, участник вышел или свернул приложение.'}</p><button className="big-button" onClick={()=>{if(bot)onBack();else{setDismissed(match.id);ready.current='';}}}>В лобби</button></section>:<>
+ </>:inMatch&&['finished','cancelled'].includes(match.status)?<section className={`battle-panel${finished?' battle-result':''}`}><h2>{match.status==='finished'?'🏆 Батл завершён':'Батл отменён'}</h2><p>{match.status==='finished'?(match.score_host===match.score_guest?'Ничья!':`Победитель: ${match.score_host>match.score_guest?match.host_name:match.guest_name}`):'Приглашение истекло, участник вышел или свернул приложение.'}</p><div className="battle-result-actions">{finished&&<button className="big-button" disabled={busy} onClick={()=>{if(bot){onStartBot(match.topic);}else void act('rematch',{match:match.id});}}>Реванш</button>}<button className="battle-secondary" onClick={()=>{if(bot)onBack();else{setDismissed(match.id);ready.current='';setView('stats');}}}>К статистике</button></div></section>:!bot&&view==='stats'?<BattleStatistics onPlay={()=>{setView('lobby');if(match)setDismissed(match.id);}}/>:<>
  <div className="battle-label">Выбери тему</div><TopicWheel items={state.topics} value={topic} onChange={setTopic}/>
  <p className="battle-rules">До 10 слов в каждом направлении · 5 секунд · 3 ответа</p>
  <button className="big-button" disabled={busy} onClick={()=>{primeBattleSpeech();sound.current.ready();courtSound.current.ready();onStartBot(topic);}}>🤖 Сыграть с ботом</button>
