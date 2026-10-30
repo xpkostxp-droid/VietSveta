@@ -2,3 +2,7 @@
 .at-playing{gap:8px}.at-board{height:clamp(150px,24svh,230px)}.at-prompt{height:80px;min-height:80px}.at-options button{height:76px;min-height:76px;font-size:clamp(1.2rem,4.8vw,1.4rem);padding:8px 12px}@media(max-height:650px){.at-playing{gap:6px}.at-board{height:100px}.at-prompt{height:64px;min-height:64px}.at-feedback{height:40px}.at-options{gap:8px}.at-options button{height:64px;min-height:64px;font-size:1.15rem}.at-note{font-size:.78rem}}
 
 .at-prompt{height:126px;min-height:126px}.at-prompt strong{font-size:clamp(2.15rem,8.5vw,3.1rem);font-weight:850;line-height:1.12;text-wrap:balance}@media(max-height:650px){.at-prompt{height:102px;min-height:102px}.at-prompt strong{font-size:clamp(1.9rem,8vw,2.5rem)}}
+/* Keep the Tetris board, word and answers close after removing captions. */
+.at-playing:not(.rope-playing) > .at-prompt{height:auto;min-height:0;padding:8px 0;gap:0}
+.at-playing:not(.rope-playing) > .at-prompt small,
+.at-playing:not(.rope-playing) > .at-feedback{display:none}
