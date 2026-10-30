@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { AccountGate } from './components/AccountGate';
 import './index.css';
+import './components/MenuKeys.css';
 import { startAutoUpdate } from './domain/autoUpdate';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(

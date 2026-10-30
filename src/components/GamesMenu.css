@@ -1,27 +1,6 @@
 .games-menu-screen .screen-title{margin:4px 0 8px}
-.games-menu-keys{display:grid;gap:22px;padding:0 0 14px}
-.games-menu-key{
- --key-base:#94866e;--key-shadow:#69583e3b;
- position:relative;isolation:isolate;display:grid;grid-template-columns:38px minmax(0,1fr);align-items:center;gap:16px;
- width:100%;min-height:84px;margin:0;padding:17px 21px;box-sizing:border-box;
- border:1px solid #d9ccb3;border-radius:22px;
- background:linear-gradient(170deg,#fffef9 0%,#fffaf0 46%,#eee5d4 100%);color:#174f49;
- font:inherit;font-size:clamp(18px,4.8vw,23px);font-weight:800;line-height:1.25;text-align:left;
- box-shadow:0 7px 0 var(--key-base),0 11px 7px -2px var(--key-shadow),0 17px 22px -7px #69583e30,inset 0 2px 1px #fff,inset 0 -3px 3px #b5a28138,inset 2px 0 2px #ffffffc9,inset -2px 0 2px #b9aa8d40;
- transition:transform .12s ease,box-shadow .12s ease;touch-action:manipulation;-webkit-tap-highlight-color:transparent;
-}
-.games-menu-key::before{content:'';position:absolute;inset:3px 3px auto;height:42%;border-radius:18px 18px 12px 12px;background:linear-gradient(#ffffff7a,#fff0);z-index:-1;pointer-events:none}
+.games-menu-keys{display:grid;gap:15px;padding:0 0 14px}
+.games-menu-key{display:grid;grid-template-columns:38px minmax(0,1fr);align-items:center;gap:16px;width:100%;min-height:84px;margin:0;padding:17px 21px;font:inherit;font-size:clamp(18px,4.8vw,23px);font-weight:800;line-height:1.25;text-align:left}
 .games-menu-key-icon{display:grid;place-items:center;font-size:32px;line-height:1;filter:drop-shadow(0 1px 1px #26342a26)}
-.games-menu-key-battle{
- --key-base:#123d3c;--key-shadow:#13353266;
- border:2px solid #c6a45f;color:#fffdf1;text-shadow:0 1px 2px #073d3b80;
- background:linear-gradient(165deg,#138b83 0%,#087870 42%,#045752 80%,#03413f 100%);
- box-shadow:0 7px 0 var(--key-base),0 8px 0 1px #887443,0 12px 8px -2px var(--key-shadow),0 18px 24px -7px #143d3b42,inset 0 2px 2px #e5fff0a6,inset 0 -3px 3px #002f2c99,inset 2px 0 2px #f1da9b66,inset -2px 0 2px #021f2066;
-}
-.games-menu-key-battle::before{background:linear-gradient(#b2fff235,#fff0)}
-.games-menu-key:active{transform:translateY(5px);box-shadow:0 2px 0 var(--key-base),0 4px 5px -1px var(--key-shadow),inset 0 2px 4px #6b5c3d24,inset 0 -1px 1px #fff8}
-.games-menu-key-battle:active{box-shadow:0 2px 0 var(--key-base),0 3px 0 1px #887443,0 5px 6px -1px var(--key-shadow),inset 0 2px 5px #002c2b66,inset 0 -1px 1px #d8f5cd55}
-.games-menu-key:focus-visible{outline:3px solid #a97224;outline-offset:5px}
 @media(max-width:360px){.games-menu-key{grid-template-columns:32px minmax(0,1fr);gap:12px;padding:15px 16px}.games-menu-key-icon{font-size:29px}}
-@media(max-height:640px){.games-menu-keys{gap:18px}.games-menu-key{min-height:74px;padding-top:13px;padding-bottom:13px}}
-@media(prefers-reduced-motion:reduce){.games-menu-key{transition:none}}
+@media(max-height:640px){.games-menu-keys{gap:11px}.games-menu-key{min-height:74px;padding-top:13px;padding-bottom:13px}}
