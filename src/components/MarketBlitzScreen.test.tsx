@@ -46,7 +46,12 @@ it('has three choices, visits products once, explodes on a final error and clear
       expect(node.querySelector('.harvest-wrong')).toBeTruthy();
       expect(options.every(b=>b.disabled)).toBe(true);
       expect(JSON.parse(localStorage.getItem(key)!)).toContain(products.find(p => p[2] === correct)![1] + '|picture');
-    } else await chooseCorrect();
+    } else {
+      await chooseCorrect();
+      const product=products.find(p=>p[1]===correct||p[2]===correct)!;
+      expect(node.querySelector('.harvest-answer-slot')?.textContent?.trim()).toBe(product[2]);
+      expect(node.querySelector('.harvest-answer-slot')?.textContent).not.toContain(product[1]);
+    }
     if (i === products.length * 2 - 1) await time(700);
     await time(1700);
   }
@@ -90,11 +95,12 @@ it('warns only at three, two and one seconds and reveals the answer after the ex
   await time(1000); expect(audio.beep).toHaveBeenCalledTimes(2);
   await time(1000); expect(audio.beep).toHaveBeenCalledTimes(3);
   const correct = answer();
+  const translation = products.find(p=>p[1]===correct)![2];
   await time(1000); expect(node.querySelector('.harvest-shake')).toBeTruthy();
-  expect(node.querySelector('.harvest-answer-slot strong')?.textContent).not.toBe(correct);
+  expect(node.querySelector('.harvest-answer-slot strong')?.textContent).not.toBe(translation);
   expect(node.querySelector('.blitz-correct')).toBeNull();
-  await time(699); expect(node.querySelector('.harvest-answer-slot strong')?.textContent).not.toBe(correct);
-  await time(1); expect(node.querySelector('.harvest-answer-slot strong')?.textContent).toBe(correct);
+  await time(699); expect(node.querySelector('.harvest-answer-slot strong')?.textContent).not.toBe(translation);
+  await time(1); expect(node.querySelector('.harvest-answer-slot strong')?.textContent).toBe(translation);
   expect(audio.beep).toHaveBeenCalledTimes(3);
 });
 

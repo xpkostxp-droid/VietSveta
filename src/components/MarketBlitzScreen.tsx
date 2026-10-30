@@ -181,8 +181,7 @@ export function MarketBlitzScreen({ onBack, category = 'all' }: { onBack: () => 
           </div>
         </div>
         <div className="harvest-answer-slot" aria-live="polite">
-          <strong>{showAnswer ? current[1] : '\u00a0'}</strong>
-          <span>{showAnswer ? current[2] : '\u00a0'}</span>
+          <strong>{showAnswer ? current[2] : '\u00a0'}</strong>
         </div>
         <div className={'blitz-options harvest-options' + (pictureAnswers ? ' harvest-picture-options' : '')}>{options.map(i => <button key={i} aria-label={pictureAnswers ? products[i][2] : products[i][1]} className={'blitz-option' + (showAnswer && i === productForTask(round[position]) ? ' blitz-correct' : selected === i && phase === 'wrong' ? ' blitz-wrong' : '')} disabled={phase !== 'question' || paused} onClick={() => resolve(i)}>{pictureAnswers ? <span aria-hidden="true">{products[i][0]}</span> : products[i][1]}</button>)}</div>
         <p className="blitz-feedback" aria-live="polite">{phase === 'success' ? '+1 в корзину!' : '\u00a0'}</p>

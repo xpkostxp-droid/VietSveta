@@ -1132,7 +1132,7 @@ a:focus-visible {
 .harvest-prompt-content { max-width: 100%; }
 .harvest-compact-card .market-product { font-size: 88px; }
 .harvest-word-prompt { margin: 0; font-size: clamp(1.8rem, 7vw, 2.4rem); color: #174f49; overflow-wrap: anywhere; text-align: center; }
-.harvest-answer-slot { display: grid; grid-template-rows: 32px 26px; text-align: center; align-content: center; }
+.harvest-answer-slot { display: grid; grid-template-rows: 58px; text-align: center; align-content: center; align-items: center; }
 .harvest-answer-slot strong { font-size: 1.4rem; line-height: 32px; }
 .harvest-answer-slot span { font-size: 1rem; line-height: 26px; }
 .harvest-compact-card .harvest-options { margin: 0; grid-template-rows: repeat(3, 1fr); min-height: 0; }
