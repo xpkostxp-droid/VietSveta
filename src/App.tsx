@@ -1,3 +1,4 @@
+import './components/GamesMenu.css';
 import { BattleScreen } from './battle/BattleScreen';
 import { AdjectiveTetris } from './components/AdjectiveTetris';
 import { adjectiveSets } from './content/adjectiveSets';
@@ -73,7 +74,16 @@ function App({ isAdmin=false, memberId, memberName, syncStatus, onOpenProfile, c
       return <BattleScreen onBack={()=>setScreen({name:'games-menu'})}/>;
 
     case 'games-menu':
-      return <div className="screen"><BackButton onClick={() => setScreen({ name: 'group-selection', section: 'games' })} label="К выбору группы"/><h1 className="screen-title">Игры</h1><button className="big-button" style={{marginBottom:18}} onClick={()=>setScreen({name:'battle'})}>⚔️ Батл</button><button className="lesson-item" onClick={() => setScreen({ name: 'game' })}><span className="lesson-title" style={{ fontSize: '1.35rem', fontWeight: 800, color: '#174f49', lineHeight: 1.35 }}>🍎 Овощи-фрукты</span></button><button className="lesson-item" onClick={() => setScreen({ name: 'questions-menu' })}><span className="lesson-title" style={{ fontSize: '1.35rem', fontWeight: 800, color: '#174f49', lineHeight: 1.35 }}>❓ Вопросительные слова</span></button>{<button className="lesson-item" onClick={()=>setScreen({name:'adjectives-menu'})}><span className="lesson-title" style={{fontSize:'1.35rem',fontWeight:800,color:'#174f49'}}>🧪 Прилагательные</span></button>}</div>;
+      return <div className="screen games-menu-screen">
+        <BackButton onClick={()=>setScreen({name:'group-selection',section:'games'})} label="К выбору группы"/>
+        <h1 className="screen-title">Игры</h1>
+        <nav className="games-menu-keys" aria-label="Игры">
+          <button className="games-menu-key games-menu-key-battle" onClick={()=>setScreen({name:'battle'})}><span className="games-menu-key-icon" aria-hidden="true">⚔️</span>{' '}<span>Батл</span></button>
+          <button className="games-menu-key" onClick={()=>setScreen({name:'game'})}><span className="games-menu-key-icon" aria-hidden="true">🍎</span><span>Овощи-фрукты</span></button>
+          <button className="games-menu-key" onClick={()=>setScreen({name:'questions-menu'})}><span className="games-menu-key-icon" aria-hidden="true">❓</span><span>Вопросительные слова</span></button>
+          <button className="games-menu-key" onClick={()=>setScreen({name:'adjectives-menu'})}><span className="games-menu-key-icon" aria-hidden="true">🧪</span><span>Прилагательные</span></button>
+        </nav>
+      </div>;
 
     case 'adjectives-menu':
       return <div className="screen"><BackButton onClick={()=>setScreen({name:'games-menu'})} label="К играм"/><h1 className="screen-title">Прилагательные</h1><div className="market-options" style={{gap:16}}>{adjectiveSets.map((set,i)=><button key={set.title} className="big-button" onClick={()=>setScreen({name:'adjectives-tetris',variant:i===2?'cannon':i===1?'rope':'tetris'})}><span style={{fontSize:'1.2rem',fontWeight:800,lineHeight:1.4}}>{i+1}. {set.title}<br/><small>{set.words.length} слов · {set.words.length*2} заданий · {i===0?'Тетрис':i===1?'Удержи слово':'Словесная пушка'}</small></span></button>)}</div></div>;
