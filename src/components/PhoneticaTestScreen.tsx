@@ -127,7 +127,6 @@ export function PhoneticaTestScreen({ onBack, testId }: { onBack: () => void; te
       onError={() => { setPlaying(false); setError('Запись не загрузилась. Проверьте подключение.'); }} />
     {item ? <>
       <p className="counter">Слог {index + 1} из {round.length}</p>
-      {roundNumber > 1 && <p className="counter">Повтор ошибок · круг {roundNumber}<br />Осталось закрепить: {questions.length - score}</p>}
       <p className="theory-note">Послушайте слог и выберите, что прозвучало. Запись можно включать сколько угодно раз.</p>
       <button className="big-button" onClick={() => void listen()}>{playing ? '↻ Ещё раз' : '▶ Слушать'}</button>
       {error && <p role="alert" className="pronunciation-error">{error}</p>}
@@ -136,7 +135,7 @@ export function PhoneticaTestScreen({ onBack, testId }: { onBack: () => void; te
           className={`secondary-button${answer !== null && value === item.syllable ? ' is-correct' : ''}${answer === value && value !== item.syllable ? ' is-wrong' : ''}`}
           onClick={() => choose(value)}>{value}</button>)}
       </div>
-      {(showIntroHint || answer !== null) && <p className="phonetics-test-feedback" role="status">{answer === null ? (heard ? 'Какой слог вы услышали?' : 'Сначала нажмите «Слушать».') : answer === item.syllable ? '✓ Верно!' : `Правильный ответ: ${item.syllable}`}</p>}
+      {showIntroHint && answer === null && <p className="phonetics-test-feedback" role="status">{heard ? 'Какой слог вы услышали?' : 'Сначала нажмите «Слушать».'}</p>}
       {answer !== null && answer !== item.syllable && <button className="big-button" onClick={next}>Следующий слог</button>}
     </> : <>
       <div className="summary-box">

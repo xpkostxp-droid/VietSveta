@@ -87,7 +87,7 @@ export function BigNumbersGameScreen({ onBack, reverse = false }: { onBack: () =
       {reverse && <button className="secondary-button" disabled={!phraseReady} onClick={() => { const audio = phraseRef.current; if (audio) { audio.currentTime = 0; setAudioError(''); void audio.play().catch(() => setAudioError('Не удалось включить звук. Попробуй ещё раз.')); } }}>Послушать число</button>}
       <p className="hint-text">{reverse ? 'Собери число цифрами — выбирай по порядку.' : 'Собери число по-вьетнамски — выбирай слова по порядку.'}</p>
       <div className={`big-number-answer${reverse ? ' big-number-answer-digits' : ''}${complete ? ' big-number-complete' : ''}`} aria-label="Ответ" aria-live="polite">{tokens.map((_, i) => <span key={i} className={`big-number-slot${reverse ? ' big-number-digit-slot' : ''}${reverse && i > 0 && (tokens.length - i) % 3 === 0 ? ' big-number-group-start' : ''}${i === answer.length ? ' big-number-next' : ''}`}>{answer[i] || (reverse ? '·' : '···')}</span>)}</div>
-      <p className="big-number-feedback" role="status">{complete ? '✓ Верно!' : wrong ? (reverse ? 'Не та цифра — попробуй другую' : 'Не то слово — попробуй другое') : '\u00a0'}</p>
+      <p className="big-number-feedback" role="status">{'\u00a0'}</p>
       {audioError && <p role="alert" className="pronunciation-error">{audioError}</p>}
       <div className={`big-number-tiles${reverse ? ' big-number-digit-tiles' : ''}`}>{tiles.map(word => <button key={word} lang={reverse ? undefined : 'vi'} disabled={complete || speaking} className={`big-number-tile${wrong === word ? ' big-number-wrong' : ''}`} onClick={() => choose(word)}>{word}</button>)}</div>
     </>}

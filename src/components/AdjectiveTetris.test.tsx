@@ -26,7 +26,7 @@ it('plays all 36 directional tasks and saves one completed attempt',async()=>{
 });
 it('times out, shows the translation, and continues instead of ending the round',async()=>{
  await click('Начать');await time(5000);
- expect(node.querySelector('.at-gray')).toBeTruthy();expect(node.textContent).toContain('Правильный ответ:');
+ expect(node.querySelector('.at-gray')).toBeTruthy();expect(node.querySelector('.at-right')).toBeTruthy();expect(node.textContent).not.toContain('Правильный ответ:');
  await time(1300);expect(node.querySelector('.at-top')?.textContent).toContain('2/36');
  expect(node.querySelectorAll('.at-options button:disabled')).toHaveLength(0);
 });
@@ -48,7 +48,7 @@ it('rope breaks before revealing a wrong answer and continues after a timeout',a
  const wrong=[...node.querySelectorAll<HTMLButtonElement>('.at-options button')].find(b=>b.textContent!==pair[0])!;
  await act(async()=>wrong.click());expect(node.querySelector('.rope-failed')).toBeTruthy();
  expect(node.querySelector('.at-feedback')!.textContent!.trim()).toBe('');expect(node.querySelector('.at-right')).toBeNull();
- await time(699);expect(node.querySelector('.at-right')).toBeNull();await time(1);expect(node.querySelector('.at-feedback')!.textContent).toContain(pair[0]);
+ await time(699);expect(node.querySelector('.at-right')).toBeNull();await time(1);expect(node.querySelector('.at-right')!.textContent).toBe(pair[0]);expect(node.querySelector('.at-feedback')!.textContent!.trim()).toBe('');
  await time(1300);expect(node.querySelector('.at-top')!.textContent).toContain('2/36');
  await time(5000);expect(node.querySelector('.rope-failed')).toBeTruthy();await time(700);expect(node.querySelector('.at-right')).toBeTruthy();await time(1300);expect(node.querySelector('.at-top')!.textContent).toContain('3/36');
 });

@@ -56,7 +56,7 @@ export function DialogueGameScreen({ direction, onBack }: { direction: NumberGam
       {(direction === 'ru-vi' || hint || complete) && <p className="dialogue-translation">{sentence.ru}</p>}
       <div className="dialogue-controls"><button className="secondary-button" onClick={() => void play(complete ? 'vi' : direction === 'ru-vi' ? 'ru' : 'vi', complete)}>Послушать ещё раз</button>{direction === 'vi-ru' && !hint && !complete && <button className="secondary-button" onClick={() => setHint(true)}>Подсказка</button>}</div>
       <div className={`big-number-answer dialogue-answer${complete ? ' big-number-complete' : ''}`} aria-label="Собранная фраза">{tokens.map((_, i) => <span key={i} className={`big-number-slot${i === position ? ' big-number-next' : ''}`} lang="vi">{i < position ? displayed[i] : '···'}</span>)}</div>
-      <p className="big-number-feedback" role="status">{complete ? '✓ Верно! Слушай фразу целиком.' : wrong ? 'Не то слово — попробуй другое' : '\u00a0'}</p>
+      <p className="big-number-feedback" role="status">{'\u00a0'}</p>
       {error && <div><p className="pronunciation-error" role="alert">{error}</p>{complete && <button className="secondary-button" onClick={next}>Следующая фраза</button>}</div>}
       <div className="dialogue-word-groups">{groups.map(group => <section key={group.label}><h2>{group.label}</h2><div className="big-number-tiles">{group.words.map(word => <button key={word} lang="vi" disabled={complete} className={`big-number-tile${wrong === word ? ' big-number-wrong' : ''}`} onClick={() => choose(word)}>{word}</button>)}</div></section>)}</div>
     </>}

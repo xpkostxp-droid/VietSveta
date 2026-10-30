@@ -100,7 +100,7 @@ export function ProfessionsGameScreen({ onBack, initialGroup = null }: { onBack:
           <h2 lang={current.reverse ? 'vi' : 'ru'}>{current.reverse ? word[1] : word[2]}</h2>
         </div>
         {paused ? <button className="big-button" onClick={() => { audio.current.ready(); started.current = performance.now(); setPaused(false); }}>Продолжить</button> : <div className="family-choices work-options">{options.map(option => <button key={option} lang={current.reverse ? 'ru' : 'vi'} disabled={phase !== 'playing'} className={'choice-button ' + (phase === 'feedback' ? option === answer ? 'family-correct' : option === selected ? 'family-wrong' : '' : '')} onClick={() => finishAnswer(option)}>{option}</button>)}</div>}
-        <p className="family-feedback work-feedback" role="status">{paused ? 'Игра на паузе' : phase === 'feedback' ? selected === answer ? 'Верно!' : `${selected === null ? 'Время вышло.' : 'Неверно.'} ${answer}` : 'Выбери перевод'}</p>
+        <p className="family-feedback work-feedback" role="status">{paused ? 'Игра на паузе' : '\u00a0'}</p>
       </>}
 
   </div>;

@@ -145,9 +145,7 @@ export function HouseGameScreen({ onBack }: { onBack: () => void }) {
           onClick={() => answer(i)}
         >{items[i][1]}</button>)}
       </div>
-      <p className="family-feedback" role="status">
-        {correct ? `Верно! ${current[1]}` : wrong.length ? 'Попробуй другой вариант. Это задание добавлено в повтор.' : 'Выбери правильный вариант'}
-      </p>
+      <p className="family-feedback" role="status">{'\u00a0'}</p>
       {correct && <button className="secondary-button" disabled={!voice} onClick={() => speakVietnamese(current[1])}>🔊 Послушать ещё</button>}
     </> : <div className="family-result">
       <HousePicture id="blitz-private-beautiful" />

@@ -90,8 +90,8 @@ export function AdjectiveTetris({onBack,variant='tetris'}:{onBack:()=>void;varia
    <div className="at-board-label">{round.lines} рядов</div>
   </div>
   </>}
-  <div className={animated?'rope-instruction':'at-prompt'}><small>{current.reverse?'Выбери перевод':'Переведи на вьетнамский'}</small>{!animated&&<strong>{words[current.word][current.reverse?0:1]}</strong>}</div>
-  <div className="at-feedback" aria-live="polite">{round.phase==='feedback'&&revealed?<><b>{round.success?(cannon?'Попадание!':rope?'Слово спасено!':round.clearing?'Ряд собран! ✨':'Верно!'):'Правильный ответ:'}</b><strong>{words[current.word][current.reverse?1:0]}</strong></>:' '}</div>
+  <div className={animated?'rope-instruction':'at-prompt'}><small>{'\u00a0'}</small>{!animated&&<strong>{words[current.word][current.reverse?0:1]}</strong>}</div>
+  <div className="at-feedback" aria-live="polite">{'\u00a0'}</div>
   <div className="at-options">{round.options.map(i=><button key={i} disabled={round.phase!=='question'||paused} className={round.phase==='feedback'&&revealed?(i===current.word?'at-right':i===round.chosen?'at-wrong':''):''} onClick={()=>answer(i)}>{words[i][current.reverse?1:0]}</button>)}</div>
   {paused&&<div className="at-pause"><h2>Пауза</h2><button className="big-button" onClick={resume}>Продолжить</button></div>}
  </div>;

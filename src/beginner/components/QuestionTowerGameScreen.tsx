@@ -15,7 +15,7 @@ export function QuestionTowerGameScreen({onBack}:{onBack:()=>void}){
  const [done,setDone]=useState(false);
  const [remaining,setRemaining]=useState(5);
  const [crashed,setCrashed]=useState(false);
- const [endReason,setEndReason]=useState<'wrong'|'timeout'|null>(null);
+ const [,setEndReason]=useState<'wrong'|'timeout'|null>(null);
  const deadline=useRef<number|null>(null);
  const [best,setBest]=useState(()=>Number(readJSON('alexviet-question-tower-best')||0));
  const timer=useRef<ReturnType<typeof setTimeout>|null>(null);const lock=useRef(false);
@@ -59,10 +59,10 @@ export function QuestionTowerGameScreen({onBack}:{onBack:()=>void}){
  {!mode?<div className="qt-start"><p>15 вопросительных слов · кубики подпрыгивают, башня качается</p><button className="big-button" onClick={()=>start('learn')}>📚 Обучение</button><button className="big-button" onClick={()=>start('record')}>⚡ Блиц · Башня на выживание</button><p>Лучший результат: {best} кубиков</p></div>:<>
  <div className="qt-top"><span>{mode==='learn'?'Обучение · '+(Math.min(5,Math.floor(total/9)+1))+'/5'  :'Блиц · 5 секунд'}</span><span>{mode==='learn'?total+'/45':blocks.length+' кубиков'}</span></div>
  {mode==='record'&&!done&&<div className="qt-timer" aria-label={'Осталось '+Math.ceil(remaining)+' секунды'}><strong>{Math.ceil(remaining)}</strong><div className="qt-timer-track"><div className="qt-timer-fill" style={{width:(remaining/5*100)+'%'}}/></div></div>}
- <div className="qt-question"><small>{done?'Результат':reverse?'Выбери перевод':'Переведи на вьетнамский'}</small><strong>{done?(mode==='learn'?'Башня построена! 🎉':(endReason==='timeout'?'Время вышло!':'Ошибка!')+' · '+blocks.length+' кубиков'):words[q][reverse?0:1]}</strong></div>
+ <div className="qt-question"><small>{done?'Результат':'\u00a0'}</small><strong>{done?blocks.length+' кубиков':words[q][reverse?0:1]}</strong></div>
  <div className={'qt-scene '+(crashed?'qt-crashed':'')}><div className="qt-cloud">☁️</div><div className={'qt-stack '+(crashed?'qt-collapse':'')}>{blocks.slice(-9).reverse().map((index,i)=><div className={'qt-block qt-color-'+Math.floor(index/3)+(i===0&&feedback==='right'?' qt-new':'')} key={blocks.length-1-i}>{words[index][0]}</div>)}<div className="qt-ground"/></div><div className="qt-floor">{mode==='learn'?'Золотых этажей: '+Math.floor(counts.filter(n=>n===3).length/3):'Рекорд: '+best}</div></div>
- {done&&mode==='record'&&<p className="qt-result">{endReason==='timeout'?'⏰ Время вышло!':'💥 Башня рухнула!'} Рекорд: {best} кубиков</p>}
- {done?<button className="big-button" onClick={()=>start(mode)}>Играть снова</button>:<div className="qt-options">{options.map(i=><button className={'qt-option '+(feedback==='right'&&i===q?'qt-correct':'')} key={i} disabled={feedback==='right'} onClick={()=>answer(i)}>{words[i][reverse?1:0]}</button>)}<p className={'qt-feedback '+(feedback||'')}>{feedback==='right'?'Кубик на месте!':feedback==='wrong'?'Мимо! Попробуй ещё раз':''}</p></div>}
+ {done&&mode==='record'&&<p className="qt-result">Рекорд: {best} кубиков</p>}
+ {done?<button className="big-button" onClick={()=>start(mode)}>Играть снова</button>:<div className="qt-options">{options.map(i=><button className={'qt-option '+(feedback==='right'&&i===q?'qt-correct':'')} key={i} disabled={feedback==='right'} onClick={()=>answer(i)}>{words[i][reverse?1:0]}</button>)}<p className={'qt-feedback '+(feedback||'')}>{'\u00a0'}</p></div>}
  <button className="secondary-button" onClick={()=>{if(timer.current)clearTimeout(timer.current);deadline.current=null;lock.current=false;setMode(null)}}>Выбор режима</button></>}
  </div>;
 }

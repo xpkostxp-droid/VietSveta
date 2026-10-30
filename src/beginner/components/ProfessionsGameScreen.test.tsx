@@ -50,7 +50,7 @@ it('continues after mistakes and timeout, locks double answers, stores isolated 
       act(() => { wrong.click(); wrong.click(); });
       expect(host.querySelectorAll('.family-correct')).toHaveLength(1);
     } else if (i === 1) {
-      act(() => vi.advanceTimersByTime(5000)); expect(host.textContent).toContain('Время вышло');
+      act(() => vi.advanceTimersByTime(5000)); expect(host.querySelectorAll('.family-correct')).toHaveLength(1);expect(host.textContent).not.toContain('Время вышло');
     } else {
       act(() => vi.advanceTimersByTime(1000)); click(correct);
     }
@@ -70,7 +70,7 @@ it('pauses a hidden question until explicit resume and excludes the pause from t
   act(() => vi.advanceTimersByTime(15000)); expect(host.textContent).toContain('Игра на паузе');
   Object.defineProperty(document, 'hidden', { configurable: true, value: false });
   click('Продолжить'); act(() => vi.advanceTimersByTime(1000)); click(correctAnswer());
-  expect(host.textContent).toContain('Верно!');
+  expect(host.querySelectorAll('.family-correct')).toHaveLength(1);expect(host.textContent).not.toContain('Верно!');
   act(() => vi.advanceTimersByTime(1600)); expect(host.querySelector('.work-status')!.textContent).toContain('2/28 · ✓ 1');
 });
 

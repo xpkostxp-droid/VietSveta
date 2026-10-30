@@ -151,7 +151,7 @@ export function CubesGameScreen({ onBack, direction, range }: { onBack: () => vo
             disabled={!heard || game.phase !== 'ready'} lang={direction === 'ru-vi' || (cube.id === game.selectedId && game.phase === 'clearing') ? 'vi' : undefined} data-value={cube.value} aria-label={`${money ? 'Купюра' : hotel ? 'Комната' : 'Кубик'} ${direction === 'ru-vi' ? word(cube.value) : cube.value}`} onClick={() => choose(cube.id)}>{money && direction === 'vi-ru' ? <BanknoteFaces value={cube.value} flipped={cube.id === game.selectedId && game.phase === 'clearing'} /> : direction === 'ru-vi' || (cube.id === game.selectedId && game.phase === 'clearing') ? word(cube.value) : cube.value}</button>
         </div>)}
       </div>
-      <p className="cube-game-feedback" role="status">{game.phase === 'clearing' ? `✓ ${game.target} — ${word(game.target)} · +1 балл${hadMistakeRef.current ? ' · Повторим позже' : ''}` : wrongId >= 0 ? (hotel ? 'Попробуй другую табличку' : 'Попробуй другой кубик') : '\u00a0'}</p>
+      <p className="cube-game-feedback" role="status">{'\u00a0'}</p>
       <button className="big-button" disabled={busy} onClick={() => void listen()}>{game.phase === 'idle' ? 'Начать игру' : 'Слушать ещё раз'}</button>
       {error && <p className="pronunciation-error" role="alert">{error}</p>}
       <p className="hint-text">{!hotel && 'Без таймера. После ошибки цифра вернётся позже. '}{repetitions === 3 ? 'Каждый номинал закрепляем трижды — с первой попытки.' : repetitions === 1 ? 'Каждое число закрепляем один раз — с первой попытки.' : 'Каждое число закрепляем дважды — только с первой попытки.'}</p>

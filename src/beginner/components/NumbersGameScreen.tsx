@@ -96,7 +96,6 @@ export function NumbersGameScreen({ onBack }: { onBack: () => void }) {
         <SpeakerOnIcon className="number-game-speaker" />
         <p className="number-game-word" lang="vi">{answer !== null ? `${number} — ${numberWords[number - 1]}` : 'Слушай внимательно'}</p>
         {!started && <p>Прозвучит число по-вьетнамски. Выбери его цифру.</p>}
-        {roundNumber > 1 && <p>Повторяем ошибки · осталось {10 - mastered}</p>}
         <button className="big-button" onClick={() => void listen()}>{started ? 'Слушать ещё раз' : 'Начать игру'}</button>
       </div>
       {error && <p role="alert" className="pronunciation-error">{error}</p>}
@@ -104,7 +103,7 @@ export function NumbersGameScreen({ onBack }: { onBack: () => void }) {
         {options.map(value => <button key={value} className={`secondary-button${answer !== null && value === number ? ' number-game-correct' : ''}${answer === value && value !== number ? ' number-game-wrong' : ''}`}
           disabled={!heard || answer !== null} onClick={() => choose(value)}>{value}</button>)}
       </div>}
-      <p className="number-game-feedback" role="status">{answer === null ? '' : answer === number ? '✓ Верно! +1 балл' : `Правильный ответ: ${number}`}</p>
+      <p className="number-game-feedback" role="status">{'\u00a0'}</p>
       {answer !== null && answer !== number && <button className="big-button" onClick={next}>Следующая цифра</button>}
     </> : <div className="summary-box">
       <h2>Все 10 цифр закреплены!</h2>

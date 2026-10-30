@@ -34,23 +34,23 @@ it('plays two directions, calls after each number and saves only one completed t
 });
 it('beeps at three, two, one, keeps a wrong digit retryable and advances on timeout without a point',async()=>{
  await act(async()=>root.render(<PhoneGameScreen onBack={()=>{}}/>));await click('Начать');
- await choose((digit()+1)%10);expect(node.textContent).toContain('Не та цифра');
+ await choose((digit()+1)%10);expect(node.querySelector('.phone-key-wrong')).toBeTruthy();
  await time(4000);expect(mocks.beep.mock.calls.map(c=>c[0])).toEqual([3,2,1]);
- await choose(digit());expect(node.textContent).toContain('Без балла');await time(800);
- await time(5000);expect(node.textContent).toContain('Без балла');await time(800);
+ await choose(digit());expect(node.querySelector('.phone-key-correct')).toBeTruthy();expect(node.textContent).not.toContain('Без балла');await time(800);
+ await time(5000);expect(node.querySelector('.phone-key-correct')).toBeTruthy();expect(node.textContent).not.toContain('Без балла');await time(800);
  expect(node.querySelector('.phone-blitz-status')!.textContent).toContain('3/20 · ✓ 0');
 });
 it('does not start a timer without audio playback and can retry a blocked recording',async()=>{
  mocks.play.mockRejectedValueOnce(new Error('blocked'));
  await act(async()=>root.render(<PhoneGameScreen onBack={()=>{}}/>));await click('Начать');await time(6000);
  expect(node.textContent).toContain('Не удалось включить звук');expect(mocks.beep).not.toHaveBeenCalled();
- await click('Повторить цифру');expect(node.textContent).toContain('Набирай номер');
+ await click('Повторить цифру');expect(node.querySelectorAll('.phone-keypad button:not(:disabled)')).toHaveLength(10);
 });
 it('pauses the countdown in the background until explicit resume',async()=>{
  await act(async()=>root.render(<PhoneGameScreen onBack={()=>{}}/>));await click('Начать');await time(1000);
  Object.defineProperty(document,'hidden',{configurable:true,value:true});await act(async()=>document.dispatchEvent(new Event('visibilitychange')));await time(10000);
  expect(node.textContent).toContain('Игра на паузе');Object.defineProperty(document,'hidden',{configurable:true,value:false});await click('Продолжить');
- await time(1000);await choose(digit());expect(node.textContent).toContain('✓ Верно!');
+ await time(1000);await choose(digit());expect(node.querySelector('.phone-key-correct')).toBeTruthy();expect(node.textContent).not.toContain('Верно!');
 });
 
 it('never reveals future digits after a correct answer, wrong press or timeout',async()=>{

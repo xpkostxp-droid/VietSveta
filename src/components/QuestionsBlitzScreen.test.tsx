@@ -9,7 +9,7 @@ let node: HTMLDivElement; let root: Root;
 async function click(label: string) { const button = [...node.querySelectorAll('button')].find(b => b.textContent === label)!; expect(button).toBeTruthy(); await act(async () => button.click()); }
 function expectedAnswer() {
  const main=node.querySelector('.qs-prompt strong')!.textContent!; const note=node.querySelector('.qs-prompt-note')?.textContent; const prompt=note ? main+' ('+note+')' : main;
- const reverse=node.querySelector('.qs-prompt small')!.textContent==='Выбери перевод'; const pair=superCards.find(p=>p[reverse?0:1]===prompt)!; return pair[reverse?1:0];
+ const reverse=node.querySelector('.qs-prompt')!.getAttribute('data-direction')==='vi-ru'; const pair=superCards.find(p=>p[reverse?0:1]===prompt)!; return pair[reverse?1:0];
 }
 async function correctAnswer() { await click(expectedAnswer()); }
 async function wrongAnswer() { const correct=expectedAnswer(); const button=[...node.querySelectorAll<HTMLButtonElement>('.qs-answer')].find(b=>b.textContent!==correct)!; await act(async()=>button.click()); }
@@ -34,13 +34,13 @@ it('balances on a correct answer, keeps the same direction during feedback and s
 it('tips and spills after a wrong answer, then retries the missed question first', async () => {
  await click('⚡ Начать суперблиц'); await click('Ai'); await time(1200);
  await wrongAnswer(); expect(node.querySelector('.scale-failed')).toBeTruthy(); expect(node.querySelectorAll('.scale-spill')).toHaveLength(2);
- expect(node.querySelector('.qs-end')?.textContent).toContain('Nào');
+ expect(node.querySelector('.qs-end')?.textContent).toContain('Очки: 1 из 48');expect(node.querySelector('.qs-end')?.textContent).not.toContain('Правильно:');
  await click('Играть снова'); expect(node.querySelector('.qs-prompt strong')?.textContent).toBe('Nào');
  expect(node.querySelector('.qs-score')?.textContent).toContain('0');
 });
 it('times out at five seconds without awarding a point', async () => {
  await click('⚡ Начать суперблиц'); await time(4900); expect(node.querySelector('.scale-failed')).toBeNull();
- await time(100); expect(node.querySelector('.scale-failed')).toBeTruthy(); expect(node.textContent).toContain('Время вышло!');
+ await time(100); expect(node.querySelector('.scale-failed')).toBeTruthy(); expect(node.textContent).not.toContain('Время вышло!');
  expect(localStorage.getItem('vietsveta.questions.blitz.best')).toBeNull();
 });
 
@@ -60,7 +60,7 @@ it('basic mode checks all 15 words in both directions, finishes at 30 and keeps 
   const main=node.querySelector('.qs-prompt strong')!.textContent!;
   const note=node.querySelector('.qs-prompt-note')?.textContent;
   const prompt=note ? main+' ('+note+')' : main;
-  const reverse=node.querySelector('.qs-prompt small')!.textContent==='Выбери перевод';
+  const reverse=node.querySelector('.qs-prompt')!.getAttribute('data-direction')==='vi-ru';
   const pair=basicQuestions.find(p=>p[reverse?0:1]===prompt)!;
   expect(pair).toBeTruthy(); expect(seen.has(pair[0]+reverse)).toBe(false); seen.add(pair[0]+reverse);
   expect(reverse).toBe(i%2===1); await time(200); await click(pair[reverse?1:0]); await time(1200);
@@ -91,7 +91,7 @@ it('super mode checks 48 unique directional tasks and stops after all 48', async
  await click('⚡ Начать суперблиц'); const seen=new Set<string>();
  for(let i=0;i<48;i++) {
   const main=node.querySelector('.qs-prompt strong')!.textContent!; const note=node.querySelector('.qs-prompt-note')?.textContent;
-  const prompt=note?main+' ('+note+')':main; const reverse=node.querySelector('.qs-prompt small')!.textContent==='Выбери перевод';
+  const prompt=note?main+' ('+note+')':main; const reverse=node.querySelector('.qs-prompt')!.getAttribute('data-direction')==='vi-ru';
   expect(reverse).toBe(i%2===1); expect(seen.has(prompt+reverse)).toBe(false); seen.add(prompt+reverse);
   await correctAnswer(); await time(1200);
  }

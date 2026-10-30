@@ -44,7 +44,7 @@ export function FamilyGameScreen({ onBack }: { onBack: () => void }) {
       <p className="family-counter">{mode === 'learn' ? `Закреплено: ${mastered} из 19` : review ? `Осталось в повторе: ${queue.length}` : `Карточка ${20 - queue.length} из 19`} · Без таймера</p>
       <div className="family-card"><FamilyPicture id={current[0]} /><h2>{current[2]}</h2></div>
       <div className="family-choices">{options.map(i => <button key={i} disabled={correct || wrong.includes(i)} className={'choice-button ' + (wrong.includes(i) ? 'family-wrong' : correct && i === index ? 'family-correct' : '')} onClick={() => answer(i)}>{familyWords[i][1]}</button>)}</div>
-      <p className="family-feedback" role="status">{correct ? `Верно! ${current[1]}` : wrong.length ? 'Попробуй другой вариант. Это слово добавлено в повтор.' : 'Выбери один из шести вариантов'}</p>
+      <p className="family-feedback" role="status">{'\u00a0'}</p>
       {correct && <button className="secondary-button" disabled={!voice} onClick={() => speakVietnamese(current[1])}>🔊 Послушать ещё</button>}
     </> : <div className="family-result">
       <FamilyPicture id="all-family" /><h2>{mode === 'learn' ? 'Семья выучена!' : review ? 'Повтор завершён!' : 'Блиц завершён!'}</h2>

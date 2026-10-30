@@ -153,10 +153,9 @@ export function QuestionsBlitzScreen({onBack, variant = 'super'}:{onBack:()=>voi
  },[failed,completed]);
  if(!started||showRanking)return <div className="screen ranking-screen"><BackButton onClick={onBack} label="К играм"/><h1 className="screen-title">⚖️ {basic?'Блиц · 15 слов':'Суперблиц · 24 слова'}</h1>
   {!started&&<p>{cards.length} слов · {totalTasks} заданий · 5 секунд на ответ.<br/>Игра до первой ошибки.</p>}
-  {showRanking&&failed&&<p>{failed==='timeout'?'Время вышло.':'Ошибка.'} Правильно: <b>{cards[q][0]}</b> — {cards[q][1]}</p>}
   <GameRanking game={gameId} total={totalTasks} onStart={start} startLabel={showRanking?'Играть снова':basic?'⚡ Начать блиц':'⚡ Начать суперблиц'} result={showRanking?{correct:blocks.length,time:correctTime.current}:undefined}/>
  </div>;
- const promptText = !started ? '' : completed ? `Все ${totalTasks} заданий пройдены!` : failed ? (failed === 'timeout' ? 'Время вышло!' : 'Ошибка!') : cards[q][reverse ? 0 : 1];
+ const promptText = !started ? '' : completed ? `Все ${totalTasks} заданий пройдены!` : failed ? '' : cards[q][reverse ? 0 : 1];
  const promptParts = promptText.match(/^(.*?)\s*\((.*?)\)$/);
  return <div className={'screen qs-screen' + (started ? ' qs-playing' : '')}>
   <div className="qs-topbar"><BackButton onClick={started?()=>{deadline.current=null;if(pending.current)clearTimeout(pending.current);stopSpeaking();setStarted(false);}:onBack} label={started?'Назад':'К играм'}/><p className="qs-total-time" aria-label="Общее время ответов">⏱ {formatAnswerTime(answerTime)}</p>{started&&<div className="qs-score"><span>⚖️ {blocks.length}/{totalTasks}</span><span>🏆 {best}</span></div>}</div>
@@ -165,13 +164,13 @@ export function QuestionsBlitzScreen({onBack, variant = 'super'}:{onBack:()=>voi
       <svg viewBox="0 0 100 100" aria-hidden="true"><circle className="qs-ring-bg" cx="50" cy="50" r="43"/><circle className="qs-ring" cx="50" cy="50" r="43" pathLength="100" strokeDasharray="100" strokeDashoffset={100-(failed?0:seconds/5*100)}/></svg><span>{failed?'0':feedback||completed?'✓':Math.ceil(seconds)}</span>
     </div></div>
    <div className="qs-balance-scene"><BalanceScales heavy={heavy} outcome={failed?'failed':feedback?'success':'question'} labels={blocks.map(i => cards[i][0])}/></div>
-   <div className="qs-message" aria-live="polite">{completed?'Все слова проверены!':failed?'Перевес! Попробуй ещё раз':feedback?'+1 · Равновесие!':'\u00a0'}</div>
+   <div className="qs-message" aria-live="polite">{'\u00a0'}</div>
    <div className="qs-question-row">
-    <div className="qs-prompt"><small>{completed?'Готово!':failed?'Игра окончена':reverse?'Выбери перевод':'Переведи на вьетнамский'}</small><strong>{promptParts ? promptParts[1] : promptText}</strong>{promptParts && <span className="qs-prompt-note">{promptParts[2]}</span>}</div>
+    <div className="qs-prompt" data-direction={reverse?'vi-ru':'ru-vi'}><small>{'\u00a0'}</small><strong>{promptParts ? promptParts[1] : promptText}</strong>{promptParts && <span className="qs-prompt-note">{promptParts[2]}</span>}</div>
 
    </div>
    <div className="qs-controls">
-   {completed?<div className="qs-end"><p>{totalTasks} из {totalTasks} — отлично! 🎉</p><p>Время правильных ответов: {formatAnswerTime(correctTime.current)}</p><button className="big-button" onClick={start}>Играть снова</button></div>:failed?<div className="qs-end"><p>Правильно: <b>{cards[q][0]}</b> — {cards[q][1]}</p><p>Очки: {blocks.length} из {totalTasks} · Рекорд: {recordText}</p><p>Время правильных ответов: {formatAnswerTime(correctTime.current)}</p><button className="big-button" onClick={start}>Играть снова</button></div>:<div className="qs-answers">{options.map(i=><button key={i} className={'qs-answer'+(feedback&&i===q?' qs-correct':'')} disabled={feedback} onClick={()=>answer(i)}>{cards[i][reverse?1:0]}</button>)}</div>}
+   {completed?<div className="qs-end"><p>{totalTasks} из {totalTasks} — отлично! 🎉</p><p>Время правильных ответов: {formatAnswerTime(correctTime.current)}</p><button className="big-button" onClick={start}>Играть снова</button></div>:failed?<div className="qs-end"><p>Очки: {blocks.length} из {totalTasks} · Рекорд: {recordText}</p><p>Время правильных ответов: {formatAnswerTime(correctTime.current)}</p><button className="big-button" onClick={start}>Играть снова</button></div>:<div className="qs-answers">{options.map(i=><button key={i} className={'qs-answer'+(feedback&&i===q?' qs-correct':'')} disabled={feedback} onClick={()=>answer(i)}>{cards[i][reverse?1:0]}</button>)}</div>}
    </div>
 
   </>

@@ -12,7 +12,7 @@ export function PhoneGameScreen({ onBack }: { onBack: () => void }) {
  const [retry,setRetry]=useState(0);
  const [numbers,setNumbers]=useState<string[]>([]),[at,setAt]=useState(0),[phase,setPhase]=useState<Phase>('intro');
  const [left,setLeft]=useState(5000),[paused,setPaused]=useState(false),[error,setError]=useState('');
- const [wrong,setWrong]=useState<number|null>(null),[success,setSuccess]=useState(false),[score,setScore]=useState({correct:0,time:0});
+ const [wrong,setWrong]=useState<number|null>(null),[,setSuccess]=useState(false),[score,setScore]=useState({correct:0,time:0});
  const voice=useRef<HTMLAudioElement>(null),tone=useRef<HTMLAudioElement>(null),audio=useRef(makeGameSound());
  const deadline=useRef(0),frozen=useRef(5000),lastBeep=useRef<number|null>(null),clean=useRef(true),locked=useRef(true),request=useRef(0);
  const result=useRef({correct:0,time:0,answerTime:0}),saved=useRef(false);
@@ -102,7 +102,7 @@ export function PhoneGameScreen({ onBack }: { onBack: () => void }) {
    <div className="phone-digits" aria-label="Набранный номер">{Array.from({length:10},(_,i)=><span key={i} className={i===position&&!calling?'phone-digit-current':''}>{i<position||calling||(i===position&&phase==='feedback')?phone[i]:'·'}</span>)}</div>
   </div>
   <div className="phone-blitz-prompt"><small>{reverse?'Выбери вьетнамское название':'Слушай цифру по-вьетнамски'}</small><strong>{calling?'☎️':reverse?digit:'🔊'}</strong></div>
-  <p className="phone-feedback" role="status">{paused?'Игра на паузе':calling?'Номер набран! Звоним…':phase==='feedback'?success?'✓ Верно!':`Без балла. Правильно: ${digit} — ${phoneDigitWords[digit]}`:wrong!==null?'Не та цифра — попробуй ещё':phase==='listening'?'Включаем запись…':'Набирай номер'}</p>
+  <p className="phone-feedback" role="status">{paused ? 'Игра на паузе' : calling ? 'Номер набран! Звоним…' : phase === 'listening' ? 'Включаем запись…' : '\u00a0'}</p>
   <div className={'phone-keypad'+(reverse?' phone-keypad-words':'')}>{[1,2,3,4,5,6,7,8,9,0].map(value=><button key={value} data-digit={value} lang={reverse?'vi':undefined} className={'phone-key'+(value===0?' phone-key-zero':'')+(wrong===value?' phone-key-wrong':'')+(phase==='feedback'&&value===digit?' phone-key-correct':'')} disabled={phase!=='question'||paused} onClick={()=>choose(value)}>{reverse?phoneDigitWords[value]:value}</button>)}</div>
   {paused?<button className="big-button" onClick={()=>{audio.current.ready();deadline.current=Date.now()+frozen.current;setPaused(false);}}>Продолжить</button>:<button className="secondary-button" disabled={calling||phase==='feedback'} onClick={replay}>Повторить цифру</button>}
   <p className="phone-blitz-error" role="alert">{error}</p>
