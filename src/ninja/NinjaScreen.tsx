@@ -6,16 +6,18 @@ import {primeBattleSpeech} from '../battle/battleSpeech';
 import {createNinjaGame,type NinjaTopic} from './ninjaEngine';
 import {ninjaAsset,assignNinjaCharacters,type NinjaCharacter} from './ninjaCharacters';
 import {createNinjaSound} from './ninjaSound';
+import type {MemberGender} from '../domain/memberGender';
 import {NinjaStage} from './NinjaStage';
 import '../battle/BattleScreen.css';
 import './NinjaScreen.css';
-export function NinjaScreen({onBack,memberId='admin'}:{onBack:()=>void;memberId?:string}){
- const [pair,setPair]=useState(()=>assignNinjaCharacters(memberId));
- const [topic,setTopic]=useState<NinjaTopic>('fruits'),[session,setSession]=useState(0),[playing,setPlaying]=useState(false);
- const [sound]=useState(createNinjaSound);
- useEffect(()=>()=>{sound.close();stopSpeaking();},[sound]);
- const start=()=>{setPair(assignNinjaCharacters(memberId));sound.ready();primeBattleSpeech();setSession(n=>n+1);setPlaying(true);};
- if(playing)return <NinjaMatch key={session} topic={topic} human={pair.human} bot={pair.bot} sound={sound} onBack={()=>setPlaying(false)} onReplay={start}/>;
+export function NinjaScreen({onBack,memberId='admin',testSetup}:{onBack:()=>void;memberId?:string;testSetup?:{topic:NinjaTopic;gender:MemberGender;sound:ReturnType<typeof createNinjaSound>}}){
+ const opponent=testSetup?.gender==='woman'?'svetlana':testSetup?.gender==='man'?'admin':memberId;
+ const [pair,setPair]=useState(()=>assignNinjaCharacters(memberId,opponent));
+ const [topic,setTopic]=useState<NinjaTopic>(testSetup?.topic??'fruits'),[session,setSession]=useState(0),[playing,setPlaying]=useState(!!testSetup);
+ const [sound]=useState(()=>testSetup?.sound??createNinjaSound());
+ useEffect(()=>()=>{if(!testSetup)sound.close();stopSpeaking();},[sound]);
+ const start=()=>{setPair(assignNinjaCharacters(memberId,opponent));sound.ready();primeBattleSpeech();setSession(n=>n+1);setPlaying(true);};
+ if(playing)return <NinjaMatch key={session} topic={topic} human={pair.human} bot={pair.bot} sound={sound} onBack={()=>testSetup?onBack():setPlaying(false)} onReplay={start}/>;
  const count=Math.min(10,products.filter(p=>topic==='all'||p[3]===topic).length);
  return <div className="screen ninja-setup"><BackButton onClick={onBack} label="К играм"/><h1>🥷 Ниндзя</h1><p>Пробный батл с ботом</p>
   <label className="ninja-topic">Тема<select value={topic} onChange={e=>setTopic(e.target.value as NinjaTopic)}><option value="fruits">Фрукты</option><option value="vegetables">Овощи</option><option value="all">Фрукты и овощи</option></select></label>
