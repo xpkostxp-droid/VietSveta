@@ -42,7 +42,7 @@ type Screen =
   | { name: 'cards-setup'; lessonId: string }
   | { name: 'training'; lessonId: string; direction: Direction; order: CardOrder };
 
-function App({ memberId, memberName, syncStatus, onOpenProfile, courseGroup='advanced' }: { courseGroup?: 'beginner'|'advanced'; isAdmin?: boolean; memberId?: string; memberName?: string; syncStatus?: string; onOpenProfile?: () => void } = {}) {
+function App({ isAdmin=false, memberId, memberName, syncStatus, onOpenProfile, courseGroup='advanced' }: { courseGroup?: 'beginner'|'advanced'; isAdmin?: boolean; memberId?: string; memberName?: string; syncStatus?: string; onOpenProfile?: () => void } = {}) {
   const [screen, setScreen] = useState<Screen>({ name: 'home' });
 
   switch (screen.name) {
@@ -65,7 +65,7 @@ function App({ memberId, memberName, syncStatus, onOpenProfile, courseGroup='adv
     case 'group-selection':
       return <GroupSelection preferredGroup={courseGroup} section={screen.section} onBack={()=>setScreen({name:'home'})} onChoose={group=>setScreen(group==='beginner'?{name:'beginner',section:screen.section}:screen.section==='games'?{name:'games-menu'}:screen.section==='theory'?{name:'theory-list'}:screen.section==='cards'?{name:'cards-lesson-list'}:{name:'listening'})}/>;
     case 'beginner':
-      return <Suspense fallback={<div className="screen"><BackButton onClick={()=>setScreen({name:'group-selection',section:screen.section})} label="К выбору группы"/><p role="status">Загружаем материалы…</p></div>}><div className="beginner-area"><BeginnerApp key={screen.section} section={screen.section} onBack={()=>setScreen({name:'group-selection',section:screen.section})}/></div></Suspense>;
+      return <Suspense fallback={<div className="screen"><BackButton onClick={()=>setScreen({name:'group-selection',section:screen.section})} label="К выбору группы"/><p role="status">Загружаем материалы…</p></div>}><div className="beginner-area"><BeginnerApp isAdmin={isAdmin} key={screen.section} section={screen.section} onBack={()=>setScreen({name:'group-selection',section:screen.section})}/></div></Suspense>;
 
     case 'games-menu':
       return <div className="screen"><BackButton onClick={() => setScreen({ name: 'group-selection', section: 'games' })} label="К выбору группы"/><h1 className="screen-title">Игры</h1><button className="lesson-item" onClick={() => setScreen({ name: 'game' })}><span className="lesson-title" style={{ fontSize: '1.35rem', fontWeight: 800, color: '#174f49', lineHeight: 1.35 }}>🍎 Овощи-фрукты</span></button><button className="lesson-item" onClick={() => setScreen({ name: 'questions-menu' })}><span className="lesson-title" style={{ fontSize: '1.35rem', fontWeight: 800, color: '#174f49', lineHeight: 1.35 }}>❓ Вопросительные слова</span></button>{<button className="lesson-item" onClick={()=>setScreen({name:'adjectives-menu'})}><span className="lesson-title" style={{fontSize:'1.35rem',fontWeight:800,color:'#174f49'}}>🧪 Прилагательные</span></button>}</div>;

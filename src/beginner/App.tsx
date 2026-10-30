@@ -64,19 +64,25 @@ type Screen =
   | { name: 'training'; lessonId: string; direction: Direction; order: CardOrder };
 
 export type BeginnerSection = 'games' | 'listening' | 'theory' | 'cards';
-function App({section,onBack}:{section:BeginnerSection;onBack:()=>void}) {
+function App({section,onBack,isAdmin=false}:{section:BeginnerSection;onBack:()=>void;isAdmin?:boolean}) {
   const [gamesCategory, setGamesCategory] = useState<GamesCategory>(null);
-  const [screen, setScreen] = useState<Screen>(section === 'games' ? {name:'games-list'} : section === 'theory' ? {name:'theory-list'} : section === 'cards' ? {name:'cards-lesson-list'} : {name:'listening'});
+  const [requestedScreen, setScreen] = useState<Screen>(section === 'games' ? {name:'games-list'} : section === 'theory' ? {name:'theory-list'} : section === 'cards' ? {name:'cards-lesson-list'} : {name:'listening'});
 
+  let screen = requestedScreen;
+  if(!isAdmin) {
+    if(screen.name === 'family-game' || screen.name === 'house-game') screen = {name:'games-list'};
+    else if(['dialogue-games-list','dialogue-game-setup','dialogue-game','big-numbers-setup','big-numbers-game'].includes(screen.name)
+      || ((screen.name === 'numbers-game-setup' || screen.name === 'numbers-game') && screen.range !== 'phone')) screen = {name:'numbers-games-list'};
+  }
   switch (screen.name) {
     case 'listening':
       return <Suspense fallback={<div className="screen"><BackButton onClick={onBack} label="К выбору группы" /><p role="status">Загружаем аудирование…</p></div>}><ListeningScreen onBack={onBack} /></Suspense>;
 
     case 'games-list':
-      return <GamesListScreen category={gamesCategory} onCategoryChange={setGamesCategory} onOpenTaxi={() => setScreen({ name: 'taxi-demo' })} onOpenQuestionTower={() => setScreen({ name: 'question-tower' })} onOpenSuperBlitz={() => setScreen({ name: 'questions-superblitz' })} onOpenRestaurant={() => setScreen({ name: 'restaurant-game' })} onOpenPeople={() => setScreen({ name: 'people-game' })} onBack={onBack} onOpenTravel={() => setScreen({ name: 'travel-game' })} onOpenProfessions={() => setScreen({ name: 'professions-game' })} onOpenFamily={() => setScreen({ name: 'family-game' })} onOpenHouse={() => setScreen({ name: 'house-game' })} onOpenLesson9={() => setScreen({ name: 'numbers-games-list' })} />;
+      return <GamesListScreen isAdmin={isAdmin} category={gamesCategory} onCategoryChange={setGamesCategory} onOpenTaxi={() => setScreen({ name: 'taxi-demo' })} onOpenQuestionTower={() => setScreen({ name: 'question-tower' })} onOpenSuperBlitz={() => setScreen({ name: 'questions-superblitz' })} onOpenRestaurant={() => setScreen({ name: 'restaurant-game' })} onOpenPeople={() => setScreen({ name: 'people-game' })} onBack={onBack} onOpenTravel={() => setScreen({ name: 'travel-game' })} onOpenProfessions={() => setScreen({ name: 'professions-game' })} onOpenFamily={() => setScreen({ name: 'family-game' })} onOpenHouse={() => setScreen({ name: 'house-game' })} onOpenLesson9={() => setScreen({ name: 'numbers-games-list' })} />;
 
     case 'numbers-games-list':
-      return <NumbersGamesListScreen onBack={() => setScreen({ name: 'games-list' })} onOpenDialogues={() => setScreen({ name: 'dialogue-games-list' })} onOpenBigNumbers={() => setScreen({ name: 'big-numbers-setup' })} onOpenNumbers={range => setScreen({ name: 'numbers-game-setup', range })} />;
+      return <NumbersGamesListScreen isAdmin={isAdmin} onBack={() => setScreen({ name: 'games-list' })} onOpenDialogues={() => setScreen({ name: 'dialogue-games-list' })} onOpenBigNumbers={() => setScreen({ name: 'big-numbers-setup' })} onOpenNumbers={range => setScreen({ name: 'numbers-game-setup', range })} />;
 
     case 'questions-superblitz':
       return <QuestionsBlitzScreen onBack={() => { setGamesCategory('extra'); setScreen({ name: 'games-list' }); }} />;
