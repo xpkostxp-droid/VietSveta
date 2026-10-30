@@ -37,3 +37,9 @@ it('falls back to muted playback if the browser refuses audio autoplay',async()=
  expect((node.querySelector('video.is-selected') as HTMLVideoElement).muted).toBe(true);
  expect(node.textContent).toContain('Повторить со звуком');
 });
+it.each([['near','victory'],['far','defeat']] as const)('plays the %s perspective with %s crowd reaction',async(outcome,reaction)=>{
+ await act(async()=>root.render(<BattleCinema lobby={false} result={{key:'reaction',outcome,label:'Итог'}}/>));
+ expect(node.querySelector('video.is-selected')?.getAttribute('src')).toContain(reaction);
+ const other=node.querySelector('video:not(.is-selected)') as HTMLVideoElement;
+ expect(other.className).not.toContain('is-selected');
+});

@@ -23,3 +23,16 @@ Public preview: https://cdn.freesound.org/previews/139/139972_968325-lq.mp3
 Retrieved 2026-10-30. Excerpt 0.1–3.1s, normalized quietly, faded, placed
 1.5s into each smash-cheer-v5.mp4 after ball contact with the court.
 Video streams are unchanged from real-v4.mp4.
+
+
+# Approved per-player reactions (v6)
+Near/local winner: smash-near-victory-v6.mp4 uses the approved two-second
+victory cut, 01-victory-cheer-short.mp3, from jessepash 139972 (CC0 above).
+Far/opponent winner: smash-far-defeat-v6.mp4 uses the approved disappointment
+cut, 02-defeat-disappointment.mp3, from mrrap4food:
+https://freesound.org/people/mrrap4food/sounds/619007/
+https://cdn.freesound.org/previews/619/619007_781461-lq.mp3
+License: CC0 1.0, https://creativecommons.org/publicdomain/zero/1.0/
+Both reactions begin at 1.5 seconds, gain 0.65. Original real-v4 paddle/court
+sounds and video streams are preserved. The defeat container retains the
+complete reaction audio, holding the final video frame for its short tail.
