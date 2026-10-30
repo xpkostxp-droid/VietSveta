@@ -30,3 +30,14 @@ it.each([['host',12,8,'near'],['guest',12,8,'far'],['guest',8,12,'near'],['host'
  expect(host.querySelector('video.is-selected')?.getAttribute('src')).toContain(outcome);
  expect(host.textContent).not.toContain('Проверим смэш на телефоне');
 });
+it('uses total match score when both players miss question 15',async()=>{
+ rpc.mockResolvedValue({data:{...base,match:{id:'last-miss',status:'finished',side:'host',round:15,starts_at:null,task:null,answered:true,score_host:6,score_guest:4,host_name:'Админ',guest_name:'Светлана',last_result:{winner:'none',word:'táo',options:['яблоко','банан','манго'],answer:0}}},error:null});
+ await act(async()=>root.render(<BattleScreen onBack={()=>{}}/>));
+ expect(host.querySelector('video.is-selected')?.getAttribute('src')).toContain('near');
+ expect(host.textContent).toContain('6 : 4');
+});
+it('shows a draw without a victory smash after 15 questions',async()=>{
+ rpc.mockResolvedValue({data:{...base,match:{id:'draw',status:'finished',side:'guest',round:15,starts_at:null,task:null,answered:true,score_host:5,score_guest:5,host_name:'Админ',guest_name:'Светлана',last_result:null}},error:null});
+ await act(async()=>root.render(<BattleScreen onBack={()=>{}}/>));
+ expect(host.querySelector('video.is-selected')).toBeNull();expect(host.textContent).toContain('Ничья!');
+});
