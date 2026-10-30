@@ -21,3 +21,36 @@
 .qs-playing .qs-message { min-height: 0; height: 22px; line-height: 22px; }
 @media(max-height:720px) { .qs-timer-top .qs-circle { width: 52px; height: 52px; } .qs-question-row { min-height: 98px; padding: 8px; } .qs-playing .qs-balance-scene { height: 162px; } }
 .qs-total-time { text-align: center; margin: 0; font-size: 1rem; font-weight: 750; color: #42695e; font-variant-numeric: tabular-nums; }
+
+/* Stable compact slots: changing text or feedback never moves the choices. */
+.qs-playing { gap: 8px; padding-top: max(10px, env(safe-area-inset-top)); }
+.qs-playing > * { flex-shrink: 0; }
+.qs-topbar { min-height: 30px; gap: 6px; }
+.qs-topbar .back-button { margin: 0; padding: 4px 0; }
+.qs-score { gap: 8px; font-size: .9rem; font-variant-numeric: tabular-nums; }
+.qs-total-time { font-size: .9rem; white-space: nowrap; }
+.qs-timer-top { height: 52px; padding: 0; }
+.qs-timer-top .qs-circle { width: 52px; height: 52px; }
+.qs-playing .qs-balance-scene { height: 190px; }
+.qs-playing .qs-message { height: 22px; margin: 0; font-size: .9rem; }
+.qs-playing .qs-question-row { box-sizing: border-box; height: 112px; min-height: 112px; padding: 8px 10px; }
+.qs-prompt { gap: 4px; }
+.qs-prompt strong { overflow-wrap: normal; font-size: clamp(24px, 6.5vw, 32px); }
+.qs-prompt-note { font-size: 1rem; }
+.qs-playing .qs-controls { box-sizing: border-box; height: 194px; min-height: 194px; }
+.qs-answers { grid-template-columns: 1fr; grid-template-rows: repeat(3, 58px); gap: 8px; }
+.qs-answer { box-sizing: border-box; height: 58px; min-height: 58px; padding: 6px 12px; font-size: clamp(18px, 4.8vw, 22px); line-height: 1.18; overflow-wrap: normal; word-break: normal; text-align: center; display: flex; align-items: center; justify-content: center; }
+.qs-end { font-size: .92rem; }
+.qs-end p { margin: 4px 0 6px; }
+@media(max-height:740px) {
+ .qs-playing { gap: 6px; }
+ .qs-playing .qs-balance-scene { height: 126px; }
+ .qs-playing .qs-question-row { height: 98px; min-height: 98px; }
+ .qs-timer-top { height: 44px; }
+ .qs-timer-top .qs-circle { width: 44px; height: 44px; }
+ .qs-playing .qs-controls { height: 184px; min-height: 184px; }
+ .qs-answers { grid-template-rows: repeat(3, 56px); gap: 8px; }
+ .qs-answer { height: 56px; min-height: 56px; }
+}
+@media(max-width:350px) { .qs-topbar { gap: 4px; } .qs-score { font-size: .8rem; gap: 5px; } .qs-total-time { font-size: .8rem; } }
+@media(max-height:620px) { .qs-playing { gap: 4px; } .qs-playing .qs-balance-scene { height: 90px; } }

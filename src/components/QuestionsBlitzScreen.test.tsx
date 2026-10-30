@@ -48,7 +48,7 @@ it('separates a long parenthetical clarification from the centered main question
  await click('⚡ Начать суперблиц');
  for (let i=0;i<20;i++) { await correctAnswer(); await time(1200); }
  expect(node.querySelector('.qs-prompt strong')?.textContent).toBe('Сколько');
- expect(node.querySelector('.qs-prompt-note')?.textContent).toBe('общее количество');
+ expect(node.querySelector('.qs-prompt-note')?.textContent).toBe('13+');
 });
 
 it('basic mode checks all 15 words in both directions, finishes at 30 and keeps a separate record', async () => {

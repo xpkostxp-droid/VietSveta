@@ -12,7 +12,7 @@ export const superCards: [string,string][] = [
  ['Ai','Кто'],['Gì','Что'],['Ở đâu','Где'],['Đi đâu','Куда'],
  ['Từ đâu','Откуда'],['Khi nào','Когда'],['Ngày nào','В какой день'],
  ['Mấy giờ','Во сколько'],['Tại sao','Почему'],['Thế nào','Как'],
- ['Bao nhiêu','Сколько (общее количество)'],['Mấy','Сколько (небольшое количество)'],
+ ['Bao nhiêu','Сколько (13+)'],['Mấy','Сколько (1–12)'],
  ['Nào','Какой / который'],['Của ai','Чей'],['Với ai','С кем'],
  ['Cho ai','Кому / для кого'],['Bằng gì','Чем / с помощью чего'],
  ['Để làm gì','Зачем / для чего'],['Bao lâu','Как долго'],
@@ -159,9 +159,8 @@ export function QuestionsBlitzScreen({onBack, variant = 'super'}:{onBack:()=>voi
  const promptText = !started ? '' : completed ? `Все ${totalTasks} заданий пройдены!` : failed ? (failed === 'timeout' ? 'Время вышло!' : 'Ошибка!') : cards[q][reverse ? 0 : 1];
  const promptParts = promptText.match(/^(.*?)\s*\((.*?)\)$/);
  return <div className={'screen qs-screen' + (started ? ' qs-playing' : '')}>
-  <div className="qs-topbar"><BackButton onClick={started?()=>{deadline.current=null;if(pending.current)clearTimeout(pending.current);stopSpeaking();setStarted(false);}:onBack} label={started?'Назад':'К играм'}/>{started&&<div className="qs-score"><span>⚖️ {blocks.length}/{totalTasks}</span><span>🏆 {best}</span></div>}</div>
+  <div className="qs-topbar"><BackButton onClick={started?()=>{deadline.current=null;if(pending.current)clearTimeout(pending.current);stopSpeaking();setStarted(false);}:onBack} label={started?'Назад':'К играм'}/><p className="qs-total-time" aria-label="Общее время ответов">⏱ {formatAnswerTime(answerTime)}</p>{started&&<div className="qs-score"><span>⚖️ {blocks.length}/{totalTasks}</span><span>🏆 {best}</span></div>}</div>
   <>
-   <p className="qs-total-time" aria-label="Общее время ответов">⏱ {formatAnswerTime(answerTime)}</p>
    <div className="qs-timer-top"><div className={'qs-circle'+(seconds<=3?' qs-circle-urgent':'')} role="progressbar" aria-label="Время на ответ" aria-valuemin={0} aria-valuemax={5} aria-valuenow={failed||completed?0:Math.ceil(seconds)}>
       <svg viewBox="0 0 100 100" aria-hidden="true"><circle className="qs-ring-bg" cx="50" cy="50" r="43"/><circle className="qs-ring" cx="50" cy="50" r="43" pathLength="100" strokeDasharray="100" strokeDashoffset={100-(failed?0:seconds/5*100)}/></svg><span>{failed?'0':feedback||completed?'✓':Math.ceil(seconds)}</span>
     </div></div>
