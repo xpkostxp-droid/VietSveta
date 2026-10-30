@@ -2,11 +2,16 @@ export function createNinjaSound(){
  let ctx:AudioContext|null=null;
  const ready=()=>{try{ctx??=new AudioContext();void ctx.resume();}catch{}};
  const beep=(digit:number)=>{try{
-  if(!ctx||ctx.state!=='running')return;
-  const now=ctx.currentTime,osc=ctx.createOscillator(),gain=ctx.createGain();
-  osc.type='square';osc.frequency.value=digit===1?880:800;
-  gain.gain.setValueAtTime(.0001,now);gain.gain.exponentialRampToValueAtTime(.24,now+.004);gain.gain.exponentialRampToValueAtTime(.0001,now+.18);
-  osc.connect(gain);gain.connect(ctx.destination);osc.start(now);osc.stop(now+.19);
+  const context=ctx;if(!context)return;
+  const play=()=>{try{
+   if(ctx!==context||context.state!=='running')return;
+   const now=context.currentTime,osc=context.createOscillator(),gain=context.createGain();
+   osc.type='square';osc.frequency.value=digit===1?880:800;
+   gain.gain.setValueAtTime(.0001,now);gain.gain.exponentialRampToValueAtTime(.24,now+.004);gain.gain.exponentialRampToValueAtTime(.0001,now+.18);
+   osc.connect(gain);gain.connect(context.destination);osc.start(now);osc.stop(now+.19);
+  }catch{}};
+  // An iPhone may still be completing resume() from the Start/Accept tap.
+  if(context.state==='running')play();else void context.resume().then(play).catch(()=>{});
  }catch{}};
  const tone=(kind:'miss'|'hit'|'splat')=>{try{
   if(!ctx||ctx.state!=='running')return;

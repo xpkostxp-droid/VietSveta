@@ -36,7 +36,7 @@ function BattleSession({onBack,audio,botConfig,onBotReplay}:{onBack:()=>void;aud
  const device=useRef(crypto.randomUUID());
  const courtSound=useRef(audio.court);
  const sound=useRef(audio.sound),beeped=useRef('');
- const answerSpeech=useRef<{key:string;topic:string;word:string}|null>(null),spoken=useRef(''),scoreSeen=useRef<{id:string;host:number;guest:number}|null>(null);
+ const spoken=useRef(''),scoreSeen=useRef<{id:string;host:number;guest:number}|null>(null);
  const [voiceReady,setVoiceReady]=useState(()=>hasVietnameseVoice());
  useEffect(()=>onVoicesChanged(()=>setVoiceReady(hasVietnameseVoice())),[]);
  const [state,setState]=useState<Snapshot|null>(null),[topic,setTopic]=useState('fruits'),[error,setError]=useState(''),[busy,setBusy]=useState(false),[now,setNow]=useState(Date.now()),[hidden,setHidden]=useState(document.hidden),[dismissed,setDismissed]=useState('');
@@ -74,23 +74,22 @@ function BattleSession({onBack,audio,botConfig,onBotReplay}:{onBack:()=>void;aud
  const starts=match?.starts_at?Date.parse(match.starts_at):Infinity;
  const running=match?.status==='active'&&now>=starts&&now<starts+5000;
  const roundKey=match?`${match.id}:${match.round}`:'';
- const seconds=Math.ceil((starts+5000-now)/1000);
  const preparing=match?.status==='active'&&match.round===0&&Number.isFinite(starts)&&now<starts;
  const prepareSeconds=Math.ceil((starts-now)/1000);
+ const resultAt=match?.last_result?.at?Date.parse(match.last_result.at):0;
+ const showResult=!!match?.last_result&&(match.status==='active'&&now<starts||match.status==='finished'&&resultAt>0&&now<resultAt+1700);
+ const resultKey=match?.last_result?`${match.id}:${match.last_result.round??match.round-1}`:'';
  useEffect(()=>{
-  if(isNinja)return;
-  const digit=preparing?prepareSeconds:seconds;
-  const enabled=preparing||(running&&!match?.answered);
-  const key=`${roundKey}:${preparing?'prepare':'answer'}:${digit}`;
-  if(enabled&&digit>=1&&digit<=3&&beeped.current!==key){beeped.current=key;sound.current?.beep(digit);}
- },[roundKey,seconds,prepareSeconds,preparing,running,match?.answered,isNinja]);
+  if(isNinja||!preparing)return;
+  const key=`${roundKey}:prepare:${prepareSeconds}`;
+  if(prepareSeconds>=1&&prepareSeconds<=3&&beeped.current!==key){beeped.current=key;audio.ninja.beep(prepareSeconds);}
+ },[roundKey,prepareSeconds,preparing,isNinja,audio]);
  useEffect(()=>{
   if(hidden||match?.status==='cancelled'){stopSpeaking();return;}
-  const pending=answerSpeech.current;
-  if(pending&&pending.key===roundKey&&voiceReady&&spoken.current!==pending.key){
-   spoken.current=pending.key;speakBattleWord(pending.topic,pending.word);
+  if(!isNinja&&showResult&&match?.last_result&&voiceReady&&spoken.current!==resultKey){
+   spoken.current=resultKey;speakBattleWord(match.topic,match.last_result.word);
   }
- },[roundKey,voiceReady,hidden,match?.status]);
+ },[resultKey,showResult,voiceReady,hidden,match?.status,isNinja]);
  useEffect(()=>{
   if(!match||isNinja)return;
   const previous=scoreSeen.current;
@@ -100,34 +99,30 @@ function BattleSession({onBack,audio,botConfig,onBotReplay}:{onBack:()=>void;aud
  const choose=(choice:number)=>{
   if(!match||!running||busy||match.answered||locked.current===roundKey)return;
   locked.current=roundKey;
-  if(!isNinja&&match.task){
-   const pending={key:roundKey,topic:match.topic,word:match.task.word};
-   answerSpeech.current=pending;primeBattleSpeech();
-   if(hasVietnameseVoice()){spoken.current=roundKey;speakBattleWord(pending.topic,pending.word);}
-  }
   void act('answer',{match:match.id,round:match.round,choice,elapsed:Math.max(0,Math.round(now-starts))});
  };
  const inMatch=match&&match.id!==dismissed;
- const finished=!!inMatch&&match.status==='finished';
+ const finished=!!inMatch&&match.status==='finished'&&(!showResult||isNinja);
  const outcome=finished?finalOutcome(match.score_host,match.score_guest,match.side):null;
  const cinemaResult:CinemaResult|null=finished&&outcome?{key:match.id,outcome,label:outcome==='near'?'Твоя победа!':'Победа соперника'}:null;
- const playing=!!inMatch&&match.status==='active';
+ const playing=!!inMatch&&(match.status==='active'||showResult&&!isNinja);
  const showCinema=!!state&&!hidden;
- const shownWord=running?(match?.task?.word??''):now<starts?(match?.last_result?.word??'Приготовьтесь!'):'Время!';
+ const shownWord=showResult?'':preparing?'Приготовились!':running?(match?.task?.word??''):'';
+ const shownOptions=showResult?match?.last_result?.options??[]:match?.task?.options??[];
 
  if(isNinja&&inMatch&&(playing||finished)&&!hidden)return <OnlineNinjaBattle key={match.id} match={match} now={now} busy={busy} locked={locked.current===roundKey} error={error} sound={audio.ninja} onReady={()=>setAssetsReady(match.id)} onAnswer={choose} onCancel={()=>void act('cancel',{match:match.id})} onBack={onBack} onReplay={()=>void act('rematch',{match:match.id})} onStatistics={()=>{setDismissed(match.id);ready.current='';setView('stats');}}/>;
- return <div className={`screen battle-screen${playing||finished?' is-playing':''}${finished?' is-finished':''}`}><div className="battle-topbar"><BackButton onClick={!playing&&!finished&&view==='lobby'?()=>setView('stats'):onBack} label={!playing&&!finished&&view==='lobby'?'К статистике':'К играм'}/>{(playing||finished)&&!hidden&&<div className="battle-round">{match.round>=baseRounds&&!finished?'Дополнительный раунд '+(match.round-baseRounds+1):`Раунд ${Math.min(baseRounds,match.round+1)}/${baseRounds}`} <b>{finished?'✓':!match.starts_at?'…':now<starts?Math.ceil((starts-now)/1000):Math.max(0,Math.ceil((starts+5000-now)/1000))}</b></div>}</div><div className="battle-heading"><h1>{bot?'🤖 Проверка с ботом':'⚔️ Батл'}</h1>{!playing&&<span>{bot?'Тест администратора · без статистики':'Онлайн · с участниками'}</span>}</div>
+ return <div className={`screen battle-screen${playing||finished?' is-playing':''}${finished?' is-finished':''}`}><div className="battle-topbar"><BackButton onClick={!playing&&!finished&&view==='lobby'?()=>setView('stats'):onBack} label={!playing&&!finished&&view==='lobby'?'К статистике':'К играм'}/>{(playing||finished)&&!hidden&&<div className="battle-round">{match.round>=baseRounds&&!finished?'Дополнительный раунд '+(match.round-baseRounds+1):`Раунд ${Math.min(baseRounds,match.round+1)}/${baseRounds}`} <b>{finished||showResult?'✓':!match.starts_at?'…':now<starts?Math.ceil((starts-now)/1000):Math.max(0,Math.ceil((starts+5000-now)/1000))}</b></div>}</div><div className="battle-heading"><h1>{bot?'🤖 Проверка с ботом':'⚔️ Батл'}</h1>{!playing&&<span>{bot?'Тест администратора · без статистики':'Онлайн · с участниками'}</span>}</div>
 
- {(playing||(finished&&!outcome))&&!hidden&&<BattleCourt players={courtPlayers(match)} state={{key:roundKey,round:finished?Math.max(0,match.round-1):match.round,now,starts:finished?Infinity:starts,winner:ownWinner(match.last_result?.winner??'none',match.side),nearBlue:match.side==='host'}} onHit={(kind,near)=>courtSound.current?.hit(kind,near)}/>}
+ {(playing||(finished&&!outcome))&&!hidden&&<BattleCourt countdown={preparing?prepareSeconds:undefined} players={courtPlayers(match)} state={{key:roundKey,round:finished?Math.max(0,match.round-1):match.round,now,starts:showResult&&resultAt?resultAt+2000:finished?Infinity:starts,winner:ownWinner(match.last_result?.winner??'none',match.side),nearBlue:match.side==='host'}} onHit={(kind,near)=>courtSound.current?.hit(kind,near)}/>}
 
  <BattleCinema lobby={false} compact result={showCinema?cinemaResult:null} players={match?courtPlayers(match):undefined} nearBlue={match?.side==='host'} round={match?.round}/>
  {showCinema&&(playing||finished)&&<div className="battle-score"><span className="battle-team-blue">{match.host_name}<strong key={`host:${match.score_host}`} className={match.score_host?'battle-score-pop':undefined}>{match.score_host}</strong></span><b>:</b><span className="battle-team-red">{match.guest_name}<strong key={`guest:${match.score_guest}`} className={match.score_guest?'battle-score-pop':undefined}>{match.score_guest}</strong></span></div>}
 
- {hidden?<p>Вернись в приложение, чтобы снова быть в сети.</p>:!state?<p role="status">Подключаемся…</p>:inMatch&&match.status==='invited'?<section className="battle-panel"><h2>{match.side==='host'?'Ждём ответа…':`${match.host_name} вызывает тебя!`}</h2><p>{state.topics.find(t=>t.id===match.topic)?.title} · {baseRounds} вопросов</p>{match.side==='guest'?<><button className="big-button" disabled={busy} onClick={()=>void act('accept',{match:match.id})}>Принять вызов</button><button className="battle-secondary" disabled={busy} onClick={()=>void act('decline',{match:match.id})}>Отклонить</button></>:<button className="battle-secondary" disabled={busy} onClick={()=>void act('cancel',{match:match.id})}>Отменить вызов</button>}</section>:inMatch&&match.status==='active'?<>
+ {hidden?<p>Вернись в приложение, чтобы снова быть в сети.</p>:!state?<p role="status">Подключаемся…</p>:inMatch&&match.status==='invited'?<section className="battle-panel"><h2>{match.side==='host'?'Ждём ответа…':`${match.host_name} вызывает тебя!`}</h2><p>{state.topics.find(t=>t.id===match.topic)?.title} · {baseRounds} вопросов</p>{match.side==='guest'?<><button className="big-button" disabled={busy} onClick={()=>void act('accept',{match:match.id})}>Принять вызов</button><button className="battle-secondary" disabled={busy} onClick={()=>void act('decline',{match:match.id})}>Отклонить</button></>:<button className="battle-secondary" disabled={busy} onClick={()=>void act('cancel',{match:match.id})}>Отменить вызов</button>}</section>:inMatch&&(match.status==='active'||showResult)?<>
  <div className={`battle-word${shownWord.length>16?' battle-word-long':''}`}>{shownWord}</div>
- <div className="battle-feedback" aria-live="polite">{now<starts&&match.last_result?<>✓ {match.last_result.options[match.last_result.answer]} · {match.last_result.winner==='none'?'Без очков':match.last_result.winner==='both'?'По очку обоим':`Очко: ${match.last_result.winner==='host'?match.host_name:match.guest_name}`}</>:match.answered||locked.current===roundKey?'Ответ принят. Ждём результат…':'Выбери перевод'}</div>
- <div className="battle-answers">{(match.task?.options??[]).map((option,i)=><button key={`${roundKey}:${i}`} disabled={!running||busy||match.answered||locked.current===roundKey} onClick={()=>choose(i)}>{option}</button>)}</div>
- <button className="battle-secondary" disabled={busy} onClick={()=>void act('cancel',{match:match.id})}>Завершить батл</button>
+ <div className="battle-feedback" aria-live="polite"/>
+ <div className="battle-answers">{shownOptions.map((option,i)=><button key={`${showResult?resultKey:roundKey}:${i}`} className={showResult&&i===match.last_result?.answer?'is-correct':undefined} disabled={showResult||!running||busy||match.answered||locked.current===roundKey} onClick={()=>choose(i)}>{option}</button>)}</div>
+ <button className="battle-secondary" disabled={busy||match.status==='finished'} onClick={()=>void act('cancel',{match:match.id})}>Завершить батл</button>
  </>:inMatch&&['finished','cancelled'].includes(match.status)?<section className={`battle-panel${finished?' battle-result':''}`}><h2>{match.status==='finished'?'🏆 Батл завершён':'Батл отменён'}</h2><p>{match.status==='finished'?(match.score_host===match.score_guest?'Ничья!':`Победитель: ${match.score_host>match.score_guest?match.host_name:match.guest_name}`):'Приглашение истекло, участник вышел или свернул приложение.'}</p><div className="battle-result-actions">{finished&&<button className="big-button" disabled={busy} onClick={()=>bot?onBotReplay?.():void act('rematch',{match:match.id})}>Реванш</button>}<button className="battle-return-button" onClick={()=>{if(bot){onBack();return;}setDismissed(match.id);ready.current='';setView('stats');}}>{bot?'← К настройкам бота':'← К статистике'}</button></div></section>:view==='stats'?<BattleStatistics onPlay={()=>{setView('lobby');if(match)setDismissed(match.id);}}/>:<>
  <div className="battle-label">Выбери тему</div><TopicWheel items={state.topics} value={topic} onChange={setTopic}/>
  <p className="battle-rules">{['fruits','vegetables','harvest'].includes(topic)?'🥷 Ниндзя · картинки → вьетнамский · до 10 раундов':'🏓 Пиклбол · до 10 слов в каждом направлении'} · 5 секунд · до победы</p>

@@ -45,7 +45,7 @@ export function preloadCourt() {
 function pose(t: number, hit: number) {
  const d=t-hit;return d<-.20||d>.32?0:d<-.045?1:d<.07?2:3;
 }
-export function BattleCourt({state,onHit,players=defaultPlayers}:{state:CourtState;players?:CourtPlayers;onHit:(kind:'paddle'|'bounce',near:boolean)=>void}) {
+export function BattleCourt({state,onHit,players=defaultPlayers,countdown}:{state:CourtState;countdown?:number;players?:CourtPlayers;onHit:(kind:'paddle'|'bounce',near:boolean)=>void}) {
  const canvas=useRef<HTMLCanvasElement>(null),latest=useRef({state,onHit,players,received:performance.now()});
  latest.current={state,onHit,players,received:performance.now()};
  const [failed,setFailed]=useState(false);
@@ -110,6 +110,7 @@ export function BattleCourt({state,onHit,players=defaultPlayers}:{state:CourtSta
  },[]);
  return <div className="battle-court" style={{backgroundImage:"url('./battle-media/court-clean-v1.jpg')",backgroundSize:'contain',backgroundPosition:'center',backgroundRepeat:'no-repeat'}} aria-label="Розыгрыш пиклбола" data-near-gender={players.near} data-far-gender={players.far}>
   <canvas ref={canvas} width={W} height={H} role="img" aria-label="Твой игрок со спины, соперник напротив"/>
+  {countdown!==undefined&&countdown>=1&&countdown<=3&&<div className="battle-court-countdown" role="status">{countdown}</div>}
   {failed&&<span className="battle-court-fallback">Корт не загрузился — отвечать можно как обычно.</span>}
  </div>;
 }

@@ -51,7 +51,7 @@ export function createBotBattle(topic:string,random:()=>number=Math.random,clock
   }
   if(winner==='host'||winner==='both')match.score_host++;
   if(winner==='guest'||winner==='both')match.score_guest++;
-  match.last_result={winner,...tasks[match.round]};
+  match.last_result={winner,...tasks[match.round],round:match.round,at:new Date(clock()).toISOString(),starts_at:match.starts_at};
   match.round++;human=null;opponent=null;match.answered=false;
   if(match.round>=baseRounds&&match.score_host!==match.score_guest){match.status='finished';match.task=null;}
   else {
