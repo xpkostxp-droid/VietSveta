@@ -7,8 +7,8 @@ import { BattleScreen } from './BattleScreen';
 Object.assign(globalThis,{IS_REACT_ACT_ENVIRONMENT:true});
 let host:HTMLDivElement;let root:ReturnType<typeof createRoot>;
 const base={server_now:new Date().toISOString(),topics:[{id:'fruits',title:'Фрукты'}],online:[{device:'peer',name:'Светлана',busy:false}],match:null};
-beforeEach(()=>{vi.useFakeTimers();rpc.mockReset();rpc.mockResolvedValue({data:base,error:null});host=document.createElement('div');document.body.append(host);root=createRoot(host);});
-afterEach(async()=>{await act(async()=>root.unmount());host.remove();vi.useRealTimers();});
+beforeEach(()=>{vi.spyOn(HTMLMediaElement.prototype,'pause').mockImplementation(()=>{});vi.spyOn(HTMLMediaElement.prototype,'play').mockResolvedValue();vi.useFakeTimers();rpc.mockReset();rpc.mockResolvedValue({data:base,error:null});host=document.createElement('div');document.body.append(host);root=createRoot(host);});
+afterEach(async()=>{await act(async()=>root.unmount());host.remove();vi.useRealTimers();vi.restoreAllMocks();});
 it('shows online opponent, selected topic and sends an invitation',async()=>{
  await act(async()=>root.render(<BattleScreen onBack={()=>{}}/>));
  expect(host.textContent).toContain('Светлана');expect(host.textContent).toContain('не влияют');
@@ -22,4 +22,11 @@ it('locks an answer immediately, preventing double submission',async()=>{
  const answer=host.querySelector('.battle-answers button') as HTMLButtonElement;
  await act(async()=>{answer.click();answer.click();});
  expect(rpc.mock.calls.filter(c=>c[1].p_action==='answer')).toHaveLength(1);
+});
+
+it.each([['host',12,8,'near'],['guest',12,8,'far'],['guest',8,12,'near'],['host',8,12,'far']] as const)('uses personal perspective for %s at %i:%i',async(side,h,g,outcome)=>{
+ rpc.mockResolvedValue({data:{...base,match:{id:'finished',status:'finished',side,round:15,starts_at:null,task:null,answered:true,score_host:h,score_guest:g,host_name:'Админ',guest_name:'Светлана',last_result:null}},error:null});
+ await act(async()=>root.render(<BattleScreen onBack={()=>{}}/>));
+ expect(host.querySelector('video.is-selected')?.getAttribute('src')).toContain(outcome);
+ expect(host.textContent).not.toContain('Проверим смэш на телефоне');
 });

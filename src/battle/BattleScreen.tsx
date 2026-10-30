@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { BackButton } from '../components/BackButton';
 import { supabase } from '../domain/cloud';
 import './BattleScreen.css';
+import { BattleCinema, type CinemaResult } from './BattleCinema';
 import { TopicWheel } from './TopicWheel';
 import { makeGameSound } from '../beginner/components/gameSounds';
 type Match={id:string;status:string;topic:string;side:'host'|'guest';host_name:string;guest_name:string;round:number;starts_at:string|null;ready_host:boolean;ready_guest:boolean;task:{word:string;options:string[]}|null;answered:boolean;score_host:number;score_guest:number;last_result:{winner:string;word:string;options:string[];answer:number}|null};
@@ -47,6 +48,10 @@ export function BattleScreen({onBack}:{onBack:()=>void}){
   void act('answer',{match:match.id,round:match.round,choice,elapsed:Math.max(0,Math.round(now-starts))});
  };
  const inMatch=match&&match.id!==dismissed;
+ const finished=!!inMatch&&match.status==='finished';
+ const tied=finished&&match.score_host===match.score_guest;
+ const won=finished&&(match.side==='host'?match.score_host>match.score_guest:match.score_guest>match.score_host);
+ const cinemaResult:CinemaResult|null=finished&&!tied?{key:match.id,outcome:won?'near':'far',label:won?'Твоя победа!':'Победа соперника'}:null;
  return <div className="screen battle-screen"><BackButton onClick={onBack} label="К играм"/><div className="battle-heading"><h1>⚔️ Батл</h1><span>Пробный · продвинутая группа</span></div>
  {hidden?<p>Вернись в приложение, чтобы снова быть в сети.</p>:!state?<p role="status">Подключаемся…</p>:inMatch&&match.status==='invited'?<section className="battle-panel"><h2>{match.side==='host'?'Ждём ответа…':`${match.host_name} вызывает тебя!`}</h2><p>{state.topics.find(t=>t.id===match.topic)?.title} · 15 раундов</p>{match.side==='guest'?<><button className="big-button" disabled={busy} onClick={()=>void act('accept',{match:match.id})}>Принять вызов</button><button className="battle-secondary" disabled={busy} onClick={()=>void act('decline',{match:match.id})}>Отклонить</button></>:<button className="battle-secondary" disabled={busy} onClick={()=>void act('cancel',{match:match.id})}>Отменить вызов</button>}</section>:inMatch&&match.status==='active'?<>
  <div className="battle-score"><span>{match.host_name}<strong>{match.score_host}</strong></span><b>:</b><span>{match.guest_name}<strong>{match.score_guest}</strong></span></div>
@@ -61,6 +66,7 @@ export function BattleScreen({onBack}:{onBack:()=>void}){
  <h2>Сейчас в сети</h2>{state.online.length?state.online.map(p=><div className="battle-person" key={p.device}><span>🟢 {p.name}</span><button disabled={busy||p.busy} onClick={()=>{setDismissed('');void act('invite',{opponent:p.device,topic});}}>{p.busy?'Занят':'Вызвать'}</button></div>):<p>Пока никого. Откройте этот раздел под второй учётной записью на другом устройстве.</p>}
  <p className="battle-note">Доступно только админу и Светлане. Пробные результаты не влияют на рейтинги обычных игр.</p>
  </>}
+ <BattleCinema lobby={!!state&&!hidden&&(!inMatch||!['invited','active','finished','cancelled'].includes(match.status))} result={hidden?null:cinemaResult}/>
  {error&&<p role="alert" className="battle-error">{error} <button onClick={()=>void act('poll')}>Повторить</button></p>}
  </div>;
 }
