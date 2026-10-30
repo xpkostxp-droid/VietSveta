@@ -11,13 +11,28 @@ function shuffle<T>(items:T[],random:()=>number) {
 }
 export function createBotBattle(topic:string,random:()=>number=Math.random,clock:()=>number=Date.now) {
  const group=botVocabulary[topic]??botVocabulary.fruits;
- const pool=shuffle(group.words.flatMap(([vi,ru])=>[{word:vi,correct:ru,lang:1},{word:ru,correct:vi,lang:0}]),random);
- const tasks:Task[]=pool.slice(0,15).map(t=>{
-  const wrong=shuffle([...new Set(group.words.map(pair=>pair[t.lang]))].filter(w=>w!==t.correct),random).slice(0,2);
-  const options=shuffle([t.correct,...wrong],random);return {word:t.word,options,answer:options.indexOf(t.correct)};
- });
+ const count=Math.min(10,group.words.length),baseRounds=count*2;
+ const draw=(direction:number,n:number)=>{
+  const key=`battle-words-v2:${topic}:${direction}`;
+  let seen:string[]=[];
+  try{seen=JSON.parse(localStorage.getItem(key)??'[]');}catch{}
+  const selected:typeof group.words=[];
+  for(let i=0;i<n;i++){
+   let available=group.words.filter(p=>!seen.includes(p[0])&&!selected.includes(p));
+   if(!available.length){seen=[];available=group.words.filter(p=>!selected.includes(p));}
+   const pair=available[Math.floor(random()*available.length)];selected.push(pair);seen.push(pair[0]);
+  }
+  try{localStorage.setItem(key,JSON.stringify(seen));}catch{}
+  return selected.map(pair=>{
+   const correct=pair[1-direction];
+   const wrong=shuffle([...new Set(group.words.map(p=>p[1-direction]))].filter(w=>w!==correct),random).slice(0,2);
+   const options=shuffle([correct,...wrong],random);
+   return {word:pair[direction],options,answer:options.indexOf(correct)};
+  });
+ };
+ const tasks:Task[]=shuffle([...draw(0,count),...draw(1,count)],random);
  const plans=tasks.map(()=>botPlan(random));
- const match:Match={id:'bot-'+clock().toString(36),status:'active',topic,side:'host',host_name:'Ты',guest_name:'Бот',round:0,starts_at:null,ready_host:false,ready_guest:true,task:null,answered:false,score_host:0,score_guest:0,last_result:null};
+ const match:Match={id:'bot-'+clock().toString(36),status:'active',topic,side:'host',host_name:'Ты',guest_name:'Бот',round:0,base_rounds:baseRounds,starts_at:null,ready_host:false,ready_guest:true,task:null,answered:false,score_host:0,score_guest:0,last_result:null};
  let human:Answer|null=null,opponent:Answer|null=null;
  const settle=()=>{
   if(match.status!=='active'||!match.starts_at)return;
@@ -38,8 +53,11 @@ export function createBotBattle(topic:string,random:()=>number=Math.random,clock
   if(winner==='guest'||winner==='both')match.score_guest++;
   match.last_result={winner,...tasks[match.round]};
   match.round++;human=null;opponent=null;match.answered=false;
-  if(match.round===15){match.status='finished';match.task=null;}
-  else match.starts_at=new Date(clock()+2000).toISOString();
+  if(match.round>=baseRounds&&match.score_host!==match.score_guest){match.status='finished';match.task=null;}
+  else {
+   if(match.round===tasks.length){tasks.push(...draw(Math.floor(random()*2),1));plans.push(botPlan(random));}
+   match.starts_at=new Date(clock()+2000).toISOString();
+  }
  };
  const snapshot=():Snapshot=>{
   const task=tasks[match.round];
