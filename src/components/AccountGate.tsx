@@ -52,9 +52,9 @@ export function AccountGate() {
   catch {setError('Не удалось переключить профиль. Попробуй снова.');}
   finally {setBusy(false);}
  };
- if(loading)return <div className="screen account-screen"><h1>VietSveta</h1><p role="status">Открываем приложение…</p></div>;
+ if(loading)return <div className="screen account-screen"><h1>Viet Club</h1><p role="status">Открываем приложение…</p></div>;
  if(member)return profile?<ProfileScreen member={member} status={status} onBack={()=>setProfile(false)} onLogout={logout} onSwitch={['konstantin','admin'].includes(member.id)?switchProfile:undefined} busy={busy}/>:<App courseGroup={member.course_group} isAdmin={member.is_admin} memberId={member.id} memberName={member.display_name} syncStatus={status} onOpenProfile={()=>setProfile(true)}/>;
- return <div className="screen account-screen"><div className="account-brand">🇻🇳 VietSveta</div><h1>{selected?'Введи свой код':'Вход в приложение'}</h1>
+ return <div className="screen account-screen"><div className="account-brand">🇻🇳 Viet Club</div><h1>{selected?'Введи свой код':'Вход в приложение'}</h1>
   {selected?<form onSubmit={e=>{e.preventDefault();if(pin.length===4&&!busy)void login();}}>
    <p className="account-person"><MemberAvatar id={selected} name={roster.find(p=>p[0]===selected)?.[1]??''} size={48}/>{roster.find(p=>p[0]===selected)?.[1]}</p>
    <label htmlFor="member-pin">Четыре цифры</label><input id="member-pin" type="password" inputMode="numeric" autoComplete="current-password" pattern="[0-9]{4}" maxLength={4} value={pin} onChange={e=>setPin(e.target.value.replace(/\D/g,''))} autoFocus disabled={busy}/>
