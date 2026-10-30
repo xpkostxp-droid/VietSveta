@@ -98,8 +98,8 @@ export function ProfessionsGameScreen({ onBack, initialGroup = null }: { onBack:
         <div className="work-status"><strong>{position + 1}/{tasks.length} · ✓ {score.correct}</strong><span className="work-clock" aria-label="Осталось секунд">{Math.ceil(remaining / 1000)}</span></div>
         <div className="work-timebar"><div style={{ width: `${remaining / 50}%` }} /></div>
         <div className={'family-card work-prompt ' + (current.reverse ? 'work-prompt-text' : '')}>
-          {!current.reverse && <ProfessionPicture id={word[0]} />}
-          {group==='professions' ? current.reverse ? <h2 lang="vi">{word[1]}</h2> : phase==='feedback'&&<h2 className="profession-caption" lang="vi">{word[1]}</h2> : <h2 lang={current.reverse ? 'vi' : 'ru'}>{current.reverse ? word[1] : word[2]}</h2>}
+          {!current.reverse && (group==='professions' ? <div className="profession-illustration"><ProfessionPicture id={word[0]} /><h2 className="profession-caption" lang="ru">{word[2]}</h2></div> : <ProfessionPicture id={word[0]} />)}
+          {current.reverse ? <h2 lang="vi">{word[1]}</h2> : group!=='professions'&&<h2 lang="ru">{word[2]}</h2>}
         </div>
         {paused ? <button className="big-button" onClick={() => { audio.current.ready(); started.current = performance.now(); setPaused(false); }}>Продолжить</button> : <div className="family-choices work-options">{options.map(option => <button key={option} lang={current.reverse ? 'ru' : 'vi'} disabled={phase !== 'playing'} className={'choice-button ' + (phase === 'feedback' ? option === answer ? 'family-correct' : option === selected ? 'family-wrong' : '' : '')} onClick={() => finishAnswer(option)}>{option}</button>)}</div>}
         {group!=='professions'&&<p className="family-feedback work-feedback" role="status">{paused ? 'Игра на паузе' : '\u00a0'}</p>}

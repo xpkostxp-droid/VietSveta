@@ -1,6 +1,7 @@
 import { act } from 'react';
 import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
+import { speakVietnamese } from '../domain/speech';
 import { ProfessionsGameScreen } from './ProfessionsGameScreen';
 import { professionWords, workBlitzTasks, workBlitzOptions, workBlitzAnswer } from '../content/games/professions';
 const sounds = vi.hoisted(() => ({ ready: vi.fn(), beep: vi.fn(), close: vi.fn() }));
@@ -46,7 +47,7 @@ it('continues after mistakes and timeout, locks double answers, stores isolated 
   start();
   for (let i = 0; i < 30; i++) {
     const correct = correctAnswer();
-    if(host.querySelector('.profession-photo')){expect(host.querySelector('.profession-caption')).toBeNull();expect(host.querySelector('.work-prompt h2')).toBeNull();}
+    if(host.querySelector('.profession-photo')){expect(host.querySelector('.profession-caption')?.getAttribute('lang')).toBe('ru');expect(host.querySelector('.profession-caption')?.textContent).toBe(professionWords.find(w=>w[1]===correct)![2]);}
     else expect(host.querySelector('.work-prompt img')).toBeNull();
     if (i === 0) {
       act(() => vi.advanceTimersByTime(1000));
@@ -96,14 +97,25 @@ it('opens the profile-linked subgroup directly and returns to the profile',()=>{
  expect(back).toHaveBeenCalledOnce();
 });
 
-it('shows only the picture before an answer, reveals the Vietnamese caption, and uses no picture in reverse tasks',()=>{
- start();
- let foundPicture=false,foundReverse=false;
- for(let i=0;i<30&&(!foundPicture||!foundReverse);i++){
+it('keeps the Russian caption within the image for correct, wrong and timeout answers; reverse tasks have no image',()=>{
+ start();let pictures=0,reverses=0;
+ for(let i=0;i<30;i++){
   const photo=host.querySelector<HTMLImageElement>('.profession-photo');const right=correctAnswer();
-  if(photo){foundPicture=true;expect(host.querySelector('.work-prompt h2')).toBeNull();click(right);expect(host.querySelector('.profession-caption')?.textContent).toBe(right);}
-  else {foundReverse=true;expect(host.querySelector('.work-prompt h2')?.getAttribute('lang')).toBe('vi');click(right);expect(host.querySelector('.work-prompt img')).toBeNull();}
+  if(photo){
+   const word=professionWords.find(w=>w[1]===right)!;
+   const caption=host.querySelector('.profession-illustration .profession-caption')!;
+   expect(caption.textContent).toBe(word[2]);expect(caption.getAttribute('lang')).toBe('ru');
+   if(pictures%3===0)click(right);
+   else if(pictures%3===1){const wrong=Array.from(host.querySelectorAll<HTMLButtonElement>('.work-options button')).find(b=>b.textContent!==right)!;act(()=>wrong.click());}
+   else act(()=>vi.advanceTimersByTime(5000));
+   expect(host.querySelector('.profession-caption')?.textContent).toBe(word[2]);
+   expect(host.querySelector('.family-correct')?.textContent).toBe(right);
+   expect(speakVietnamese).toHaveBeenLastCalledWith(word[1]);pictures++;
+  }else{
+   reverses++;expect(host.querySelector('.work-prompt h2')?.getAttribute('lang')).toBe('vi');
+   click(right);expect(host.querySelector('.work-prompt img')).toBeNull();
+  }
   act(()=>vi.advanceTimersByTime(1600));
  }
- expect(foundPicture&&foundReverse).toBe(true);
+ expect(pictures).toBe(15);expect(reverses).toBe(15);
 });
