@@ -1,0 +1,2 @@
+create policy admin_no_attempts on public.game_attempts as restrictive for insert to authenticated with check (exists(select 1 from public.participants p where p.user_id=(select auth.uid()) and p.active and not p.is_admin));
+create policy admin_no_learning on public.learning_state as restrictive for all to authenticated using (exists(select 1 from public.participants p where p.user_id=(select auth.uid()) and p.active and not p.is_admin)) with check (exists(select 1 from public.participants p where p.user_id=(select auth.uid()) and p.active and not p.is_admin));

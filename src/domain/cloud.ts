@@ -19,6 +19,7 @@ export async function signInMember(id:string,pin:string):Promise<Member> {
  cacheMember(result.profile);return result.profile;
 }
 export async function syncAccount(id:string) {
+ if(cachedMember()?.user_id===id&&cachedMember()?.is_admin)return;
  const entries=accountEntries(id);
  const {data,error}=await supabase.rpc('sync_learning_state',{p_entries:entries});
  if(error)throw error;
@@ -48,4 +49,28 @@ export function startAccountSync(id:string,onStatus:(status:string)=>void) {
  const sessionChanged=supabase.auth.onAuthStateChange(event=>{if(event==='TOKEN_REFRESHED')changed(new Event('refresh'));});
  void run();
  return()=>{stopped=true;if(timer)clearTimeout(timer);window.removeEventListener('vietsveta-progress',changed);window.removeEventListener('online',changed);window.removeEventListener('focus',changed);sessionChanged.data.subscription.unsubscribe();};
+}
+
+const identityKey = 'vietSveta.identities.v1';
+function identities(): Record<string,{access_token:string;refresh_token:string}> {
+ try { return JSON.parse(localStorage.getItem(identityKey) ?? '{}'); } catch { return {}; }
+}
+export async function rememberIdentity(member: Member) {
+ if (!['konstantin','admin'].includes(member.id)) return;
+ const {data:{session}} = await supabase.auth.getSession();
+ if (!session || session.user.id !== member.user_id) return;
+ localStorage.setItem(identityKey,JSON.stringify({...identities(),[member.id]:{access_token:session.access_token,refresh_token:session.refresh_token}}));
+}
+export function forgetIdentity(id: string) {
+ const saved = identities(); delete saved[id]; localStorage.setItem(identityKey,JSON.stringify(saved));
+}
+export async function restoreIdentity(id: string): Promise<Member|null> {
+ if (!['konstantin','admin'].includes(id)) return null;
+ const session = identities()[id]; if (!session) return null;
+ try {
+  const {error} = await supabase.auth.setSession(session); if (error) throw error;
+  const member = (await memberRequest({action:'profile'})).profile as Member;
+  if (member.id !== id) throw new Error('identity');
+  return member;
+ } catch { forgetIdentity(id); return null; }
 }

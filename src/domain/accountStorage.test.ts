@@ -14,3 +14,10 @@ it('merges other device keys without overwriting newer pending changes',()=>{
  setStorageOwner('a');writeJSON('vietCards.progress.v1',{new:true});const local=accountEntries();
  applyAccountEntries('a',{'vietCards.progress.v1':{value:{old:true},modified:1}});expect(accountEntries()).toEqual(local);
 });
+
+it('discards all administrator progress without changing the player account',()=>{
+ setStorageOwner('player');writeJSON('vietCards.progress.v1',{keep:true});
+ setStorageOwner('admin-user',true);writeJSON('vietCards.progress.v1',{test:true});writeJSON('vietSveta.timedAttempts.v1',[{game:'test'}]);
+ expect(readJSON('vietCards.progress.v1')).toBeUndefined();expect(accountEntries('admin-user')).toEqual({});
+ setStorageOwner('player');expect(readJSON('vietCards.progress.v1')).toEqual({keep:true});
+});

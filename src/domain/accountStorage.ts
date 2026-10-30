@@ -1,7 +1,8 @@
 export interface CloudEntry { value: unknown; modified: number }
 export type AccountEntries = Record<string, CloudEntry>;
 let owner: string | null = null;
-export function setStorageOwner(id: string | null) { owner = id; }
+let testing = false;
+export function setStorageOwner(id: string | null, isTesting = false) { owner = id; testing = isTesting; }
 export function storageOwner() { return owner; }
 function key(id: string) { return `vietSveta.account.${id}.v1`; }
 export function accountEntries(id = owner): AccountEntries {
@@ -17,9 +18,9 @@ export function applyAccountEntries(id:string, remote:AccountEntries) {
  const merged=mergeEntries(accountEntries(id),remote);
  localStorage.setItem(key(id),JSON.stringify(merged));return merged;
 }
-export function accountRead(name:string):unknown {return owner?accountEntries()[name]?.value:undefined;}
+export function accountRead(name:string):unknown {return owner && !testing ? accountEntries()[name]?.value : undefined;}
 export function accountWrite(name:string,value:unknown) {
- if(!owner)return;
+ if(!owner || testing)return;
  const entries=accountEntries();entries[name]={value,modified:Math.max(Date.now(),(entries[name]?.modified??0)+1)};
  localStorage.setItem(key(owner),JSON.stringify(entries));
  window.dispatchEvent(new CustomEvent('vietsveta-progress',{detail:owner}));

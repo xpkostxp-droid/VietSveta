@@ -5,7 +5,7 @@ import { memberRequest, type Member } from '../domain/cloud';
 import { readJSON } from '../domain/storage';
 import { loadProgress, type CardProgressRecord } from '../domain/progress';
 interface AdminData {participants:Member[];states:{user_id:string;data:Record<string,{value:unknown}>;updated_at:string}[];attempts:{id:string;user_id:string;game:string;correct:number;total:number;correct_time_ms:number}[]}
-export function ProfileScreen({member,status,onBack,onLogout,busy}:{member:Member;status:string;onBack:()=>void;onLogout:()=>void;busy:boolean}) {
+export function ProfileScreen({member,status,onBack,onLogout,onSwitch,busy}:{member:Member;status:string;onBack:()=>void;onLogout:()=>void;onSwitch?:()=>void;busy:boolean}) {
  const [admin,setAdmin]=useState<AdminData|null>(null),[error,setError]=useState(''),[reset,setReset]=useState(''),[pin,setPin]=useState(''),[message,setMessage]=useState(''),[confirm,setConfirm]=useState(false);
  const beginnerProgress=readJSON('vietSveta.beginner.vietCards.progress.v1') as {records?:Record<string,CardProgressRecord>}|undefined;
  const records=[...Object.values(loadProgress().records).map(r=>({...r,cardId:`advanced:${r.cardId}`})),...Object.values(beginnerProgress?.records??{}).map(r=>({...r,cardId:`beginner:${r.cardId}`}))],count=new Set(records.map(r=>r.cardId)).size;
@@ -14,11 +14,13 @@ export function ProfileScreen({member,status,onBack,onLogout,busy}:{member:Membe
  const visitCount=[advancedVisits,beginnerVisits].reduce<number>((n,v)=>n+(v&&typeof v==='object'?Object.keys(v).length:0),0);
  const attempts=readJSON('vietSveta.timedAttempts.v1');
  useEffect(()=>{if(member.is_admin)void memberRequest({action:'admin-overview'}).then(setAdmin).catch(()=>setError('Не удалось загрузить участников. Проверь сеть.'));},[member.is_admin]);
- return <div className="screen account-profile"><BackButton onClick={onBack} label="На главную"/><div className="profile-avatar-heading"><MemberAvatar id={member.id} name={member.display_name} size={88}/><h1>{member.display_name}{member.is_admin?' · админ':''}</h1></div><p className="account-sync">{status}</p>
-  {member.is_admin&&<p className="account-admin-note">Режим проверки. Твои результаты сохраняются отдельно и не участвуют в рейтинге игроков.</p>}
-  <div className="account-stats"><div><strong>{count}</strong><span>Карточек отработано</span></div><div><strong>{new Set(records.filter(r=>r.lastResult==='not-remembered').map(r=>r.cardId)).size}</strong><span>Карточек на повтор</span></div><div><strong>{visitCount}</strong><span>Уроков теории открыто</span></div><div><strong>{Array.isArray(attempts)?attempts.length:0}</strong><span>{member.is_admin?'Тестовых игр':'Игр сыграно'}</span></div></div>
+ return <div className="screen account-profile"><BackButton onClick={onBack} label="На главную"/><div className="profile-avatar-heading"><MemberAvatar id={member.id} name={member.display_name} size={88}/><h1>{member.display_name}</h1></div><p className="account-sync">{status}</p>
+  {member.is_admin&&<p className="account-admin-note">Режим проверки. Результаты игр и учебная статистика не сохраняются.</p>}
+  {!member.is_admin&&<><div className="account-stats"><div><strong>{count}</strong><span>Карточек отработано</span></div><div><strong>{new Set(records.filter(r=>r.lastResult==='not-remembered').map(r=>r.cardId)).size}</strong><span>Карточек на повтор</span></div><div><strong>{visitCount}</strong><span>Уроков теории открыто</span></div><div><strong>{Array.isArray(attempts)?attempts.length:0}</strong><span>{member.is_admin?'Тестовых игр':'Игр сыграно'}</span></div></div>
   <p className="account-description">Подробный прогресс карточек — в разделе «Карточки». Открытая теория не считается выученным уроком.</p>
-  {member.is_admin&&<section className="account-admin"><h2>Участники</h2>{error&&<p role="alert">{error}</p>}{!admin&&!error&&<p>Загружаем…</p>}{admin?.participants.map(p=>{
+  </>}
+  {onSwitch&&<button className="big-button" disabled={busy} onClick={onSwitch}>Переключить профиль</button>}
+  {member.is_admin&&<section className="account-admin"><h2>Участники</h2>{error&&<p role="alert">{error}</p>}{!admin&&!error&&<p>Загружаем…</p>}{admin?.participants.filter(p=>!p.is_admin).map(p=>{
    const state=admin.states.find(s=>s.user_id===p.user_id);const progress=state?.data['vietCards.progress.v1']?.value as {records?:Record<string,{cardId:string}>}|undefined;
    const beginner=state?.data['vietSveta.beginner.vietCards.progress.v1']?.value as {records?:Record<string,{cardId:string}>}|undefined;
    const cards=new Set(Object.values(progress?.records??{}).map(r=>r.cardId)).size+new Set(Object.values(beginner?.records??{}).map(r=>r.cardId)).size;
