@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { BackButton } from '../components/BackButton';
 import { supabase } from '../domain/cloud';
 import './BattleScreen.css';
+import { TopicWheel } from './TopicWheel';
 import { makeGameSound } from '../beginner/components/gameSounds';
 type Match={id:string;status:string;topic:string;side:'host'|'guest';host_name:string;guest_name:string;round:number;starts_at:string|null;ready_host:boolean;ready_guest:boolean;task:{word:string;options:string[]}|null;answered:boolean;score_host:number;score_guest:number;last_result:{winner:string;word:string;options:string[];answer:number}|null};
 type Snapshot={server_now:string;online:{device:string;name:string;busy:boolean}[];topics:{id:string;title:string}[];match:Match|null};
@@ -55,7 +56,7 @@ export function BattleScreen({onBack}:{onBack:()=>void}){
  <div className="battle-answers">{(match.task?.options??[]).map((option,i)=><button key={`${roundKey}:${i}`} disabled={!running||busy||match.answered||locked.current===roundKey} onClick={()=>choose(i)}>{option}</button>)}</div>
  <button className="battle-secondary" disabled={busy} onClick={()=>void act('cancel',{match:match.id})}>Завершить батл</button>
  </>:inMatch&&['finished','cancelled'].includes(match.status)?<section className="battle-panel"><h2>{match.status==='finished'?'🏆 Батл завершён':'Батл отменён'}</h2><p>{match.host_name} {match.score_host} : {match.score_guest} {match.guest_name}</p><p>{match.status==='finished'?(match.score_host===match.score_guest?'Ничья!':`Победитель: ${match.score_host>match.score_guest?match.host_name:match.guest_name}`):'Приглашение истекло, участник вышел или свернул приложение.'}</p><button className="big-button" onClick={()=>{setDismissed(match.id);ready.current='';}}>В лобби</button></section>:<>
- <label className="battle-label" htmlFor="battle-topic">Выбери тему</label><select id="battle-topic" className="battle-topic" value={topic} onChange={e=>setTopic(e.target.value)}>{state.topics.map(t=><option key={t.id} value={t.id}>{t.title}</option>)}</select>
+ <div className="battle-label">Выбери тему</div><TopicWheel items={state.topics} value={topic} onChange={setTopic}/>
  <p className="battle-rules">15 раундов · 5 секунд · 3 ответа<br/>Первый правильный ответ приносит очко. После ошибки соперник ещё может ответить.</p>
  <h2>Сейчас в сети</h2>{state.online.length?state.online.map(p=><div className="battle-person" key={p.device}><span>🟢 {p.name}</span><button disabled={busy||p.busy} onClick={()=>{setDismissed('');void act('invite',{opponent:p.device,topic});}}>{p.busy?'Занят':'Вызвать'}</button></div>):<p>Пока никого. Откройте этот раздел под второй учётной записью на другом устройстве.</p>}
  <p className="battle-note">Доступно только админу и Светлане. Пробные результаты не влияют на рейтинги обычных игр.</p>
