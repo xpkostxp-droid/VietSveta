@@ -179,14 +179,13 @@ export function MarketBlitzScreen({ onBack, category = 'all' }: { onBack: () => 
           <div className={'harvest-prompt-content' + (exploding ? ' harvest-shake' : '')}>
             {pictureAnswers ? <h2 className="harvest-word-prompt">{current[1]}</h2> : <div className="market-product" role="img" aria-label={current[2]}>{current[0]}</div>}
           </div>
-          {exploding && <div className="harvest-puff" aria-hidden="true">💥<span>✦</span><span>✧</span><span>✦</span></div>}
         </div>
         <div className="harvest-answer-slot" aria-live="polite">
           <strong>{showAnswer ? current[1] : '\u00a0'}</strong>
           <span>{showAnswer ? current[2] : '\u00a0'}</span>
         </div>
         <div className={'blitz-options harvest-options' + (pictureAnswers ? ' harvest-picture-options' : '')}>{options.map(i => <button key={i} aria-label={pictureAnswers ? products[i][2] : products[i][1]} className={'blitz-option' + (showAnswer && i === productForTask(round[position]) ? ' blitz-correct' : selected === i && phase === 'wrong' ? ' blitz-wrong' : '')} disabled={phase !== 'question' || paused} onClick={() => resolve(i)}>{pictureAnswers ? <span aria-hidden="true">{products[i][0]}</span> : products[i][1]}</button>)}</div>
-        <p className="blitz-feedback" aria-live="polite">{phase === 'question' ? ' ' : phase === 'success' ? '+1 в корзину!' : exploding ? 'Пух! 💥' : 'Повторим после раунда'}</p>
+        <p className="blitz-feedback" aria-live="polite">{phase === 'success' ? '+1 в корзину!' : '\u00a0'}</p>
         {paused && <div className="harvest-pause-overlay"><h2>Пауза ⏸</h2><button className="big-button" onClick={resume}>Продолжить</button></div>}
       </div>
     </> : <div className="market-intro"><h2>{saved.length === 0 ? 'Весь урожай спасён! 🎉' : 'Урожай собран не весь'}</h2>
