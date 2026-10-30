@@ -44,8 +44,8 @@ function NinjaMatch({topic,human,bot,sound,onBack,onReplay}:{topic:NinjaTopic;hu
  useEffect(()=>{
   for(const e of state.events){if(e.id<=heard.current)continue;heard.current=e.id;
    if(e.kind==='hit'){
-    timeouts.current.push(setTimeout(()=>{if(alive.current){sound.play('hit');if(e.side==='human')speakVietnamese(products[state.task.product][1]);}},Math.max(0,e.at+190-Date.now())));
-   }else sound.play(e.kind);
+    timeouts.current.push(setTimeout(()=>{if(alive.current){sound.play('hit');speakVietnamese(products[state.task.product][1]);}},Math.max(0,e.at+190-Date.now())));
+   }else {sound.play(e.kind);if(e.kind==='splat')timeouts.current.push(setTimeout(()=>{if(alive.current)speakVietnamese(products[state.task.product][1]);},Math.max(0,e.at+300-Date.now())));}
   }
  },[state.events.map(e=>e.id).join(',')]);
  const countdown=assetsReady&&!paused&&state.round===0&&state.phase==='ready'?Math.ceil((state.startsAt-now)/1000):0;
@@ -53,6 +53,7 @@ function NinjaMatch({topic,human,bot,sound,onBack,onReplay}:{topic:NinjaTopic;hu
   if(countdown>=1&&countdown<=3&&lastBeep.current!==countdown){lastBeep.current=countdown;sound.beep(countdown);}
  },[countdown,sound]);
  const finished=state.phase==='finished',result=state.phase==='result';
+ const reveal=state.events.some(e=>(e.kind==='hit'&&now>=e.at+190)||(e.kind==='splat'&&now>=e.at+300));
  const seconds=Math.max(0,Math.ceil((state.startsAt+5000-now)/1000));
  const extra=state.round>=state.baseRounds;
  const label=extra?`Доп. раунд ${state.round-state.baseRounds+1}`:`Раунд ${state.round+1}/${state.baseRounds}`;
@@ -64,9 +65,9 @@ function NinjaMatch({topic,human,bot,sound,onBack,onReplay}:{topic:NinjaTopic;hu
   <NinjaStage state={state} now={now} human={human} bot={bot}/>
   <div className="battle-score ninja-score"><span className="battle-team-blue">Ты<strong key={'you'+state.scoreHuman}>{state.scoreHuman}</strong></span><b>:</b><span className="battle-team-red">Бот<strong key={'bot'+state.scoreBot}>{state.scoreBot}</strong></span></div>
   {finished?<section className="ninja-result"><h2>{state.scoreHuman>state.scoreBot?'🏆 Ты победил!':'Бот победил'}</h2><p>Тренировка завершена · без рейтинга</p><button className="big-button" onClick={onReplay}>Реванш</button><button className="battle-return-button" onClick={onBack}>← К выбору темы</button></section>:<>
-   <div className="ninja-prompt">{state.phase==='ready'?'Приготовься!':'Как это называется?'}</div>
-   <div className="ninja-feedback" aria-live="polite">{result?<>{products[state.task.product][1]} — {products[state.task.product][2]} · {state.winner==='human'?'Твоё очко':state.winner==='bot'?'Очко бота':'Без очков'}</>:state.humanAnswered?'Промах! У бота ещё есть время':state.events.some(e=>e.side==='bot'&&e.kind==='miss')?'Бот промахнулся — отвечай!':'Выбери название на вьетнамском'}</div>
-   <div className="battle-answers ninja-answers">{state.task.options.map(p=><button key={`${state.round}:${p}`} disabled={state.phase!=='question'||state.humanAnswered} onClick={()=>choose(p)}>{products[p][1]}</button>)}</div>
+   <div className="ninja-prompt" aria-hidden="true"/>
+   <div className="ninja-feedback" aria-live="polite">{result?<>{state.winner==='human'?'Твоё очко':state.winner==='bot'?'Очко бота':'Без очков'}</>:state.humanAnswered?'Промах! У бота ещё есть время':state.events.some(e=>e.side==='bot'&&e.kind==='miss')?'Бот промахнулся — отвечай!':''}</div>
+   <div className="battle-answers ninja-answers">{state.task.options.map(p=><button key={`${state.round}:${p}`} className={reveal&&p===state.task.product?'is-correct':''} disabled={state.phase!=='question'||state.humanAnswered} onClick={()=>choose(p)}>{products[p][1]}</button>)}</div>
    <button className="battle-secondary" onClick={onBack}>Завершить батл</button>
   </>}
  </div>;

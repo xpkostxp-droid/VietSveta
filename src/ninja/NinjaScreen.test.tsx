@@ -54,3 +54,20 @@ it('automatically assigns two different women for Svetlana',async()=>{
  const characters=[...node.querySelectorAll<HTMLElement>('.ninja-actor')].map(n=>n.dataset.character);
  expect(characters.every(id=>id?.endsWith('-woman'))).toBe(true);expect(new Set(characters).size).toBe(2);
 });
+it('shows preparation only at startup and reveals a dropped fruit without points',async()=>{
+ await act(async()=>root.render(<NinjaScreen onBack={()=>{}}/>));await click('Сыграть с ботом');
+ expect(node.textContent).toContain('Приготовься!');await advance(3100);
+ expect(node.textContent).not.toContain('Приготовься!');expect(node.textContent).not.toContain('Как это называется?');
+ const img=node.querySelector('.ninja-produce img') as HTMLImageElement,p=Number(img.src.match(/produce-(\d+)/)![1]);
+ await advance(4900);expect(speech).not.toHaveBeenCalled();await advance(400);await advance(1);
+ expect(speech).toHaveBeenCalledTimes(1);expect(speech).toHaveBeenCalledWith(products[p][1]);expect(node.querySelector('.is-correct')?.textContent).toBe(products[p][1]);
+ expect([...node.querySelectorAll('.battle-score strong')].map(n=>n.textContent)).toEqual(['0','0']);
+ await advance(1400);expect(node.querySelector('.ninja-prepare')).toBeNull();expect(node.querySelector('.is-correct')).toBeNull();
+});
+it('speaks and highlights the correct answer when the bot slices the fruit',async()=>{
+ vi.mocked(Math.random).mockReturnValue(0);
+ await act(async()=>root.render(<NinjaScreen onBack={()=>{}}/>));await click('Сыграть с ботом');await advance(3100);
+ const img=node.querySelector('.ninja-produce img') as HTMLImageElement,p=Number(img.src.match(/produce-(\d+)/)![1]);
+ await advance(1100);await advance(1);expect(speech).toHaveBeenCalledTimes(1);expect(speech).toHaveBeenCalledWith(products[p][1]);
+ expect(node.querySelector('.is-correct')?.textContent).toBe(products[p][1]);expect([...node.querySelectorAll('.battle-score strong')].map(n=>n.textContent)).toEqual(['0','1']);
+});
