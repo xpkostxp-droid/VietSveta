@@ -18,7 +18,7 @@ it.each(['near','far'] as const)('plays %s winner once despite repeated server s
  await act(async()=>root.render(<BattleCinema lobby={false} result={{key:'match',outcome,label:'Итог'}}/>));
  const play=vi.mocked(HTMLMediaElement.prototype.play);expect(play).toHaveBeenCalledTimes(1);
  expect(node.querySelector('video.is-selected')?.getAttribute('src')).toContain(outcome);
- expect((node.querySelector('video.is-selected') as HTMLVideoElement).muted).toBe(true);
+ expect((node.querySelector('video.is-selected') as HTMLVideoElement).muted).toBe(false);
  await act(async()=>root.render(<BattleCinema lobby={false} result={{key:'match',outcome,label:'Итог'}}/>));
  expect(play).toHaveBeenCalledTimes(1);
 });
@@ -28,4 +28,12 @@ it('offers manual playback when autoplay is blocked and keeps an error inside th
  expect(node.textContent).toContain('Смотреть смэш');
  await act(async()=>node.querySelector('video.is-selected')!.dispatchEvent(new Event('error')));
  expect(node.textContent).toContain('Игра продолжает работать');
+});
+
+it('falls back to muted playback if the browser refuses audio autoplay',async()=>{
+ vi.mocked(HTMLMediaElement.prototype.play).mockRejectedValueOnce(new Error('audio blocked')).mockResolvedValueOnce();
+ await act(async()=>root.render(<BattleCinema lobby={false} result={{key:'silent-fallback',outcome:'near',label:'Итог'}}/>));
+ expect(HTMLMediaElement.prototype.play).toHaveBeenCalledTimes(2);
+ expect((node.querySelector('video.is-selected') as HTMLVideoElement).muted).toBe(true);
+ expect(node.textContent).toContain('Повторить со звуком');
 });

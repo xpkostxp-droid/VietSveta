@@ -4,8 +4,8 @@ import './BattleCinema.css';
 type Outcome = 'near' | 'far';
 export type CinemaResult = { key: string; outcome: Outcome; label: string };
 const media = {
- near: './battle-media/smash-near-v2.mp4',
- far: './battle-media/smash-far-v1.mp4',
+ near: './battle-media/smash-near-real-v4.mp4',
+ far: './battle-media/smash-far-real-v4.mp4',
 };
 export function BattleCinema({ lobby, result }: { lobby: boolean; result: CinemaResult | null }) {
  const videos = useRef<Partial<Record<Outcome, HTMLVideoElement>>>({});
@@ -22,10 +22,15 @@ export function BattleCinema({ lobby, result }: { lobby: boolean; result: Cinema
   if (!video) return;
   video.muted = !audible;
   video.currentTime = 0;
-  void video.play().catch(() => setNeedsPlay(true));
+  void video.play().catch(() => {
+   // Safari may reject sound before this particular video has been tapped.
+   // Keep the animation running silently and leave an explicit sound replay.
+   if (audible) { video.muted = true; setMuted(true); void video.play().catch(() => setNeedsPlay(true)); }
+   else setNeedsPlay(true);
+  });
  };
  useEffect(() => {
-  if (result) play(result.outcome);
+  if (result) play(result.outcome, true);
   else { Object.values(videos.current).forEach(v => v?.pause()); setSelected(null); }
  }, [result?.key]);
  useEffect(() => () => Object.values(videos.current).forEach(v => v?.pause()), []);
