@@ -7,3 +7,5 @@
 .battle-cinema-compact .battle-cinema-actions{position:absolute;top:7px;right:7px;left:auto;max-width:calc(100% - 14px);margin:0;gap:4px}
 .battle-cinema-compact .battle-cinema-actions button{flex:none;min-height:30px;padding:5px 9px;font-size:.72rem;border-radius:10px;background:#eaf6efe8;box-shadow:0 2px 7px #133f3926}
 .battle-cinema-compact .battle-cinema-status{font-size:.8rem;padding:6px 8px;bottom:7px;left:7px;right:7px}
+
+.battle-cinema-players>.battle-court{width:100%;height:100%;min-height:0;border-radius:inherit;box-shadow:none}

@@ -1,9 +1,10 @@
 export type CourtWinner = 'near' | 'far' | 'both' | 'none';
 export type CourtState = {
  key: string; round: number; now: number; starts: number;
- winner: CourtWinner; nearBlue: boolean;
+ winner: CourtWinner; nearBlue: boolean; finalPointAt?:number;
 };
 export function sceneTiming(s: CourtState) {
+ if(s.finalPointAt!==undefined)return {phase:'point' as const,corner:Math.max(0,s.round-1)%2,seconds:Math.max(0,(s.now-s.finalPointAt)/1000)};
  const between = Number.isFinite(s.starts) && s.now < s.starts;
  const point = between && s.round > 0;
  return {

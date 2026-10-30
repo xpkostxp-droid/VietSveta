@@ -36,3 +36,14 @@ License: CC0 1.0, https://creativecommons.org/publicdomain/zero/1.0/
 Both reactions begin at 1.5 seconds, gain 0.65. Original real-v4 paddle/court
 sounds and video streams are preserved. The defeat container retains the
 complete reaction audio, holding the final video frame for its short tail.
+
+# Female pickleball poses (v1)
+Generated with the built-in image-generation tool using male-poses-v1.webp as
+layout and style reference. Eight adult female athlete poses preserve the
+right-handed paddle, top/back and bottom/front views, navy shirt, teal sports
+skirt with integrated shorts, ponytail and white trainers. Transparent poses
+are packed into equal 512x512 cells (4 columns, 2 rows) in female-poses-v1.webp.
+The original male atlas and its cutting layout are unchanged. Runtime palette
+and pose timing apply to both genders. Mixed/female match finales use these
+same sprites on the existing court, with the existing v6 reaction soundtrack
+played as audio, so a male-only film never replaces the selected players.

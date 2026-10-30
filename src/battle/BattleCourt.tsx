@@ -1,16 +1,18 @@
 import { useEffect, useRef, useState } from 'react';
 import { sceneTiming, type CourtState } from './battleScene';
 import './BattleCourt.css';
+import type {CourtPlayers} from './battlePlayers';
+const defaultPlayers:CourtPlayers={near:'man',far:'man'};
 
 type Sprite = { image: HTMLCanvasElement; height: number; anchor: number; feet: number; paddle: [number, number] };
-type Assets = { court: HTMLImageElement; blue: Sprite[][]; red: Sprite[][] };
+type Assets = { court: HTMLImageElement; blue: Record<'man'|'woman',Sprite[][]>; red: Record<'man'|'woman',Sprite[][]> };
 const W = 960, H = 640;
 let cached: Promise<Assets> | null = null;
 function image(src: string): Promise<HTMLImageElement> {
  return new Promise((resolve, reject) => { const i = new Image(); i.onload = () => resolve(i); i.onerror = reject; i.src = src; });
 }
-function sprites(atlas: HTMLImageElement, red: boolean): Sprite[][] {
- const cuts = [0,390,785,1230,atlas.width], ch = atlas.height / 2;
+function sprites(atlas: HTMLImageElement, red: boolean, equalCells=false): Sprite[][] {
+ const cuts = equalCells?[0,1,2,3,4].map(n=>atlas.width*n/4):[0,390,785,1230,atlas.width], ch = atlas.height / 2;
  return [0,1].map(row => [0,1,2,3].map(col => {
   const tile = document.createElement('canvas'); tile.width = cuts[col+1]-cuts[col]; tile.height = ch;
   const c = tile.getContext('2d')!; c.drawImage(atlas,cuts[col],row*ch,tile.width,ch,0,0,tile.width,ch);
@@ -35,17 +37,17 @@ function sprites(atlas: HTMLImageElement, red: boolean): Sprite[][] {
  }));
 }
 export function preloadCourt() {
- if (!cached) cached = Promise.all([image('./battle-media/court-clean-v1.jpg'), image('./battle-media/male-poses-v1.webp')])
-  .then(([court,atlas])=>({court,blue:sprites(atlas,false),red:sprites(atlas,true)}))
+ if (!cached) cached = Promise.all([image('./battle-media/court-clean-v1.jpg'), image('./battle-media/male-poses-v1.webp'), image('./battle-media/female-poses-v1.webp')])
+  .then(([court,male,female])=>({court,blue:{man:sprites(male,false),woman:sprites(female,false,true)},red:{man:sprites(male,true),woman:sprites(female,true,true)}}))
   .catch(error=>{cached=null;throw error;});
  return cached;
 }
 function pose(t: number, hit: number) {
  const d=t-hit;return d<-.20||d>.32?0:d<-.045?1:d<.07?2:3;
 }
-export function BattleCourt({state,onHit}:{state:CourtState;onHit:(kind:'paddle'|'bounce',near:boolean)=>void}) {
- const canvas=useRef<HTMLCanvasElement>(null),latest=useRef({state,onHit,received:performance.now()});
- latest.current={state,onHit,received:performance.now()};
+export function BattleCourt({state,onHit,players=defaultPlayers}:{state:CourtState;players?:CourtPlayers;onHit:(kind:'paddle'|'bounce',near:boolean)=>void}) {
+ const canvas=useRef<HTMLCanvasElement>(null),latest=useRef({state,onHit,players,received:performance.now()});
+ latest.current={state,onHit,players,received:performance.now()};
  const [failed,setFailed]=useState(false);
  useEffect(()=>{
   let stopped=false,raf=0,last=0,lastSound='';
@@ -58,7 +60,7 @@ export function BattleCourt({state,onHit}:{state:CourtState;onHit:(kind:'paddle'
      const v=latest.current,s={...v.state,now:v.state.now+Math.max(0,stamp-v.received)};
      const timing=sceneTiming(s),t=timing.seconds,side=timing.corner;
      const nx=(side?.73:.27)*W,fx=(side?.18:.72)*W,nf=.94*H,ff=.61*H;
-     const nset=(s.nearBlue?a.blue:a.red)[0],fset=(s.nearBlue?a.red:a.blue)[1];
+     const nset=(s.nearBlue?a.blue:a.red)[v.players.near][0],fset=(s.nearBlue?a.red:a.blue)[v.players.far][1];
      const step=.72;
      let np=0,fp=0,ball:{x:number;y:number;r:number}|null=null,soundKey='',soundKind:'paddle'|'bounce'='paddle',soundNear=true;
      // All translations are fixed within one question. Only sprite poses change.
@@ -106,7 +108,7 @@ export function BattleCourt({state,onHit}:{state:CourtState;onHit:(kind:'paddle'
   };
   void boot();return()=>{stopped=true;cancelAnimationFrame(raf);};
  },[]);
- return <div className="battle-court" style={{backgroundImage:"url('./battle-media/court-clean-v1.jpg')",backgroundSize:'contain',backgroundPosition:'center',backgroundRepeat:'no-repeat'}} aria-label="Розыгрыш пиклбола">
+ return <div className="battle-court" style={{backgroundImage:"url('./battle-media/court-clean-v1.jpg')",backgroundSize:'contain',backgroundPosition:'center',backgroundRepeat:'no-repeat'}} aria-label="Розыгрыш пиклбола" data-near-gender={players.near} data-far-gender={players.far}>
   <canvas ref={canvas} width={W} height={H} role="img" aria-label="Твой игрок со спины, соперник напротив"/>
   {failed&&<span className="battle-court-fallback">Корт не загрузился — отвечать можно как обычно.</span>}
  </div>;

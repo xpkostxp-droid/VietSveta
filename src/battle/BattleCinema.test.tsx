@@ -43,3 +43,13 @@ it.each([['near','victory'],['far','defeat']] as const)('plays the %s perspectiv
  const other=node.querySelector('video:not(.is-selected)') as HTMLVideoElement;
  expect(other.className).not.toContain('is-selected');
 });
+it.each([['woman','man'],['man','woman'],['woman','woman']] as const)('keeps %s/%s players through the finale and plays the reaction audio once',async(near,far)=>{
+ await act(async()=>root.render(<BattleCinema lobby={false} compact players={{near,far}} result={{key:'female-final',outcome:'near',label:'Твоя победа!'}}/>));
+ expect(node.querySelector('video')).toBeNull();
+ expect(node.querySelector('.battle-court')?.getAttribute('data-near-gender')).toBe(near);
+ expect(node.querySelector('.battle-court')?.getAttribute('data-far-gender')).toBe(far);
+ expect(node.querySelector('audio')?.getAttribute('src')).toContain('victory');
+ expect(HTMLMediaElement.prototype.play).toHaveBeenCalledTimes(1);
+ await act(async()=>root.render(<BattleCinema lobby={false} compact players={{near,far}} result={{key:'female-final',outcome:'near',label:'Твоя победа!'}}/>));
+ expect(HTMLMediaElement.prototype.play).toHaveBeenCalledTimes(1);
+});

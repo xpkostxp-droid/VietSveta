@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import './BattleCinema.css';
+import {BattleCourt} from './BattleCourt';
+import type {CourtPlayers} from './battlePlayers';
 
 type Outcome = 'near' | 'far';
 export type CinemaResult = { key: string; outcome: Outcome; label: string };
@@ -7,7 +9,7 @@ const media = {
  near: './battle-media/smash-near-victory-v6.mp4',
  far: './battle-media/smash-far-defeat-v6.mp4',
 };
-export function BattleCinema({ lobby, result, compact=false }: { lobby: boolean; result: CinemaResult | null; compact?: boolean }) {
+function VideoBattleCinema({ lobby, result, compact=false }: { lobby: boolean; result: CinemaResult | null; compact?: boolean }) {
  const videos = useRef<Partial<Record<Outcome, HTMLVideoElement>>>({});
  const [selected, setSelected] = useState<Outcome | null>(null);
  const [ready, setReady] = useState({ near: false, far: false });
@@ -60,5 +62,25 @@ export function BattleCinema({ lobby, result, compact=false }: { lobby: boolean;
    {lobby && needsPlay && <button onClick={() => play(active, true)}>▶ Запустить ролик</button>}
    {selected && failed[active] && <button onClick={() => { setFailed(s => ({ ...s, [active]: false })); videos.current[active]?.load(); play(active, true); }}>Повторить загрузку</button>}
   </div>
+ </section>;
+}
+
+export function BattleCinema({lobby,result,compact=false,players,nearBlue=true,round=1}:{lobby:boolean;result:CinemaResult|null;compact?:boolean;players?:CourtPlayers;nearBlue?:boolean;round?:number}){
+ if(players&&(players.near==='woman'||players.far==='woman'))return result?<PlayerFinale key={result.key} result={result} compact={compact} players={players} nearBlue={nearBlue} round={round}/>:null;
+ return <VideoBattleCinema lobby={lobby} result={result} compact={compact}/>;
+}
+function PlayerFinale({result,compact,players,nearBlue,round}:{result:CinemaResult;compact:boolean;players:CourtPlayers;nearBlue:boolean;round:number}){
+ const [started,setStarted]=useState(Date.now),[ended,setEnded]=useState(false),[needsPlay,setNeedsPlay]=useState(false);
+ const audio=useRef<HTMLAudioElement>(null);
+ const play=()=>{setStarted(Date.now());setEnded(false);setNeedsPlay(false);if(audio.current){audio.current.currentTime=0;void audio.current.play().catch(()=>setNeedsPlay(true));}};
+ useEffect(()=>{play();return()=>{audio.current?.pause();};},[]);
+ useEffect(()=>{const timer=setTimeout(()=>setEnded(true),2200);return()=>clearTimeout(timer);},[started]);
+ return <section className={`battle-cinema${compact?' battle-cinema-compact':''}`} aria-label="Анимация пиклбола">
+  <div className="battle-cinema-frame battle-cinema-players">
+   <BattleCourt players={players} state={{key:`${result.key}:${started}`,round,now:Date.now(),starts:Infinity,finalPointAt:started+828,winner:result.outcome,nearBlue}} onHit={()=>{}}/>
+   <audio ref={audio} src={media[result.outcome]} preload="auto"/>
+   {ended&&<strong className="battle-cinema-status">{result.label}</strong>}
+  </div>
+  <div className="battle-cinema-actions"><button onClick={play}>{needsPlay?'▶ Со звуком':'↻ Со звуком'}</button></div>
  </section>;
 }

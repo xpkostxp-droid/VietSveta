@@ -91,3 +91,10 @@ it('offers a rematch with the same opponent and a return to statistics',async()=
  expect(host.textContent).toContain('Статистика батлов');
  expect(host.querySelector('.battle-score')).toBeNull();
 });
+it.each(['host','guest'] as const)('uses Svetlana’s female player from %s perspective during the match',async(side)=>{
+ rpc.mockResolvedValue({data:{...base,match:{id:'gender',mode:'pickleball',topic:'questions',status:'active',side,host_member_id:'sergey-p',guest_member_id:'svetlana',round:0,starts_at:new Date(Date.now()-1000).toISOString(),ready_host:true,ready_guest:true,task:{word:'Ai',options:['Кто','Что','Где']},answered:false,score_host:0,score_guest:0,host_name:'Сергей П',guest_name:'Светлана',last_result:null}},error:null});
+ await act(async()=>root.render(<BattleScreen onBack={()=>{}}/>));
+ const court=host.querySelector('.battle-court')!;
+ expect(court.getAttribute('data-near-gender')).toBe(side==='host'?'man':'woman');
+ expect(court.getAttribute('data-far-gender')).toBe(side==='host'?'woman':'man');
+});

@@ -1,3 +1,4 @@
+import {memberGender} from '../domain/memberGender';
 export const ninjaCharacters=[
  {id:'teal-man',name:'Бирюзовый самурай',move:'Диагональный взмах'},
  {id:'red-man',name:'Алый самурай',move:'Боковой взмах'},
@@ -13,9 +14,7 @@ export function ninjaFrame(elapsed:number){
 
 export type NinjaGender='man'|'woman';
 // The same fixed roster is used by AccountGate; admin is Konstantin's test profile.
-export function ninjaGenderForMember(memberId:string):NinjaGender{
- return ['svetlana','lesya','marina'].includes(memberId)?'woman':'man';
-}
+export const ninjaGenderForMember=memberGender;
 export function assignNinjaCharacters(memberId:string,opponentId:string=memberId,random:()=>number=Math.random):{human:NinjaCharacter;bot:NinjaCharacter}{
  const own=ninjaCharacters.filter(c=>c.id.endsWith('-'+ninjaGenderForMember(memberId)));
  const human=own[Math.floor(random()*own.length)].id;
