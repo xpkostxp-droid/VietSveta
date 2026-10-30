@@ -21,3 +21,5 @@
 .rope-shards i:nth-child(8){width:5%;height:38%;left:84%;top:6%;clip-path:polygon(0 0,100% 61%,26% 100%);--dx:121px;--dy:-48px;--spin:-300deg;animation-duration:.66s}
 .rope-shards i:nth-child(9){width:10%;height:20%;left:36%;top:76%;clip-path:polygon(7% 0,100% 20%,41% 100%,0 62%);--dx:-41px;--dy:-84px;--spin:220deg;animation-duration:.79s}
 @keyframes rope-fragment{0%{opacity:1;transform:translate(0,0) rotate(0)}38%{opacity:1;transform:translate(calc(var(--dx)*.56),var(--dy)) rotate(calc(var(--spin)*.4))}78%{opacity:.85;transform:translate(calc(var(--dx)*.86),30px) rotate(calc(var(--spin)*.85))}100%{opacity:0;transform:translate(var(--dx),60px) rotate(var(--spin))}}
+.rope-playing > .rope-instruction,
+.rope-playing > .at-feedback{display:none}
