@@ -1,6 +1,9 @@
 import type {NinjaSnapshot,NinjaSide} from './ninjaEngine';
 import {ninjaAsset,ninjaFrame,type NinjaCharacter} from './ninjaCharacters';
 import {products} from '../content/marketProducts';
+export function ninjaFruitPosition(progress:number){
+ const p=Math.max(0,Math.min(1,progress));return {x:50,y:8+75*Math.pow(p,1.35)};
+}
 export function NinjaStage({state,now,human,bot}:{state:NinjaSnapshot;now:number;human:NinjaCharacter;bot:NinjaCharacter}){
  const progress=Math.max(0,Math.min(1,(now-state.startsAt)/5000));
  const hit=state.events.find(e=>e.kind==='hit'),splat=state.events.find(e=>e.kind==='splat');
@@ -8,9 +11,8 @@ export function NinjaStage({state,now,human,bot}:{state:NinjaSnapshot;now:number
  const atProgress=event?Math.max(0,Math.min(1,(event.at-state.startsAt)/5000)):progress;
  const elapsed=event?now-event.at:0;
  const sliced=!!hit&&elapsed>=190,smashed=!!splat&&elapsed>=300;
- const flightY=83-32*Math.sin(Math.PI*atProgress);
+ const {x,y:flightY}=ninjaFruitPosition(atProgress);
  const y=splat?flightY+(83-flightY)*Math.min(1,Math.pow(elapsed/300,2)):flightY;
- const x=50+4*Math.sin(atProgress*Math.PI*2);
  const fruitStyle={left:`${x}%`,top:`${y}%`};
  const drawActor=(side:NinjaSide,id:NinjaCharacter)=>{
   const latest=[...state.events].reverse().find(e=>e.side===side&&e.kind!=='splat');

@@ -1,6 +1,13 @@
 export function createNinjaSound(){
  let ctx:AudioContext|null=null;
  const ready=()=>{try{ctx??=new AudioContext();void ctx.resume();}catch{}};
+ const beep=(digit:number)=>{try{
+  if(!ctx||ctx.state!=='running')return;
+  const now=ctx.currentTime,osc=ctx.createOscillator(),gain=ctx.createGain();
+  osc.type='sine';osc.frequency.value=digit===1?660:digit===2?740:820;
+  gain.gain.setValueAtTime(.0001,now);gain.gain.exponentialRampToValueAtTime(.13,now+.012);gain.gain.exponentialRampToValueAtTime(.0001,now+.13);
+  osc.connect(gain);gain.connect(ctx.destination);osc.start(now);osc.stop(now+.14);
+ }catch{}};
  const tone=(kind:'miss'|'hit'|'splat')=>{try{
   if(!ctx||ctx.state!=='running')return;
   const at=ctx.currentTime,duration=kind==='miss'?.15:kind==='hit'?.22:.3;
@@ -9,5 +16,5 @@ export function createNinjaSound(){
   const noise=ctx.createBufferSource();noise.buffer=buffer;const filter=ctx.createBiquadFilter();filter.type=kind==='splat'?'lowpass':'bandpass';filter.frequency.setValueAtTime(kind==='miss'?2400:kind==='hit'?1600:650,at);filter.frequency.exponentialRampToValueAtTime(180,at+duration);
   const gain=ctx.createGain();gain.gain.setValueAtTime(.25,at);gain.gain.exponentialRampToValueAtTime(.001,at+duration);noise.connect(filter);filter.connect(gain);gain.connect(ctx.destination);noise.start(at);
  }catch{}};
- return {ready,play:tone,close(){void ctx?.close();ctx=null;}};
+ return {ready,beep,play:tone,close(){void ctx?.close();ctx=null;}};
 }

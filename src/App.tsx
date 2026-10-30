@@ -72,7 +72,7 @@ function App({ isAdmin=false, memberId, memberName, syncStatus, onOpenProfile, c
       return <Suspense fallback={<div className="screen"><BackButton onClick={()=>setScreen({name:'group-selection',section:screen.section})} label="К выбору группы"/><p role="status">Загружаем материалы…</p></div>}><div className="beginner-area"><BeginnerApp isAdmin={isAdmin} key={screen.section} section={screen.section} onBack={()=>setScreen({name:'group-selection',section:screen.section})}/></div></Suspense>;
 
     case 'ninja':
-      return (isAdmin||memberId==='svetlana')?<NinjaScreen onBack={()=>setScreen({name:'games-menu'})}/>:null;
+      return (isAdmin||memberId==='svetlana')?<NinjaScreen memberId={memberId} onBack={()=>setScreen({name:'games-menu'})}/>:null;
     case 'battle':
       return (isAdmin||memberId==='svetlana')?<BattleScreen onBack={()=>setScreen({name:'games-menu'})}/>:null;
 
