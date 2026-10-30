@@ -23,5 +23,16 @@ export function makeCourtSound() {
   gain.gain.value = (near ? .64 : .42) * (kind === 'bounce' ? .8 : 1);
   source.connect(gain).connect(ctx.destination); source.start();
  };
- return { ready, hit, close: () => { closed = true; void ctx?.close(); ctx = null; } };
+ const point=()=>{
+  if(!ctx||ctx.state!=='running'||closed)return;
+  const now=ctx.currentTime,osc=ctx.createOscillator(),gain=ctx.createGain();
+  osc.type='triangle';osc.frequency.setValueAtTime(1150,now);osc.frequency.exponentialRampToValueAtTime(1750,now+.045);
+  gain.gain.setValueAtTime(.0001,now);gain.gain.exponentialRampToValueAtTime(.13,now+.006);gain.gain.exponentialRampToValueAtTime(.0001,now+.10);
+  osc.connect(gain).connect(ctx.destination);osc.start(now);osc.stop(now+.11);
+  const buffer=ctx.createBuffer(1,Math.floor(ctx.sampleRate*.065),ctx.sampleRate),data=buffer.getChannelData(0);
+  for(let i=0;i<data.length;i++)data[i]=(Math.random()*2-1)*Math.exp(-i/(ctx.sampleRate*.018));
+  const noise=ctx.createBufferSource(),filter=ctx.createBiquadFilter(),ng=ctx.createGain();noise.buffer=buffer;
+  filter.type='highpass';filter.frequency.value=2200;ng.gain.value=.075;noise.connect(filter).connect(ng).connect(ctx.destination);noise.start(now);
+ };
+ return { ready, hit, point, close: () => { closed = true; void ctx?.close(); ctx = null; } };
 }

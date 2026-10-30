@@ -4,8 +4,8 @@ import './BattleCinema.css';
 type Outcome = 'near' | 'far';
 export type CinemaResult = { key: string; outcome: Outcome; label: string };
 const media = {
- near: './battle-media/smash-near-real-v4.mp4',
- far: './battle-media/smash-far-real-v4.mp4',
+ near: './battle-media/smash-near-cheer-v5.mp4',
+ far: './battle-media/smash-far-cheer-v5.mp4',
 };
 export function BattleCinema({ lobby, result }: { lobby: boolean; result: CinemaResult | null }) {
  const videos = useRef<Partial<Record<Outcome, HTMLVideoElement>>>({});

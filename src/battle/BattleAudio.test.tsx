@@ -1,0 +1,46 @@
+import { act } from 'react';
+import { createRoot } from 'react-dom/client';
+import { beforeEach,afterEach,expect,it,vi } from 'vitest';
+const fx=vi.hoisted(()=>({rpc:vi.fn(),beep:vi.fn(),point:vi.fn(),speak:vi.fn()}));
+vi.mock('../domain/cloud',()=>({supabase:{rpc:fx.rpc}}));
+vi.mock('../beginner/components/gameSounds',()=>({makeGameSound:()=>({ready:vi.fn(),close:vi.fn(),beep:fx.beep})}));
+vi.mock('./courtSound',()=>({makeCourtSound:()=>({ready:vi.fn(),close:vi.fn(),hit:vi.fn(),point:fx.point})}));
+vi.mock('./battleSpeech',()=>({primeBattleSpeech:vi.fn(),speakBattleWord:fx.speak}));
+vi.mock('../domain/speech',()=>({hasVietnameseVoice:()=>true,onVoicesChanged:()=>()=>{},stopSpeaking:vi.fn()}));
+import { BattleScreen } from './BattleScreen';
+Object.assign(globalThis,{IS_REACT_ACT_ENVIRONMENT:true});
+let node:HTMLDivElement,root:ReturnType<typeof createRoot>;
+let snapshot:any;
+beforeEach(()=>{
+ vi.useFakeTimers();vi.clearAllMocks();
+ vi.spyOn(HTMLMediaElement.prototype,'pause').mockImplementation(()=>{});
+ vi.spyOn(HTMLMediaElement.prototype,'play').mockResolvedValue();
+ snapshot={server_now:new Date().toISOString(),topics:[],online:[],match:{id:'sound',topic:'fruits',status:'active',side:'host',round:0,starts_at:new Date(Date.now()+3000).toISOString(),ready_host:true,ready_guest:true,host_name:'Ты',guest_name:'Бот',task:{word:'táo',options:['яблоко','манго','банан']},answered:false,score_host:0,score_guest:0,last_result:null}};
+ fx.rpc.mockImplementation(async()=>({data:structuredClone(snapshot),error:null}));
+ node=document.createElement('div');document.body.append(node);root=createRoot(node);
+});
+afterEach(async()=>{await act(async()=>root.unmount());node.remove();vi.useRealTimers();vi.restoreAllMocks();});
+it('beeps at preparation 3, 2, 1 and speaks the question once when play starts',async()=>{
+ await act(async()=>root.render(<BattleScreen onBack={()=>{}}/>));
+ expect(fx.beep.mock.calls.map(c=>c[0])).toEqual([3]);expect(fx.speak).not.toHaveBeenCalled();
+ await act(async()=>vi.advanceTimersByTimeAsync(1000));
+ await act(async()=>vi.advanceTimersByTimeAsync(1000));
+ expect(fx.beep.mock.calls.map(c=>c[0])).toEqual([3,2,1]);
+ await act(async()=>vi.advanceTimersByTimeAsync(1200));
+ expect(fx.speak).toHaveBeenCalledTimes(1);expect(fx.speak).toHaveBeenCalledWith('fruits','táo');
+});
+it('ticks a score change once, keeps the previous word during the shot, then speaks the next word',async()=>{
+ snapshot.match.topic='fruits';
+ await act(async()=>root.render(<BattleScreen onBack={()=>{}}/>));
+ await act(async()=>vi.advanceTimersByTimeAsync(3100));
+ snapshot.match.round=1;snapshot.match.score_host=1;snapshot.match.starts_at=new Date(Date.now()+2000).toISOString();
+ snapshot.match.last_result={winner:'host',word:'táo',options:['яблоко','манго','банан'],answer:0};
+ snapshot.match.task={word:'xoài',options:['манго','банан','яблоко']};
+ await act(async()=>vi.advanceTimersByTimeAsync(300));
+ expect(fx.point).toHaveBeenCalledTimes(1);
+ expect(node.textContent).not.toContain('Следующий раунд');
+ expect(fx.speak).toHaveBeenCalledTimes(1);
+ await act(async()=>vi.advanceTimersByTimeAsync(2200));
+ expect(fx.point).toHaveBeenCalledTimes(1);expect(fx.speak).toHaveBeenCalledTimes(2);
+ expect(fx.speak).toHaveBeenLastCalledWith('fruits','xoài');
+});

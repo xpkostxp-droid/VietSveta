@@ -13,3 +13,13 @@ Source cuts are retained as paddle-real-v1.wav and bounce-real-v1.wav.
 
 Video motion is the approved male/male prototype, with only 0.75–1.62s sped
 up by 1.35x. Contact is at 1.0685s, first floor impact at 1.3944s.
+
+
+# Finale crowd reaction
+Crowd.Yay.Applause.25ppl.Short.wav by jessepash
+https://freesound.org/people/jessepash/sounds/139972/
+License: CC0 1.0, https://creativecommons.org/publicdomain/zero/1.0/
+Public preview: https://cdn.freesound.org/previews/139/139972_968325-lq.mp3
+Retrieved 2026-10-30. Excerpt 0.1–3.1s, normalized quietly, faded, placed
+1.5s into each smash-cheer-v5.mp4 after ball contact with the court.
+Video streams are unchanged from real-v4.mp4.

@@ -15,3 +15,7 @@
 .is-playing .battle-answers button{min-height:46px;padding:7px 10px;border-radius:15px;font-size:1.04rem;line-height:1.15}
 .is-playing .battle-secondary{margin:0 auto;min-height:28px;padding:5px;font-size:.85rem}
 @media(max-height:700px){.is-playing .battle-court{height:clamp(135px,24svh,180px)}.is-playing .battle-word{height:48px}.is-playing .battle-answers button{min-height:42px}.is-playing .battle-feedback{height:36px}}
+
+.battle-score-pop{display:inline-block;animation:battle-score-pop .3s ease-out}
+@keyframes battle-score-pop{0%{transform:scale(1);color:#fff}38%{transform:scale(1.4);color:#fcf19c;text-shadow:0 0 12px #f8dc6388}100%{transform:scale(1);color:#fff}}
+@media(prefers-reduced-motion:reduce){.battle-score-pop{animation:none}}
