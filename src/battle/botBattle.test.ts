@@ -67,7 +67,7 @@ it('uses the remaining unseen words first in the next match',()=>{
  localStorage.clear();let now=0;
  const collect=(n:number)=>{
   const bot=createBotBattle('adjectives-1',Math.random,()=>now);let s=bot.request('ready');const words:string[]=[];
-  for(let i=0;i<n;i++){words.push(s.match!.task!.word);now=Date.parse(s.match!.starts_at!)+5000;s=bot.request();}
+  for(let i=0;i<n;i++){words.push(s.match!.task!.word);if(i<n-1){now=Date.parse(s.match!.starts_at!)+5000;s=bot.request();}}
   return words;
  };
  const first=collect(20),second=collect(20);
