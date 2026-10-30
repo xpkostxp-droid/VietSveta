@@ -19,3 +19,45 @@
 .battle-score-pop{display:inline-block;animation:battle-score-pop .3s ease-out}
 @keyframes battle-score-pop{0%{transform:scale(1);color:#fff}38%{transform:scale(1.4);color:#fcf19c;text-shadow:0 0 12px #f8dc6388}100%{transform:scale(1);color:#fff}}
 @media(prefers-reduced-motion:reduce){.battle-score-pop{animation:none}}
+
+/* The lobby starts with the topic picker, without the old video test. */
+.screen.battle-screen{max-width:620px;margin:auto;gap:10px;padding:calc(env(safe-area-inset-top,0px) + 10px) 14px calc(env(safe-area-inset-bottom,0px) + 14px)}
+.battle-topbar{display:flex;justify-content:space-between;align-items:center;gap:10px;min-width:0}
+.battle-topbar .back-button{margin:0;min-height:30px;padding:3px 0;flex:none;font-size:.9rem}
+.battle-heading h1{margin:0 0 2px;font-size:1.55rem}
+.battle-heading>span{font-size:.82rem}
+.battle-screen>.battle-label{margin:4px 0 0;font-size:1.05rem}
+.battle-screen>.battle-rules{margin:0;font-size:.9rem;line-height:1.3}
+.battle-screen>.battle-note{margin:0;font-size:.8rem;line-height:1.3}
+.battle-screen>h2{margin:5px 0 0;font-size:1.1rem}
+.battle-screen>p{margin:0;line-height:1.35}
+.battle-screen>.big-button{min-height:52px;padding:12px;margin:2px 0}
+.battle-person{padding:12px 14px;margin:0}
+.battle-person button{padding:10px 14px}
+
+/* Fixed tracks reserve space for every question and result, even on small phones. */
+.battle-screen.is-playing{display:grid;height:100svh;min-height:0;box-sizing:border-box;grid-template-rows:34px minmax(100px,1fr) 38px 64px 30px 198px 24px;gap:6px;padding:calc(env(safe-area-inset-top,0px) + 6px) 12px calc(env(safe-area-inset-bottom,0px) + 6px)}
+.is-playing .battle-topbar .back-button{font-size:.85rem;min-height:28px;padding:2px 0}
+.is-playing .battle-topbar .battle-round{min-height:32px;font-size:.88rem;gap:10px;white-space:nowrap}
+.is-playing .battle-round b{width:32px;height:32px;flex:none;font-size:1.1rem}
+.is-playing .battle-court{height:100%;min-height:0;width:100%}
+.is-playing .battle-score{height:100%;box-sizing:border-box;margin:0;padding:3px 10px;border-radius:14px}
+.is-playing .battle-score strong{font-size:1.45rem;min-width:2ch}
+.is-playing .battle-score span{font-size:.9rem;gap:7px}
+.is-playing .battle-word{height:100%;min-height:0;font-size:clamp(32px,8.4vw,46px);line-height:1.08;overflow-wrap:normal;word-break:normal}
+.is-playing .battle-word-long{font-size:clamp(22px,5.4vw,28px);line-height:1.1}
+.is-playing .battle-feedback{height:100%;min-height:0;display:flex;flex-direction:row;flex-wrap:wrap;align-content:center;align-items:center;justify-content:center;font-size:.79rem;line-height:1.1}
+.is-playing .battle-answers{height:100%;min-height:0;display:grid;grid-template-rows:repeat(3,minmax(0,1fr));gap:8px}
+.is-playing .battle-answers button{height:100%;min-height:0;box-sizing:border-box;padding:5px 10px;font-size:clamp(19px,4.8vw,22px);line-height:1.1;overflow-wrap:normal;word-break:normal;white-space:normal}
+.is-playing .battle-secondary{height:100%;min-height:0;box-sizing:border-box;padding:1px;margin:0 auto;font-size:.8rem}
+@media(max-height:640px){
+ .battle-screen.is-playing{grid-template-rows:32px minmax(70px,1fr) 32px 48px 24px 168px 20px;gap:4px;padding-top:calc(env(safe-area-inset-top,0px) + 4px);padding-bottom:calc(env(safe-area-inset-bottom,0px) + 4px)}
+ .is-playing .battle-topbar .battle-round{font-size:.8rem}
+ .is-playing .battle-round b{width:28px;height:28px;font-size:1rem}
+ .is-playing .battle-word{font-size:32px}
+ .is-playing .battle-word-long{font-size:21px}
+ .is-playing .battle-feedback{font-size:.72rem}
+ .is-playing .battle-answers{gap:6px}
+ .is-playing .battle-answers button{font-size:18px;padding:4px 8px}
+ .is-playing .battle-score strong{font-size:1.3rem}
+}

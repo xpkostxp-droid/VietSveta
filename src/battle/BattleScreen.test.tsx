@@ -55,3 +55,17 @@ it('starts a local bot match without sending bot answers to the server',async()=
  expect(rpc.mock.calls.length).toBe(afterStart);
  expect(host.querySelector('.battle-court')).not.toBeNull();
 });
+
+it('keeps the lobby free of the old smash preview controls',async()=>{
+ await act(async()=>root.render(<BattleScreen onBack={()=>{}}/>));
+ expect(host.textContent).not.toContain('Проверим смэш на телефоне');
+ expect([...host.querySelectorAll('button')].some(b=>b.textContent==='Мой смэш'||b.textContent==='Смэш соперника')).toBe(false);
+});
+it('places the question timer above the court and scores below the players',async()=>{
+ rpc.mockResolvedValue({data:{...base,match:{id:'layout',topic:'fruits',status:'active',side:'host',round:0,starts_at:new Date(Date.now()-1000).toISOString(),ready_host:true,ready_guest:true,task:{word:'táo',options:['яблоко','банан','манго']},answered:false,score_host:0,score_guest:0,host_name:'Админ',guest_name:'Светлана',last_result:null}},error:null});
+ await act(async()=>root.render(<BattleScreen onBack={()=>{}}/>));
+ const top=host.querySelector('.battle-topbar')!,court=host.querySelector('.battle-court')!,score=host.querySelector('.battle-score')!;
+ expect(top.contains(host.querySelector('.battle-round'))).toBe(true);
+ expect(top.compareDocumentPosition(court)&Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+ expect(court.compareDocumentPosition(score)&Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+});

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import './TopicWheel.css';
-const rowHeight = 64;
+const rowHeight = 54;
 export function TopicWheel({items,value,onChange}:{items:{id:string;title:string}[];value:string;onChange:(value:string)=>void}) {
  const viewport=useRef<HTMLDivElement>(null);
  const localValue=useRef<string|null>(null);
