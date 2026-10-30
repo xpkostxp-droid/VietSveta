@@ -20,27 +20,37 @@ beforeEach(()=>{
  node=document.createElement('div');document.body.append(node);root=createRoot(node);
 });
 afterEach(async()=>{await act(async()=>root.unmount());node.remove();vi.useRealTimers();vi.restoreAllMocks();});
-it('beeps at preparation 3, 2, 1 and speaks the question once when play starts',async()=>{
+
+it('beeps at preparation 3, 2, 1 but does not pronounce a new question',async()=>{
  await act(async()=>root.render(<BattleScreen onBack={()=>{}}/>));
  expect(fx.beep.mock.calls.map(c=>c[0])).toEqual([3]);expect(fx.speak).not.toHaveBeenCalled();
  await act(async()=>vi.advanceTimersByTimeAsync(1000));
  await act(async()=>vi.advanceTimersByTimeAsync(1000));
  expect(fx.beep.mock.calls.map(c=>c[0])).toEqual([3,2,1]);
  await act(async()=>vi.advanceTimersByTimeAsync(1200));
- expect(fx.speak).toHaveBeenCalledTimes(1);expect(fx.speak).toHaveBeenCalledWith('fruits','táo');
+ expect(fx.speak).not.toHaveBeenCalled();
 });
-it('ticks a score change once, keeps the previous word during the shot, then speaks the next word',async()=>{
- snapshot.match.topic='fruits';
+it.each([0,1])('pronounces the correct Vietnamese word after choice %i, once only',async(choice)=>{
  await act(async()=>root.render(<BattleScreen onBack={()=>{}}/>));
  await act(async()=>vi.advanceTimersByTimeAsync(3100));
+ expect(fx.speak).not.toHaveBeenCalled();
+ const button=node.querySelectorAll('.battle-answers button')[choice] as HTMLButtonElement;
+ await act(async()=>button.click());
+ expect(fx.speak).toHaveBeenCalledTimes(1);expect(fx.speak).toHaveBeenCalledWith('fruits','táo');
+ await act(async()=>{button.click();await vi.advanceTimersByTimeAsync(300);});
+ expect(fx.speak).toHaveBeenCalledTimes(1);
+});
+it('ticks the score once and keeps the next word silent until the next tap',async()=>{
+ await act(async()=>root.render(<BattleScreen onBack={()=>{}}/>));
+ await act(async()=>vi.advanceTimersByTimeAsync(3100));
+ await act(async()=>(node.querySelector('.battle-answers button') as HTMLButtonElement).click());
  snapshot.match.round=1;snapshot.match.score_host=1;snapshot.match.starts_at=new Date(Date.now()+2000).toISOString();
  snapshot.match.last_result={winner:'host',word:'táo',options:['яблоко','манго','банан'],answer:0};
  snapshot.match.task={word:'xoài',options:['манго','банан','яблоко']};
  await act(async()=>vi.advanceTimersByTimeAsync(300));
- expect(fx.point).toHaveBeenCalledTimes(1);
- expect(node.textContent).not.toContain('Следующий раунд');
- expect(fx.speak).toHaveBeenCalledTimes(1);
+ expect(fx.point).toHaveBeenCalledTimes(1);expect(fx.speak).toHaveBeenCalledTimes(1);
  await act(async()=>vi.advanceTimersByTimeAsync(2200));
- expect(fx.point).toHaveBeenCalledTimes(1);expect(fx.speak).toHaveBeenCalledTimes(2);
- expect(fx.speak).toHaveBeenLastCalledWith('fruits','xoài');
+ expect(fx.point).toHaveBeenCalledTimes(1);expect(fx.speak).toHaveBeenCalledTimes(1);
+ await act(async()=>(node.querySelector('.battle-answers button') as HTMLButtonElement).click());
+ expect(fx.speak).toHaveBeenCalledTimes(2);expect(fx.speak).toHaveBeenLastCalledWith('fruits','xoài');
 });

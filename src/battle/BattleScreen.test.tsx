@@ -34,7 +34,7 @@ it('uses total match score when both players miss question 15',async()=>{
  rpc.mockResolvedValue({data:{...base,match:{id:'last-miss',status:'finished',side:'host',round:15,starts_at:null,task:null,answered:true,score_host:6,score_guest:4,host_name:'Админ',guest_name:'Светлана',last_result:{winner:'none',word:'táo',options:['яблоко','банан','манго'],answer:0}}},error:null});
  await act(async()=>root.render(<BattleScreen onBack={()=>{}}/>));
  expect(host.querySelector('video.is-selected')?.getAttribute('src')).toContain('near');
- expect(host.textContent).toContain('6 : 4');
+ expect([...host.querySelectorAll('.battle-score strong')].map(n=>n.textContent)).toEqual(['6','4']);
 });
 it('shows a draw without a victory smash after 15 questions',async()=>{
  rpc.mockResolvedValue({data:{...base,match:{id:'draw',status:'finished',side:'guest',round:15,starts_at:null,task:null,answered:true,score_host:5,score_guest:5,host_name:'Админ',guest_name:'Светлана',last_result:null}},error:null});
@@ -68,4 +68,15 @@ it('places the question timer above the court and scores below the players',asyn
  expect(top.contains(host.querySelector('.battle-round'))).toBe(true);
  expect(top.compareDocumentPosition(court)&Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
  expect(court.compareDocumentPosition(score)&Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+});
+
+it('keeps the final score below the smash and preserves the match layout',async()=>{
+ rpc.mockResolvedValue({data:{...base,match:{id:'end-layout',topic:'fruits',status:'finished',side:'host',round:15,starts_at:null,task:null,answered:true,score_host:6,score_guest:4,host_name:'Админ',guest_name:'Светлана',last_result:null}},error:null});
+ await act(async()=>root.render(<BattleScreen onBack={()=>{}}/>));
+ const screen=host.querySelector('.battle-screen')!,cinema=host.querySelector('.battle-cinema')!,score=host.querySelector('.battle-score')!;
+ expect(screen.classList.contains('is-playing')).toBe(true);expect(screen.classList.contains('is-finished')).toBe(true);
+ expect(cinema.compareDocumentPosition(score)&Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+ expect(cinema.classList.contains('battle-cinema-compact')).toBe(true);
+ expect(host.querySelectorAll('.battle-score')).toHaveLength(1);
+ expect(host.querySelector('.battle-result')?.textContent).toContain('В лобби');
 });

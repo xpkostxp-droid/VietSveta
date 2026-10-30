@@ -1,1 +1,9 @@
 .battle-cinema{margin:16px 0}.battle-cinema[hidden]{display:none}.battle-cinema h2{font-size:1.15rem;margin:0 0 6px}.battle-cinema p{font-size:.9rem;color:#536863;margin:0 0 10px}.battle-cinema-frame{position:relative;aspect-ratio:3/2;overflow:hidden;border-radius:20px;background:#164746;box-shadow:0 7px 20px #153d3526}.battle-cinema-frame video,.battle-cinema-frame>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.battle-cinema-frame video{visibility:hidden}.battle-cinema-frame video.is-selected{visibility:visible}.battle-cinema-status{position:absolute;bottom:10px;left:10px;right:10px;text-align:center;background:#123d3be8;color:#fff;padding:10px;border-radius:12px;font-size:.95rem}.battle-cinema-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.battle-cinema-actions button{flex:1;min-height:44px;border:1px solid #94bfb5;border-radius:13px;padding:9px;background:#e8f6ef;color:#17423b;font:inherit;font-size:.95rem;font-weight:750}
+
+/* The final clip occupies exactly the live court's slot. Controls stay inside it. */
+.battle-cinema-compact{position:relative;margin:0;min-height:0;height:100%}
+.battle-cinema-compact .battle-cinema-frame{height:100%;min-height:0;aspect-ratio:auto;border-radius:18px}
+.battle-cinema-compact .battle-cinema-frame video,.battle-cinema-compact .battle-cinema-frame>img{object-fit:contain}
+.battle-cinema-compact .battle-cinema-actions{position:absolute;top:7px;right:7px;left:auto;max-width:calc(100% - 14px);margin:0;gap:4px}
+.battle-cinema-compact .battle-cinema-actions button{flex:none;min-height:30px;padding:5px 9px;font-size:.72rem;border-radius:10px;background:#eaf6efe8;box-shadow:0 2px 7px #133f3926}
+.battle-cinema-compact .battle-cinema-status{font-size:.8rem;padding:6px 8px;bottom:7px;left:7px;right:7px}

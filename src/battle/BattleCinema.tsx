@@ -7,7 +7,7 @@ const media = {
  near: './battle-media/smash-near-victory-v6.mp4',
  far: './battle-media/smash-far-defeat-v6.mp4',
 };
-export function BattleCinema({ lobby, result }: { lobby: boolean; result: CinemaResult | null }) {
+export function BattleCinema({ lobby, result, compact=false }: { lobby: boolean; result: CinemaResult | null; compact?: boolean }) {
  const videos = useRef<Partial<Record<Outcome, HTMLVideoElement>>>({});
  const [selected, setSelected] = useState<Outcome | null>(null);
  const [ready, setReady] = useState({ near: false, far: false });
@@ -36,7 +36,7 @@ export function BattleCinema({ lobby, result }: { lobby: boolean; result: Cinema
  useEffect(() => () => Object.values(videos.current).forEach(v => v?.pause()), []);
  const visible = lobby || !!result;
  const active = selected ?? 'near';
- return <section className="battle-cinema" hidden={!visible} aria-label="Анимация пиклбола">
+ return <section className={`battle-cinema${compact?' battle-cinema-compact':''}`} hidden={!visible} aria-label="Анимация пиклбола">
   {lobby && <><h2>Проверим смэш на телефоне</h2><p>Пока пробный ролик: два мужчины. Выбери удар.</p></>}
   <div className="battle-cinema-frame">
    {(['near', 'far'] as const).map(outcome => <video key={outcome}
@@ -56,7 +56,7 @@ export function BattleCinema({ lobby, result }: { lobby: boolean; result: Cinema
   </div>
   <div className="battle-cinema-actions">
    {lobby ? <><button onClick={() => play('near', true)}>Мой смэш</button><button onClick={() => play('far', true)}>Смэш соперника</button></>
-    : <button onClick={() => play(result!.outcome, true)}>{needsPlay ? '▶ Смотреть смэш' : 'Повторить со звуком'}</button>}
+    : result&&<button aria-label={needsPlay?'Смотреть смэш':'Повторить смэш со звуком'} onClick={() => play(result.outcome, true)}>{compact?(needsPlay?'▶ Смэш':'↻ Со звуком'):needsPlay?'▶ Смотреть смэш':'Повторить со звуком'}</button>}
    {lobby && needsPlay && <button onClick={() => play(active, true)}>▶ Запустить ролик</button>}
    {selected && failed[active] && <button onClick={() => { setFailed(s => ({ ...s, [active]: false })); videos.current[active]?.load(); play(active, true); }}>Повторить загрузку</button>}
   </div>
