@@ -11,5 +11,6 @@ it.each([['admin',true,true],['svetlana',false,true],['konstantin',false,false],
  await act(async()=>root.render(<App memberId={memberId} isAdmin={isAdmin}/>));
  await click('Игра');await click('Продвинутая группа');
  expect(node.textContent?.includes('Батл · пробный')).toBe(visible);
+ expect(node.textContent?.includes('Ниндзя · с ботом')).toBe(visible);
  }finally{await act(async()=>root.unmount());vi.restoreAllMocks();}
 });

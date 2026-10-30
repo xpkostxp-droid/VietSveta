@@ -1,3 +1,4 @@
+import { NinjaScreen } from './ninja/NinjaScreen';
 import { BattleScreen } from './battle/BattleScreen';
 import { AdjectiveTetris } from './components/AdjectiveTetris';
 import { adjectiveSets } from './content/adjectiveSets';
@@ -29,6 +30,7 @@ type Screen =
   | { name: 'game' }
   | { name: 'games-menu' }
   | { name: 'battle' }
+  | { name: 'ninja' }
   | { name: 'adjectives-menu' }
   | { name: 'adjectives-tetris'; variant?:'tetris'|'rope'|'cannon' }
   | { name: 'questions-menu' }
@@ -69,11 +71,13 @@ function App({ isAdmin=false, memberId, memberName, syncStatus, onOpenProfile, c
     case 'beginner':
       return <Suspense fallback={<div className="screen"><BackButton onClick={()=>setScreen({name:'group-selection',section:screen.section})} label="К выбору группы"/><p role="status">Загружаем материалы…</p></div>}><div className="beginner-area"><BeginnerApp isAdmin={isAdmin} key={screen.section} section={screen.section} onBack={()=>setScreen({name:'group-selection',section:screen.section})}/></div></Suspense>;
 
+    case 'ninja':
+      return (isAdmin||memberId==='svetlana')?<NinjaScreen onBack={()=>setScreen({name:'games-menu'})}/>:null;
     case 'battle':
       return (isAdmin||memberId==='svetlana')?<BattleScreen onBack={()=>setScreen({name:'games-menu'})}/>:null;
 
     case 'games-menu':
-      return <div className="screen"><BackButton onClick={() => setScreen({ name: 'group-selection', section: 'games' })} label="К выбору группы"/><h1 className="screen-title">Игры</h1>{(isAdmin||memberId==='svetlana')&&<button className="big-button" style={{marginBottom:18}} onClick={()=>setScreen({name:'battle'})}>⚔️ Батл · пробный</button>}<button className="lesson-item" onClick={() => setScreen({ name: 'game' })}><span className="lesson-title" style={{ fontSize: '1.35rem', fontWeight: 800, color: '#174f49', lineHeight: 1.35 }}>🍎 Овощи-фрукты</span></button><button className="lesson-item" onClick={() => setScreen({ name: 'questions-menu' })}><span className="lesson-title" style={{ fontSize: '1.35rem', fontWeight: 800, color: '#174f49', lineHeight: 1.35 }}>❓ Вопросительные слова</span></button>{<button className="lesson-item" onClick={()=>setScreen({name:'adjectives-menu'})}><span className="lesson-title" style={{fontSize:'1.35rem',fontWeight:800,color:'#174f49'}}>🧪 Прилагательные</span></button>}</div>;
+      return <div className="screen"><BackButton onClick={() => setScreen({ name: 'group-selection', section: 'games' })} label="К выбору группы"/><h1 className="screen-title">Игры</h1>{(isAdmin||memberId==='svetlana')&&<button className="big-button" style={{marginBottom:18}} onClick={()=>setScreen({name:'battle'})}>⚔️ Батл · пробный</button>}{(isAdmin||memberId==='svetlana')&&<button className="big-button" style={{marginBottom:18}} onClick={()=>setScreen({name:'ninja'})}>🥷 Ниндзя · с ботом</button>}<button className="lesson-item" onClick={() => setScreen({ name: 'game' })}><span className="lesson-title" style={{ fontSize: '1.35rem', fontWeight: 800, color: '#174f49', lineHeight: 1.35 }}>🍎 Овощи-фрукты</span></button><button className="lesson-item" onClick={() => setScreen({ name: 'questions-menu' })}><span className="lesson-title" style={{ fontSize: '1.35rem', fontWeight: 800, color: '#174f49', lineHeight: 1.35 }}>❓ Вопросительные слова</span></button>{<button className="lesson-item" onClick={()=>setScreen({name:'adjectives-menu'})}><span className="lesson-title" style={{fontSize:'1.35rem',fontWeight:800,color:'#174f49'}}>🧪 Прилагательные</span></button>}</div>;
 
     case 'adjectives-menu':
       return <div className="screen"><BackButton onClick={()=>setScreen({name:'games-menu'})} label="К играм"/><h1 className="screen-title">Прилагательные</h1><div className="market-options" style={{gap:16}}>{adjectiveSets.map((set,i)=><button key={set.title} className="big-button" onClick={()=>setScreen({name:'adjectives-tetris',variant:i===2?'cannon':i===1?'rope':'tetris'})}><span style={{fontSize:'1.2rem',fontWeight:800,lineHeight:1.4}}>{i+1}. {set.title}<br/><small>{set.words.length} слов · {set.words.length*2} заданий · {i===0?'Тетрис':i===1?'Удержи слово':'Словесная пушка'}</small></span></button>)}</div></div>;
