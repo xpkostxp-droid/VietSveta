@@ -35,8 +35,17 @@ it('does not classify a failed ranking as unplayed and offers retry',async()=>{
  expect(node.querySelector('.profile-achievement-error')).toBeTruthy();
  expect(node.querySelectorAll('.profile-game-link')).toHaveLength(0);
 });
-it.each([['konstantin',false],['admin',true]] as const)('preserves the old %s profile and logout',async(id,is_admin)=>{
+it.each([['admin',true]] as const)('preserves the old %s profile and logout',async(id,is_admin)=>{
  await render({...base,id,is_admin});
  expect(node.textContent).toContain('Выйти из учётной записи');expect(node.textContent).not.toContain('Мои достижения');
  expect(vi.mocked(memberRequest).mock.calls.some(([b])=>b.action==='leaderboard')).toBe(false);
+});
+
+it('shows Konstantin achievements while preserving logout and profile switching',async()=>{
+ const switchProfile=vi.fn();
+ await act(async()=>root.render(<ProfileScreen member={{...base,id:'konstantin'}} status="Сохранено" onBack={()=>{}} onLogout={()=>{}} onSwitch={switchProfile} busy={false}/>));
+ expect(node.textContent).toContain('Мои достижения');
+ expect(node.textContent).toContain('Выйти из учётной записи');
+ await act(async()=>Array.from(node.querySelectorAll('button')).find(b=>b.textContent==='Переключить профиль')!.click());
+ expect(switchProfile).toHaveBeenCalledOnce();
 });
