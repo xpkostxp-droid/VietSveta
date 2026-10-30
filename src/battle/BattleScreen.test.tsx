@@ -96,7 +96,7 @@ it('offers a rematch with the same opponent and a return to statistics',async()=
  await act(async()=>root.render(<BattleScreen onBack={()=>{}}/>));
  await act(async()=>[...host.querySelectorAll('button')].find(b=>b.textContent==='Реванш')!.click());
  expect(rpc).toHaveBeenCalledWith('battle_preview',expect.objectContaining({p_action:'rematch',p_payload:{match:'ended'}}));
- await act(async()=>[...host.querySelectorAll('button')].find(b=>b.textContent==='К статистике')!.click());
+ await act(async()=>[...host.querySelectorAll('button')].find(b=>b.textContent==='← К статистике')!.click());
  expect(host.textContent).toContain('Статистика батлов');
  expect(host.querySelector('.battle-score')).toBeNull();
 });
