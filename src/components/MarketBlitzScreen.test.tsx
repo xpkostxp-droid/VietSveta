@@ -36,6 +36,8 @@ beforeEach(async () => {
 afterEach(async () => { await act(async () => root.unmount()); node.remove(); vi.useRealTimers(); });
 it('has three choices, visits products once, explodes on a final error and clears it after a clean retry', async () => {
   await click('Начать'); const seen = new Set<string>();
+  expect(node.querySelector('.harvest-compact-card .harvest-options')).toBeNull();
+  expect(node.querySelector('.harvest-play-block > .harvest-options')).toBeTruthy();
   for(let i=0;i<products.length * 2;i++) {
     const correct = answer(); expect(seen.has(correct)).toBe(false); seen.add(correct);
     const options = [...node.querySelectorAll<HTMLButtonElement>('.blitz-option')];

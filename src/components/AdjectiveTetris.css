@@ -7,6 +7,6 @@
 .at-playing:not(.rope-playing) > .at-prompt small,
 .at-playing:not(.rope-playing) > .at-feedback{display:none}
 /* Anchor the compact play block near the thumb; free space stays below the header. */
-.screen.at-playing{min-height:100svh;min-height:100dvh;padding-bottom:max(20px,env(safe-area-inset-bottom,0px))}
+.screen.at-playing{min-height:100svh;min-height:100dvh;padding-bottom:max(var(--play-bottom-reserve,20px),env(safe-area-inset-bottom,0px))}
 .at-screen.at-playing > .at-board{margin-top:auto;flex-shrink:0}
 .at-screen.at-playing > :is(.at-top,.at-prompt,.at-options){flex-shrink:0}

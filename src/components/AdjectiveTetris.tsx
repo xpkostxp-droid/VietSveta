@@ -9,6 +9,7 @@ import { BackButton } from './BackButton';
 import { createCountdownSound } from '../domain/countdownSound';
 import { speakVietnamese,stopSpeaking } from '../domain/speech';
 import './AdjectiveTetris.css';
+import './SharedPlayLayout.css';
 type Task={word:number;reverse:boolean};
 type Round={tasks:Task[];at:number;options:number[];board:WordBlock[];correct:number;time:number;answerTime:number;lines:number;phase:'question'|'feedback'|'end';success:boolean;chosen:number|null;clearing:boolean};
 export function AdjectiveTetris({onBack,variant='tetris'}:{onBack:()=>void;variant?:'tetris'|'rope'|'cannon'}){
