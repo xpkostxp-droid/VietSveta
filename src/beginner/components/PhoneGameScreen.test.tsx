@@ -52,3 +52,14 @@ it('pauses the countdown in the background until explicit resume',async()=>{
  expect(node.textContent).toContain('Игра на паузе');Object.defineProperty(document,'hidden',{configurable:true,value:false});await click('Продолжить');
  await time(1000);await choose(digit());expect(node.textContent).toContain('✓ Верно!');
 });
+
+it('never reveals future digits after a correct answer, wrong press or timeout',async()=>{
+ await act(async()=>root.render(<PhoneGameScreen onBack={()=>{}}/>));await click('Начать');
+ const slots=()=>Array.from(node.querySelectorAll('.phone-digits span')).map(n=>n.textContent);
+ expect(slots()).toEqual(Array(10).fill('·'));
+ await choose((digit()+1)%10);expect(slots()).toEqual(Array(10).fill('·'));
+ await choose(digit());expect(slots()[0]).not.toBe('·');expect(slots().slice(1)).toEqual(Array(9).fill('·'));
+ await time(800);expect(slots().slice(1)).toEqual(Array(9).fill('·'));
+ await time(5000);expect(slots()[1]).not.toBe('·');expect(slots().slice(2)).toEqual(Array(8).fill('·'));
+ await time(800);await choose(digit());expect(slots().slice(3)).toEqual(Array(7).fill('·'));
+});

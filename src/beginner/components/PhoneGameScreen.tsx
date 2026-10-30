@@ -99,7 +99,7 @@ export function PhoneGameScreen({ onBack }: { onBack: () => void }) {
   <audio ref={tone} src={toneUrl} preload="auto"/>
   <div className={'phone-display'+(calling?' phone-ringing':'')}>
    <span className="phone-handset" aria-hidden="true">☎️</span>
-   <div className="phone-digits" aria-label="Набранный номер">{Array.from({length:10},(_,i)=><span key={i} className={i===position&&!calling?'phone-digit-current':''}>{i<position||calling||phase==='feedback'?phone[i]:'·'}</span>)}</div>
+   <div className="phone-digits" aria-label="Набранный номер">{Array.from({length:10},(_,i)=><span key={i} className={i===position&&!calling?'phone-digit-current':''}>{i<position||calling||(i===position&&phase==='feedback')?phone[i]:'·'}</span>)}</div>
   </div>
   <div className="phone-blitz-prompt"><small>{reverse?'Выбери вьетнамское название':'Слушай цифру по-вьетнамски'}</small><strong>{calling?'☎️':reverse?digit:'🔊'}</strong></div>
   <p className="phone-feedback" role="status">{paused?'Игра на паузе':calling?'Номер набран! Звоним…':phase==='feedback'?success?'✓ Верно!':`Без балла. Правильно: ${digit} — ${phoneDigitWords[digit]}`:wrong!==null?'Не та цифра — попробуй ещё':phase==='listening'?'Включаем запись…':'Набирай номер'}</p>
