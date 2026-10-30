@@ -1,0 +1,2 @@
+export type Match={id:string;status:string;topic:string;side:'host'|'guest';host_name:string;guest_name:string;round:number;starts_at:string|null;ready_host:boolean;ready_guest:boolean;task:{word:string;options:string[]}|null;answered:boolean;score_host:number;score_guest:number;last_result:{winner:string;word:string;options:string[];answer:number}|null};
+export type Snapshot={server_now:string;online:{device:string;name:string;busy:boolean}[];topics:{id:string;title:string}[];match:Match|null};

@@ -41,3 +41,17 @@ it('shows a draw without a victory smash after 15 questions',async()=>{
  await act(async()=>root.render(<BattleScreen onBack={()=>{}}/>));
  expect(host.querySelector('video.is-selected')).toBeNull();expect(host.textContent).toContain('Ничья!');
 });
+it('starts a local bot match without sending bot answers to the server',async()=>{
+ await act(async()=>root.render(<BattleScreen onBack={()=>{}}/>));
+ const button=[...host.querySelectorAll('button')].find(b=>b.textContent?.includes('Сыграть с ботом'))!;
+ await act(async()=>button.click());
+ expect(host.textContent).toContain('Бот');
+ const afterStart=rpc.mock.calls.length;
+ await act(async()=>vi.advanceTimersByTimeAsync(3100));
+ const answer=host.querySelector('.battle-answers button') as HTMLButtonElement;
+ expect(answer.disabled).toBe(false);
+ await act(async()=>answer.click());
+ await act(async()=>vi.advanceTimersByTimeAsync(5500));
+ expect(rpc.mock.calls.length).toBe(afterStart);
+ expect(host.querySelector('.battle-court')).not.toBeNull();
+});
