@@ -15,3 +15,10 @@ it('shows the latest score from the selected player’s perspective for each opp
  expect(battleOpponents(records,'a').map(r=>[r.id,r.played,r.wins,r.losses,r.score])).toEqual([['b',2,2,0,'10:7'],['c',1,0,1,'3:5']]);
  expect(battleOpponents(records,'b')[0].score).toBe('7:10');
 });
+
+it('excludes admin test matches from standings, opponents and medal places',()=>{
+ const records=[match('1','admin','svetlana',5,2),match('2','konstantin','svetlana',12,5),match('3','svetlana','konstantin',7,3)];
+ expect(battleRanking(records).map(r=>[r.id,r.played,r.wins,r.losses,r.place])).toEqual([['konstantin',2,1,1,1],['svetlana',2,1,1,1]]);
+ expect(battleOpponents(records,'svetlana').map(r=>[r.id,r.played])).toEqual([['konstantin',2]]);
+ expect(battleRanking([records[0]])).toEqual([]);expect(battleOpponents(records,'admin')).toEqual([]);
+});
