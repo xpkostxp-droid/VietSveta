@@ -19,7 +19,7 @@ export function createAnswerClock() {
   };
 }
 export interface TimedAttempt {
-  game: 'lesson8-people' | 'lesson7-countries' | 'lesson7-travel' | 'lesson5-professions' | 'lesson5-work' | 'questions-24' | 'questions-15' | 'harvest-40' | 'harvest-fruits' | 'harvest-vegetables' | 'harvest-review' | 'adjectives-tetris' | 'adjectives-rope' | 'adjectives-cannon';
+  game: 'lesson9-phone' | 'lesson8-people' | 'lesson7-countries' | 'lesson7-travel' | 'lesson5-professions' | 'lesson5-work' | 'questions-24' | 'questions-15' | 'harvest-40' | 'harvest-fruits' | 'harvest-vegetables' | 'harvest-review' | 'adjectives-tetris' | 'adjectives-rope' | 'adjectives-cannon';
   correct: number;
   total: number | null;
   answerTimeMs: number;

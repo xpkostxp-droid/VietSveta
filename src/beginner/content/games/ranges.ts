@@ -3,7 +3,7 @@ import { numberWords } from './numbers';
 import { hotelNumberBank } from './hotel';
 export type NumberGameRange = '1-10' | '11-99' | '100-999' | 'banknotes' | 'phone';
 export const numberGameRanges = {
-  phone: { title: 'Номер телефона', values: [] as number[] },
+  phone: { title: 'Цифры 1–10 · Номер телефона', values: [] as number[] },
   banknotes: { title: 'Купюры', values: banknotes.map(note => note.value) },
   '1-10': { title: 'Цифры 1–10', values: Array.from({ length: 10 }, (_, i) => i + 1) },
   '100-999': { title: 'Числа 100–999', values: hotelNumberBank },

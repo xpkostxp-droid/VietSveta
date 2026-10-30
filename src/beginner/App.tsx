@@ -119,10 +119,11 @@ function App({section,onBack}:{section:BeginnerSection;onBack:()=>void}) {
       return <BigNumbersGameScreen key={String(screen.reverse)} reverse={screen.reverse} onBack={() => setScreen({ name: 'big-numbers-setup' })} />;
 
     case 'numbers-game-setup':
+      if(screen.range === 'phone') return <PhoneGameScreen onBack={() => setScreen({ name: 'numbers-games-list' })} />;
       return <GameDirectionScreen range={screen.range} onBack={() => setScreen({ name: 'numbers-games-list' })} onStart={direction => setScreen({ name: 'numbers-game', direction, range: screen.range })} />;
 
     case 'numbers-game':
-      if(screen.range === 'phone') return <PhoneGameScreen key={screen.direction} direction={screen.direction} onBack={() => setScreen({ name: 'numbers-game-setup', range: 'phone' })} />;
+      if(screen.range === 'phone') return <PhoneGameScreen onBack={() => setScreen({ name: 'numbers-games-list' })} />;
       return <CubesGameScreen key={`${screen.range}-${screen.direction}`} range={screen.range} direction={screen.direction} onBack={() => setScreen({ name: 'numbers-game-setup', range: screen.range })} />;
 
     case 'pronunciation':

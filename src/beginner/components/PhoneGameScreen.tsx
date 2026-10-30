@@ -1,127 +1,110 @@
 import { useEffect, useRef, useState } from 'react';
 import { phoneToneUrl } from '../content/games/phoneTone';
+import { phoneDigitWords, phoneBlitzNumbers } from '../content/games/phone';
 import { BackButton } from './BackButton';
-import type { NumberGameDirection } from './GameDirectionScreen';
-import { phoneDigitWords, phoneNumbers } from '../content/games/phone';
-
-export function PhoneGameScreen({ direction, onBack }: { direction: NumberGameDirection; onBack: () => void }) {
-  const [numbers, setNumbers] = useState(phoneNumbers);
-  const [numberIndex, setNumberIndex] = useState(0);
-  const [position, setPosition] = useState(0);
-  const [started, setStarted] = useState(false);
-  const [heard, setHeard] = useState(false);
-  const [ringing, setRinging] = useState(false);
-  const [dialIndex, setDialIndex] = useState<number | null>(null);
-  const [wrong, setWrong] = useState<number | null>(null);
-  const [correct, setCorrect] = useState<number | null>(null);
-  const [mistakes, setMistakes] = useState(0);
-  const [error, setError] = useState('');
-  const voiceRef = useRef<HTMLAudioElement>(null);
-  const ringRef = useRef<HTMLAudioElement>(null);
-  const wrongRef = useRef<HTMLAudioElement>(null);
-  const toneRef = useRef<HTMLAudioElement>(null);
-
-  const requestRef = useRef(0);
-  const lockedRef = useRef(false);
-  const timerRef = useRef<number>();
-  const phone = numbers[numberIndex];
-  const [toneUrl, setToneUrl] = useState<string>();
-  useEffect(() => {
-    const url = phone ? phoneToneUrl(phone) : undefined;
-    setToneUrl(url);
-    return () => { if (url) URL.revokeObjectURL(url); };
-  }, [phone]);
-  const digit = phone && position < 10 ? Number(phone[position]) : null;
-
-  async function listen() {
-    const audio = voiceRef.current;
-    if (!audio || digit === null || ringing) return;
-    const request = ++requestRef.current;
-    audio.pause(); audio.currentTime = 0; setError('');
-    try { await audio.play(); if(request === requestRef.current) { setHeard(true); setStarted(true); } }
-    catch { if(request === requestRef.current) setError('Не удалось включить запись. Нажми «Повторить цифру».'); }
-  }
-  useEffect(() => {
-    if(started && !ringing && digit !== null) { lockedRef.current=false; void listen(); }
-  }, [numberIndex, position, ringing]);
-  useEffect(() => {
-    const voice=voiceRef.current, ring=ringRef.current, wrongAudio=wrongRef.current, tone=toneRef.current;
-    return () => { requestRef.current++; window.clearTimeout(timerRef.current); voice?.pause(); ring?.pause(); wrongAudio?.pause(); tone?.pause(); };
-  }, []);
-  useEffect(() => {
-    if(wrong===null) return;
-    const timer=window.setTimeout(()=>setWrong(null),350);return ()=>window.clearTimeout(timer);
-  }, [wrong]);
-
-  function startRing() {
-    setDialIndex(null); setRinging(true);
-
-  }
-  const dialing = dialIndex !== null;
-  const calling = dialing || ringing;
-  useEffect(() => {
-    if (!calling) return;
-    const tone = toneRef.current;
-    if (!tone) return;
-    tone.currentTime = 0;
-    void tone.play().catch(() => { setError('Не удалось включить звук. Нажми «Следующий номер».'); startRing(); });
-    const timer = window.setInterval(() => {
-      if (tone.paused || tone.ended) return;
-      if (tone.currentTime >= .095 * phone.length) { setDialIndex(null); setRinging(true); }
-      else setDialIndex(Math.min(phone.length - 1, Math.floor(tone.currentTime / .095)));
-    }, 16);
-    return () => { window.clearInterval(timer); tone.pause(); };
-  }, [calling]);
-
-  function finishNumber() {
-    if(!ringing) return;
-    ringRef.current?.pause(); toneRef.current?.pause(); setDialIndex(null); setRinging(false); setPosition(0); setHeard(false); setCorrect(null); setWrong(null);
-    setNumberIndex(index=>index+1); lockedRef.current=false;
-  }
-  function choose(value:number) {
-    if(!heard || lockedRef.current || ringing || digit===null) return;
-    if(value!==digit) {
-      setWrong(value); setMistakes(n=>n+1);
-      const audio=wrongRef.current;if(audio){audio.currentTime=0;void audio.play().catch(()=>{});}return;
-    }
-    lockedRef.current=true; setWrong(null);setCorrect(value);setHeard(false);voiceRef.current?.pause();
-    timerRef.current=window.setTimeout(()=>{
-      setPosition(current=>current+1);setCorrect(null);
-      if(position===9) {
-        setDialIndex(0);
-      }
-    },180);
-  }
-  function restart() {
-    requestRef.current++;window.clearTimeout(timerRef.current);voiceRef.current?.pause();ringRef.current?.pause();wrongRef.current?.pause();toneRef.current?.pause();
-    lockedRef.current=false;setNumbers(phoneNumbers());setNumberIndex(0);setPosition(0);setStarted(false);setHeard(false);setRinging(false);setDialIndex(null);setWrong(null);setCorrect(null);setMistakes(0);setError('');
-  }
-  const source=digit===null?undefined:digit===0?`${import.meta.env.BASE_URL}beginner/audio/games/phone/${direction==='vi-ru'?'vi':'ru'}-0.mp3`:`${import.meta.env.BASE_URL}beginner/audio/games/${direction==='vi-ru'?'numbers':'numbers-ru'}/${digit}.mp3?v=${direction==='vi-ru'?'vi':'ru'}-soft-2`;
-  return <div className="screen screen-phone-game">
-    <BackButton onClick={onBack} label="К выбору направления" />
-    <span className="badge">Урок 9 · Номер телефона</span>
-    <h1 className="screen-title">Номер телефона</h1>
-    <p className="phone-direction">{direction==='vi-ru'?'По-вьетнамски':'По-русски'}</p>
-    <audio ref={voiceRef} src={source} preload="auto" onError={()=>setError('Запись не загрузилась. Попробуй повторить цифру.')} />
-    <audio ref={ringRef} src={`${import.meta.env.BASE_URL}beginner/audio/games/phone/ring.wav`} preload="auto" onEnded={finishNumber} />
-    <audio ref={wrongRef} src={`${import.meta.env.BASE_URL}beginner/audio/games/phone/wrong.wav`} preload="auto" />
-    <audio ref={toneRef} src={toneUrl} preload="auto" onEnded={finishNumber} />
-    {!phone ? <div className="summary-box"><h2>Все 10 номеров набраны!</h2><p>Верных цифр: 100 · Ошибок: {mistakes}</p><button className="big-button" onClick={restart}>Ещё 10 номеров</button></div> : <>
-      <div className="phone-progress"><span>Номер {numberIndex+1} из 10</span><span>Цифра {Math.min(position+1,10)} из 10</span></div>
-      <div className={`phone-display${ringing?' phone-ringing':''}`}>
-        <svg className="phone-handset" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 3h4l2 5-3 2c1 3 3 5 6 6l2-3 5 2v4c0 2-3 3-5 2C9 19 5 15 3 8 2 6 3 3 5 3Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" /></svg>
-        <div className="phone-digits" aria-label={`Набрано ${position} цифр`}>
-          {Array.from({length:10},(_,i)=><span key={i} className={`${[3,6,8].includes(i)?'phone-digit-group ':''}${i===position&&!ringing?'phone-digit-current':''}${i===dialIndex?' phone-digit-dialing':''}`}>{i<position?phone[i]:'·'}</span>)}
-        </div>
-      </div>
-      <p className="phone-feedback" role="status">{dialIndex!==null?'Тональный набор номера…':ringing?'Номер набран! Телефон звонит…':wrong!==null?'Не та цифра — попробуй ещё раз':correct!==null?'✓ Верно!':started?'Слушай и набирай по одной цифре':'Девушка назовёт номер по одной цифре.'}</p>
-      <div className={`phone-keypad${direction==='ru-vi'?' phone-keypad-words':''}`}>
-        {[1,2,3,4,5,6,7,8,9,0].map(value=><button key={value} data-digit={value} lang={direction==='ru-vi'?'vi':undefined} className={`phone-key${value===0?' phone-key-zero':''}${wrong===value?' phone-key-wrong':''}${correct===value?' phone-key-correct':''}`} disabled={!heard||ringing||correct!==null} onClick={()=>choose(value)}>{direction==='ru-vi'?phoneDigitWords[value]:value}</button>)}
-      </div>
-      {ringing?<button className="secondary-button" onClick={finishNumber}>Следующий номер</button>:<button className="big-button" onClick={()=>void listen()} disabled={correct!==null||dialIndex!==null}>{dialIndex!==null?'Набираем номер…':started?'Повторить цифру':'Начать'}</button>}
-      {error && dialing && <button className="secondary-button" onClick={startRing}>Позвонить</button>}
-      {error&&<p role="alert" className="pronunciation-error">{error}</p>}
-      <p className="hint-text">Учебные номера. Ошибка не пропускает цифру.</p>
-    </>}
-  </div>;
+import { GameRanking } from '../../components/GameRanking';
+import { saveTimedAttempt } from '../../domain/answerTime';
+import { makeGameSound } from './gameSounds';
+import './PhoneGameScreen.css';
+type Phase = 'intro' | 'listening' | 'question' | 'feedback' | 'calling' | 'result';
+const game = 'lesson9-phone';
+export function PhoneGameScreen({ onBack }: { onBack: () => void }) {
+ const [retry,setRetry]=useState(0);
+ const [numbers,setNumbers]=useState<string[]>([]),[at,setAt]=useState(0),[phase,setPhase]=useState<Phase>('intro');
+ const [left,setLeft]=useState(5000),[paused,setPaused]=useState(false),[error,setError]=useState('');
+ const [wrong,setWrong]=useState<number|null>(null),[success,setSuccess]=useState(false),[score,setScore]=useState({correct:0,time:0});
+ const voice=useRef<HTMLAudioElement>(null),tone=useRef<HTMLAudioElement>(null),audio=useRef(makeGameSound());
+ const deadline=useRef(0),frozen=useRef(5000),lastBeep=useRef<number|null>(null),clean=useRef(true),locked=useRef(true),request=useRef(0);
+ const result=useRef({correct:0,time:0,answerTime:0}),saved=useRef(false);
+ const numberIndex=Math.floor(at/10),position=at%10,reverse=numberIndex===1;
+ const phone=numbers[numberIndex],digit=phone?Number(phone[position]):0;
+ const [toneUrl,setToneUrl]=useState<string>();
+ useEffect(()=>{if(!phone)return;const url=phoneToneUrl(phone);setToneUrl(url);return()=>URL.revokeObjectURL(url);},[phone]);
+ const begin=()=>{
+  audio.current.ready();request.current++;voice.current?.pause();tone.current?.pause();
+  result.current={correct:0,time:0,answerTime:0};saved.current=false;clean.current=true;locked.current=true;lastBeep.current=null;
+  setNumbers(phoneBlitzNumbers());setAt(0);setScore({correct:0,time:0});setLeft(5000);setWrong(null);setError('');setPaused(document.hidden);setPhase('listening');
+ };
+ const stop=()=>{request.current++;voice.current?.pause();tone.current?.pause();onBack();};
+ const finish=(correct:boolean)=>{
+  if(locked.current||paused)return;locked.current=true;voice.current?.pause();request.current++;
+  const elapsed=Math.min(5000,Math.max(0,5000-(deadline.current-Date.now())));
+  result.current.answerTime+=elapsed;
+  if(correct&&clean.current){result.current.correct++;result.current.time+=elapsed;}
+  setScore({correct:result.current.correct,time:result.current.time});setSuccess(correct&&clean.current);setLeft(Math.max(0,5000-elapsed));setPhase('feedback');
+ };
+ const finishCall=()=>{
+  tone.current?.pause();
+  if(numberIndex===0){clean.current=true;locked.current=true;lastBeep.current=null;setAt(10);setWrong(null);setLeft(5000);setError('');setPhase('listening');}
+  else if(!saved.current){saved.current=true;saveTimedAttempt({game,correct:result.current.correct,total:20,answerTimeMs:result.current.answerTime,correctTimeMs:result.current.time,completed:true});setPhase('result');}
+ };
+ useEffect(()=>{
+  if(phase!=='listening'||paused)return;
+  const id=++request.current;setError('');
+  const player=voice.current;if(!player)return;player.currentTime=0;
+  void player.play().then(()=>{
+   if(request.current!==id)return;
+   if(document.hidden){player.pause();setPaused(true);return;}
+   deadline.current=Date.now()+5000;frozen.current=5000;lastBeep.current=null;locked.current=false;setLeft(5000);setPhase('question');
+  }).catch(()=>{if(request.current===id)setError('Не удалось включить звук. Нажми «Повторить цифру».');});
+  return()=>{request.current++;};
+ },[phase,at,paused,retry]);
+ useEffect(()=>{
+  if(phase!=='question'||paused)return;
+  const timer=setInterval(()=>{
+   const remaining=Math.max(0,deadline.current-Date.now());setLeft(remaining);
+   const seconds=Math.ceil(remaining/1000);
+   if(seconds>=1&&seconds<=3&&lastBeep.current!==seconds){lastBeep.current=seconds;audio.current.beep(seconds);}
+   if(!remaining)finish(false);
+  },40);return()=>clearInterval(timer);
+ },[phase,at,paused]);
+ useEffect(()=>{
+  if(phase!=='feedback'||paused)return;
+  const timer=setTimeout(()=>{
+   setWrong(null);setError('');
+   if(position===9)setPhase('calling');
+   else {clean.current=true;locked.current=true;lastBeep.current=null;setAt(n=>n+1);setLeft(5000);setPhase('listening');}
+  },800);return()=>clearTimeout(timer);
+ },[phase,at,paused]);
+ useEffect(()=>{
+  if(phase!=='calling'||paused)return;
+  const player=tone.current;if(player){player.currentTime=0;void player.play().catch(()=>{});}
+  const timer=setTimeout(finishCall,3300);
+  return()=>{clearTimeout(timer);player?.pause();};
+ },[phase,at,paused]);
+ useEffect(()=>{
+  const hide=()=>{if(document.hidden&&!['intro','result'].includes(phase)){frozen.current=Math.max(0,deadline.current-Date.now());request.current++;voice.current?.pause();tone.current?.pause();setPaused(true);}};
+  document.addEventListener('visibilitychange',hide);return()=>document.removeEventListener('visibilitychange',hide);
+ },[phase]);
+ useEffect(()=>()=>{request.current++;voice.current?.pause();tone.current?.pause();audio.current.close();},[]);
+ const choose=(value:number)=>{
+  if(phase!=='question'||paused||locked.current)return;
+  if(Date.now()>=deadline.current){finish(false);return;}
+  if(value!==digit){clean.current=false;setWrong(value);return;}
+  finish(true);
+ };
+ const replay=()=>{
+  audio.current.ready();
+  if(phase==='listening'){setRetry(n=>n+1);return;}
+  const player=voice.current;if(player){player.currentTime=0;void player.play().catch(()=>setError('Не удалось включить звук.'));}
+ };
+ const source=phone?(digit===0?`${import.meta.env.BASE_URL}beginner/audio/games/phone/${reverse?'ru':'vi'}-0.mp3`:`${import.meta.env.BASE_URL}beginner/audio/games/${reverse?'numbers-ru':'numbers'}/${digit}.mp3`):undefined;
+ if(phase==='intro'||phase==='result')return <div className="screen ranking-screen"><BackButton onClick={onBack} label="К числительным"/><h1 className="screen-title">Цифры 1–10 · Номер телефона</h1><GameRanking game={game} total={20} onStart={begin} startAtBottom startLabel={phase==='result'?'Играть ещё':'Начать'} result={phase==='result'?score:undefined}/></div>;
+ const calling=phase==='calling';
+ return <div className="screen screen-phone-game phone-blitz">
+  <BackButton onClick={stop} label="К числительным"/>
+  <div className="phone-blitz-status"><strong>Номер {numberIndex+1}/2 · {Math.min(at+1,20)}/20 · ✓ {score.correct}</strong><span className={'phone-blitz-clock'+(left<=3000?' phone-blitz-urgent':'')} aria-label="Время на ответ">{calling?'☎':paused?'Ⅱ':Math.ceil(left/1000)}</span></div>
+  <div className="phone-blitz-timebar"><div style={{width:`${left/50}%`}}/></div>
+  <audio ref={voice} src={source} preload="auto"/>
+  <audio ref={tone} src={toneUrl} preload="auto"/>
+  <div className={'phone-display'+(calling?' phone-ringing':'')}>
+   <span className="phone-handset" aria-hidden="true">☎️</span>
+   <div className="phone-digits" aria-label="Набранный номер">{Array.from({length:10},(_,i)=><span key={i} className={i===position&&!calling?'phone-digit-current':''}>{i<position||calling||phase==='feedback'?phone[i]:'·'}</span>)}</div>
+  </div>
+  <div className="phone-blitz-prompt"><small>{reverse?'Выбери вьетнамское название':'Слушай цифру по-вьетнамски'}</small><strong>{calling?'☎️':reverse?digit:'🔊'}</strong></div>
+  <p className="phone-feedback" role="status">{paused?'Игра на паузе':calling?'Номер набран! Звоним…':phase==='feedback'?success?'✓ Верно!':`Без балла. Правильно: ${digit} — ${phoneDigitWords[digit]}`:wrong!==null?'Не та цифра — попробуй ещё':phase==='listening'?'Включаем запись…':'Набирай номер'}</p>
+  <div className={'phone-keypad'+(reverse?' phone-keypad-words':'')}>{[1,2,3,4,5,6,7,8,9,0].map(value=><button key={value} data-digit={value} lang={reverse?'vi':undefined} className={'phone-key'+(value===0?' phone-key-zero':'')+(wrong===value?' phone-key-wrong':'')+(phase==='feedback'&&value===digit?' phone-key-correct':'')} disabled={phase!=='question'||paused} onClick={()=>choose(value)}>{reverse?phoneDigitWords[value]:value}</button>)}</div>
+  {paused?<button className="big-button" onClick={()=>{audio.current.ready();deadline.current=Date.now()+frozen.current;setPaused(false);}}>Продолжить</button>:<button className="secondary-button" disabled={calling||phase==='feedback'} onClick={replay}>Повторить цифру</button>}
+  <p className="phone-blitz-error" role="alert">{error}</p>
+ </div>;
 }
