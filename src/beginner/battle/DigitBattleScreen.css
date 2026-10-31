@@ -47,3 +47,5 @@
 
 .beginner-area .screen.digit-battle-picker p{margin:0;color:#617673;font-size:.9rem;line-height:1.4}
 .beginner-area .digit-battle-picker>.big-button{margin-top:auto}
+
+.digit-online-actions{display:flex;flex-direction:column;gap:12px;width:85%}.digit-online-actions>button{width:100%}.digit-online-error{position:absolute;inset:auto 0 0;padding:8px;background:#fff6e9;color:#954437;z-index:9;font-size:.8rem}

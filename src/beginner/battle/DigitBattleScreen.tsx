@@ -12,19 +12,19 @@ const keypad = [1,2,3,4,5,6,7,8,9,0];
 function cubePosition(index: number, side: DigitSide) {
  return { '--cube-column': side === 'human' ? index % 2 : 1 - index % 2, '--cube-row': Math.floor(index / 2) } as CSSProperties;
 }
-export function DigitBattleStage({ state, now, paused = false, onResume }: { state: DigitBattleState; now: number; paused?: boolean; onResume?: () => void }) {
+export function DigitBattleStage({ state, now, paused = false, onResume, opponentName = 'Бот' }: { opponentName?: string; state: DigitBattleState; now: number; paused?: boolean; onResume?: () => void }) {
  const resolved = state.phase === 'result' || state.phase === 'finished';
  const showPrompt = state.phase === 'question' || (resolved && state.winner === null && now < state.resultAt + 180);
  const progress = Math.max(0, Math.min(1, ((resolved ? state.resultAt : now) - state.startsAt) / DIGIT_ROUND_MS));
  const style = { '--fall-y': `${12 + progress * 68}%` } as CSSProperties;
  return <div className="digit-glass" style={style} aria-label="Общий стакан">
   <div className="digit-glass-rim" aria-hidden="true"/>
-  {(['human','bot'] as const).map(side => <div className={'digit-stack digit-stack-' + side} key={side} aria-label={side === 'human' ? 'Твои кубики' : 'Кубики бота'}>
+  {(['human','bot'] as const).map(side => <div className={'digit-stack digit-stack-' + side} key={side} aria-label={side === 'human' ? 'Твои кубики' : 'Кубики соперника'}>
    {state.cubes[side].map((digit, i) => <div key={i} className="digit-small-cube digit-cube" style={cubePosition(i,side)}>{digit}</div>)}
   </div>)}
   {showPrompt && <div key={state.round} className={'digit-falling-cube digit-cube' + (resolved ? ' is-popping' : '')} lang="vi">{phoneDigitWords[state.digit]}</div>}
-  {state.phase === 'ready' && state.round === 1 && <div className="digit-field-message"><strong>{Math.max(1,Math.ceil((state.startsAt-now)/1000))}</strong></div>}
-  {state.phase === 'finished' && now >= state.resultAt + 700 && <div className="digit-field-message digit-victory"><strong>{state.winner === 'human' ? 'Ты победил!' : 'Бот победил'}</strong></div>}
+  {state.phase === 'ready' && state.round === 1 && <div className="digit-field-message"><strong>{Number.isFinite(state.startsAt)?Math.max(1,Math.ceil((state.startsAt-now)/1000)):'…'}</strong></div>}
+  {state.phase === 'finished' && now >= state.resultAt + 700 && <div className="digit-field-message digit-victory"><strong>{state.winner === 'human' ? 'Ты победил!' : `${opponentName} победил`}</strong></div>}
   {paused && <div className="digit-pause"><strong>Пауза</strong><button className="big-button" onClick={onResume}>Продолжить</button></div>}
  </div>;
 }
