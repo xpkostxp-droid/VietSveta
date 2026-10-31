@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { GameRanking } from '../../components/GameRanking';
 import { saveTimedAttempt } from '../../domain/answerTime';
-import { useUntimedAnswerClock } from './useUntimedAnswerClock';
+import { useFiveSecondQuestionTimer } from './useFiveSecondQuestionTimer';
 import { familyWords, familyTasks, familyOptions, type FamilyTask } from '../content/games/family';
 import { hasVietnameseVoice, onVoicesChanged, speakVietnamese, stopSpeaking } from '../domain/speech';
 import { BackButton } from './BackButton';
 import { FamilyPicture, familyPhotos } from './FamilyPicture';
-import { GamePrompt, GameChoices, GameProgress, beginnerPlayClass } from './BeginnerPlayLayout';
+import { GamePrompt, GameChoices, beginnerPlayClass } from './BeginnerPlayLayout';
 
 export function FamilyGameScreen({ onBack }: { onBack: () => void }) {
   const words = familyWords;
@@ -15,12 +15,13 @@ export function FamilyGameScreen({ onBack }: { onBack: () => void }) {
     Object.values(familyPhotos).forEach(src => { const image = new Image(); image.src = src; });
   }, []);
   const rankingGame = 'lesson10-family';
-  const clock = useUntimedAnswerClock();
+  const clock = useFiveSecondQuestionTimer(() => answer(null), stopSpeaking);
   const answerTime = useRef(0);
   const [tasks, setTasks] = useState<FamilyTask[]>([]);
   const [position, setPosition] = useState(0);
   const [options, setOptions] = useState<number[]>([]);
   const [selected, setSelected] = useState<number | null>(null);
+  const [answered, setAnswered] = useState(false);
   const [score, setScore] = useState({ correct: 0, time: 0 });
   const [voice, setVoice] = useState(hasVietnameseVoice);
   const timer = useRef<ReturnType<typeof setTimeout>>();
@@ -33,22 +34,24 @@ export function FamilyGameScreen({ onBack }: { onBack: () => void }) {
     return () => { off(); clearTimeout(timer.current); stopSpeaking(); };
   }, []);
   const prepare = (next: FamilyTask[], at: number) => {
-    setPosition(at); setSelected(null); locked.current = false;
+    setPosition(at); setSelected(null); setAnswered(false); locked.current = false;
     if (next[at]) clock.begin();
     setOptions(next[at] ? familyOptions(next[at].index) : []);
   };
   const start = () => {
-    clearTimeout(timer.current); stopSpeaking();
+    clearTimeout(timer.current); stopSpeaking(); clock.ready();
     const next = familyTasks(); setTasks(next); setScore({ correct: 0, time: 0 }); answerTime.current = 0; prepare(next, 0);
   };
   const back = () => {
-    clearTimeout(timer.current); stopSpeaking(); locked.current = true; clock.finish();
+    clearTimeout(timer.current); stopSpeaking(); locked.current = true; clock.stop();
     if (tasks.length) { setTasks([]); setPosition(0); } else onBack();
   };
-  const answer = (index: number) => {
-    if (locked.current || !task) return;
-    locked.current = true; setSelected(index);
+  const answer = (index: number | null) => {
+    if (locked.current || clock.isPaused() || !task) return;
+    locked.current = true;
     const time = clock.finish(); answerTime.current += time;
+    if (time >= 5000) index = null;
+    setSelected(index); setAnswered(true);
     const nextScore = { correct: score.correct + (index === task.index ? 1 : 0), time: score.time + (index === task.index ? time : 0) };
     setScore(nextScore);
     speakVietnamese(words[task.index][1]);
@@ -65,13 +68,14 @@ export function FamilyGameScreen({ onBack }: { onBack: () => void }) {
     <span className="badge">Урок 10 · {title}</span><h1 className="screen-title">{title}</h1>
     {!active ? <GameRanking key={tasks.length ? 'result' : 'intro'} game={rankingGame} total={words.length * 2} onStart={start} startAtBottom
       startLabel={tasks.length ? 'Играть ещё' : 'Начать'} result={tasks.length ? score : undefined} /> : current && <>
-      <GameProgress progress={100 * position / tasks.length}>{position + 1}/{tasks.length} · ✓ {score.correct}</GameProgress>
+      <div className="work-status"><strong>{position + 1}/{tasks.length} · ✓ {score.correct}</strong><span className="work-clock" aria-label="Осталось секунд">{Math.ceil(clock.remaining / 1000)}</span></div>
+      <div className="work-timebar"><div style={{ width: `${clock.remaining / 50}%` }} /></div>
       <GamePrompt label={current[task.reverse ? 1 : 2]} lang={task.reverse ? 'vi' : 'ru'} long={!task.reverse && current[2].length > 23}
         visual={!task.reverse ? <FamilyPicture id={current[0]} /> : undefined}>
-        <div className="beginner-prompt-tools">{selected !== null && <button className="secondary-button" disabled={!voice} onClick={() => speakVietnamese(current[1])}>🔊 Послушать ещё</button>}</div>
+        <div className="beginner-prompt-tools">{clock.paused ? <button className="secondary-button" onClick={clock.resume}>Продолжить</button> : answered && <button className="secondary-button" disabled={!voice} onClick={() => speakVietnamese(current[1])}>🔊 Послушать ещё</button>}</div>
       </GamePrompt>
-      <GameChoices>{options.map(index => <button key={index} lang={task.reverse ? 'ru' : 'vi'} disabled={selected !== null}
-        className={'choice-button ' + (selected !== null ? index === task.index ? 'family-correct' : index === selected ? 'family-wrong' : '' : '')}
+      <GameChoices>{options.map(index => <button key={index} lang={task.reverse ? 'ru' : 'vi'} disabled={answered || clock.paused}
+        className={'choice-button ' + (answered ? index === task.index ? 'family-correct' : index === selected ? 'family-wrong' : '' : '')}
         onClick={() => answer(index)}>{words[index][task.reverse ? 2 : 1]}</button>)}</GameChoices>
     </>}
   </div>;
