@@ -1,5 +1,5 @@
 .beginner-area .work-group-list { display: grid; gap: 16px; margin-top: 20px; }
-.beginner-area .work-group-list .big-button { display: grid; gap: 8px; text-align: left; background: #107b70; color: white; }
+.beginner-area .work-group-list .work-group-choice { display: grid; gap: 8px; text-align: left; min-height: 60px; padding: 16px 20px; font-size: 1.1rem; font-weight: 600; }
 .beginner-area .work-group-list span { font-size: .95rem; font-weight: 500; }
 .beginner-area .screen.work-active { gap: 8px; }
 .beginner-area .work-active > .badge { display: none; }

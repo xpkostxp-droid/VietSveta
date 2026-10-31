@@ -89,7 +89,7 @@ export function ProfessionsGameScreen({ onBack, initialGroup = null }: { onBack:
     <BackButton onClick={back} label={group ? 'Назад' : 'К играм'} />
     <span className="badge">Урок 5 · Профессии и работа</span>
     <h1 className="screen-title">{title?.label ?? 'Профессии и работа'}</h1>
-    {!group ? <div className="work-group-list">{workBlitzGroups.map(g => <button className="big-button" key={g.id} onClick={() => { setGroup(g.id); }}><strong>{g.label}</strong><span>{g.words} слов и выражений · {g.words * 2} заданий</span></button>)}</div>
+    {!group ? <div className="work-group-list">{workBlitzGroups.map(g => <button className="lesson-item work-group-choice" key={g.id} onClick={() => { setGroup(g.id); }}><strong>{g.label}</strong><span>{g.words} слов и выражений · {g.words * 2} заданий</span></button>)}</div>
       : phase === 'intro' || phase === 'result' ? <GameRanking
           game={group === 'professions' ? 'lesson5-professions' : 'lesson5-work'}
           total={title!.words * 2} onStart={start} startAtBottom
