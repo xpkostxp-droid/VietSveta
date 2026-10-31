@@ -4,6 +4,7 @@ import { hasVietnameseVoice, onVoicesChanged, speakVietnamese, stopSpeaking } fr
 import { BackButton } from './BackButton';
 import { HousePicture } from './HousePicture';
 
+import { GamePrompt, GameChoices, GameProgress, beginnerPlayClass } from './BeginnerPlayLayout';
 type Mode = 'house' | 'adjectives' | 'blitz';
 
 function itemsFor(mode: Mode): readonly HouseGameItem[] {
@@ -104,7 +105,7 @@ export function HouseGameScreen({ onBack }: { onBack: () => void }) {
   const mastered = Object.values(wins).filter(n => n >= required).length;
   const total = items.length;
 
-  return <div className="screen family-screen">
+  return <div className={"screen family-screen" + (mode && current ? " " + beginnerPlayClass : "")}>
     <BackButton onClick={mode ? exit : onBack} label={mode ? 'К выбору режима' : 'К играм'} />
     <span className="badge">Урок 11 · Дом и прилагательные</span>
     <h1 className="screen-title">{titleFor(mode, review)}</h1>
@@ -125,28 +126,16 @@ export function HouseGameScreen({ onBack }: { onBack: () => void }) {
         <span>20 сочетаний только из изученных слов: высокий дом, мало комнат, длинный балкон, красивая кухня и т. д.</span>
       </button>
     </> : current ? <>
-      <p className="family-counter">
-        {mode !== 'blitz'
-          ? `Закреплено: ${mastered} из ${total}`
-          : review
-            ? `Осталось в повторе: ${queue.length}`
-            : `Карточка ${total - queue.length + 1} из ${total}`} · Без таймера
-      </p>
-      {mode !== 'blitz' && <p className="family-counter" data-testid="adjective-block">Сейчас учим: {queue.map(i => items[i][1]).join(' · ')}</p>}
-      <div className="family-card house-game-card">
-        <HousePicture id={current[0]} />
-        <h2>{current[2]}</h2>
-      </div>
-      <div className="family-choices">
-        {options.map(i => <button
-          key={i}
-          disabled={correct || wrong.includes(i)}
-          className={'choice-button ' + (wrong.includes(i) ? 'family-wrong' : correct && i === index ? 'family-correct' : '')}
-          onClick={() => answer(i)}
-        >{items[i][1]}</button>)}
-      </div>
-      <p className="family-feedback" role="status">{'\u00a0'}</p>
-      {correct && <button className="secondary-button" disabled={!voice} onClick={() => speakVietnamese(current[1])}>🔊 Послушать ещё</button>}
+      <GameProgress progress={100 * (mode !== 'blitz' ? mastered : total - queue.length) / total}>
+        {mode !== 'blitz' ? `Закреплено: ${mastered} из ${total}` : review ? `Осталось в повторе: ${queue.length}` : `Карточка ${total - queue.length + 1} из ${total}`}
+      </GameProgress>
+      <GamePrompt label={current[2]} lang="ru" visual={<HousePicture id={current[0]} />}>
+        <div className="beginner-prompt-tools">{correct && <button className="secondary-button" disabled={!voice} onClick={() => speakVietnamese(current[1])}>🔊 Послушать ещё</button>}</div>
+        {mode !== 'blitz' && <p className="beginner-prompt-note" data-testid="adjective-block">Сейчас учим: {queue.map(i => items[i][1]).join(' · ')}</p>}
+      </GamePrompt>
+      <GameChoices count={options.length}>
+        {options.map(i => <button key={i} disabled={correct || wrong.includes(i)} className={'choice-button ' + (wrong.includes(i) ? 'family-wrong' : correct && i === index ? 'family-correct' : '')} onClick={() => answer(i)}>{items[i][1]}</button>)}
+      </GameChoices>
     </> : <div className="family-result">
       <HousePicture id="blitz-private-beautiful" />
       <h2>{mode === 'blitz' ? review ? 'Повтор завершён!' : 'Блиц завершён!' : 'Раздел выучен!'}</h2>
@@ -167,7 +156,7 @@ export function HouseGameScreen({ onBack }: { onBack: () => void }) {
       <button className="big-button" onClick={() => start(mode)}>Сыграть заново</button>
       <button className="secondary-button" onClick={exit}>К выбору режима</button>
     </div>}
-    {mode && !voice && <p className="family-note">Для озвучки нужен вьетнамский голос на устройстве. Играть можно без звука.</p>}
+    {mode && !current && !voice && <p className="family-note">Для озвучки нужен вьетнамский голос на устройстве. Играть можно без звука.</p>}
   </div>;
 }
 

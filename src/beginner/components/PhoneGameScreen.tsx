@@ -6,6 +6,7 @@ import { GameRanking } from '../../components/GameRanking';
 import { saveTimedAttempt } from '../../domain/answerTime';
 import { makeGameSound } from './gameSounds';
 import './PhoneGameScreen.css';
+import { GamePrompt, GameChoices, beginnerPlayClass } from './BeginnerPlayLayout';
 type Phase = 'intro' | 'listening' | 'question' | 'feedback' | 'calling' | 'result';
 const game = 'lesson9-phone';
 export function PhoneGameScreen({ onBack }: { onBack: () => void }) {
@@ -91,20 +92,23 @@ export function PhoneGameScreen({ onBack }: { onBack: () => void }) {
  const source=phone?(digit===0?`${import.meta.env.BASE_URL}beginner/audio/games/phone/${reverse?'ru':'vi'}-0.mp3`:`${import.meta.env.BASE_URL}beginner/audio/games/${reverse?'numbers-ru':'numbers'}/${digit}.mp3`):undefined;
  if(phase==='intro'||phase==='result')return <div className="screen ranking-screen"><BackButton onClick={onBack} label="К числительным"/><h1 className="screen-title">Цифры 1–10 · Номер телефона</h1><GameRanking game={game} total={20} onStart={begin} startAtBottom startLabel={phase==='result'?'Играть ещё':'Начать'} result={phase==='result'?score:undefined}/></div>;
  const calling=phase==='calling';
- return <div className="screen screen-phone-game phone-blitz">
+ return <div className={"screen screen-phone-game phone-blitz " + beginnerPlayClass}>
   <BackButton onClick={stop} label="К числительным"/>
-  <div className="phone-blitz-status"><strong>Номер {numberIndex+1}/2 · {Math.min(at+1,20)}/20 · ✓ {score.correct}</strong><span className={'phone-blitz-clock'+(left<=3000?' phone-blitz-urgent':'')} aria-label="Время на ответ">{calling?'☎':paused?'Ⅱ':Math.ceil(left/1000)}</span></div>
-  <div className="phone-blitz-timebar"><div style={{width:`${left/50}%`}}/></div>
+  <h1 className="screen-title">Номер телефона</h1>
+  <div className="phone-blitz-status work-status"><strong>Номер {numberIndex+1}/2 · {Math.min(at+1,20)}/20 · ✓ {score.correct}</strong><span className={'phone-blitz-clock work-clock'+(left<=3000?' phone-blitz-urgent':'')} aria-label="Время на ответ">{calling?'☎':paused?'Ⅱ':Math.ceil(left/1000)}</span></div>
+  <div className="phone-blitz-timebar work-timebar"><div style={{width:`${left/50}%`}}/></div>
   <audio ref={voice} src={source} preload="auto"/>
   <audio ref={tone} src={toneUrl} preload="auto"/>
+  <GamePrompt label={calling?'☎️':reverse?digit:'🔊'}>
   <div className={'phone-display'+(calling?' phone-ringing':'')}>
    <span className="phone-handset" aria-hidden="true">☎️</span>
    <div className="phone-digits" aria-label="Набранный номер">{Array.from({length:10},(_,i)=><span key={i} className={i===position&&!calling?'phone-digit-current':''}>{i<position||calling||(i===position&&phase==='feedback')?phone[i]:'·'}</span>)}</div>
   </div>
   <div className="phone-blitz-prompt"><small>{reverse?'Выбери вьетнамское название':'Слушай цифру по-вьетнамски'}</small><strong>{calling?'☎️':reverse?digit:'🔊'}</strong></div>
   <p className="phone-feedback" role="status">{paused ? 'Игра на паузе' : calling ? 'Номер набран! Звоним…' : phase === 'listening' ? 'Включаем запись…' : '\u00a0'}</p>
-  <div className={'phone-keypad'+(reverse?' phone-keypad-words':'')}>{[1,2,3,4,5,6,7,8,9,0].map(value=><button key={value} data-digit={value} lang={reverse?'vi':undefined} className={'phone-key'+(value===0?' phone-key-zero':'')+(wrong===value?' phone-key-wrong':'')+(phase==='feedback'&&value===digit?' phone-key-correct':'')} disabled={phase!=='question'||paused} onClick={()=>choose(value)}>{reverse?phoneDigitWords[value]:value}</button>)}</div>
-  {paused?<button className="big-button" onClick={()=>{audio.current.ready();deadline.current=Date.now()+frozen.current;setPaused(false);}}>Продолжить</button>:<button className="secondary-button" disabled={calling||phase==='feedback'} onClick={replay}>Повторить цифру</button>}
+  <div className="phone-replay">{paused?<button className="big-button" onClick={()=>{audio.current.ready();deadline.current=Date.now()+frozen.current;setPaused(false);}}>Продолжить</button>:<button className="secondary-button phone-replay-button" aria-label="Повторить цифру" disabled={calling||phase==='feedback'} onClick={replay}>Повторить цифру</button>}</div>
   <p className="phone-blitz-error" role="alert">{error}</p>
+  </GamePrompt>
+  <GameChoices count={10} columns={3} rows={4} className={'phone-keypad'+(reverse?' phone-keypad-words':'')}>{[1,2,3,4,5,6,7,8,9,0].map(value=><button key={value} data-digit={value} lang={reverse?'vi':undefined} className={'phone-key'+(value===0?' phone-key-zero':'')+(wrong===value?' phone-key-wrong':'')+(phase==='feedback'&&value===digit?' phone-key-correct':'')} disabled={phase!=='question'||paused} onClick={()=>choose(value)}>{reverse?phoneDigitWords[value]:value}</button>)}</GameChoices>
  </div>;
 }

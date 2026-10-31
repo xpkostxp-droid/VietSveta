@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { BackButton } from './BackButton';
 import { dialogueSentences, dialogueTokens, dialogueWordGroups } from '../content/games/dialogues';
 import type { NumberGameDirection } from './GameDirectionScreen';
+import { GamePrompt, GameChoices, GameProgress, beginnerPlayClass } from './BeginnerPlayLayout';
 export function DialogueGameScreen({ direction, onBack }: { direction: NumberGameDirection; onBack: () => void }) {
   const [index, setIndex] = useState(0), [position, setPosition] = useState(0);
   const [hint, setHint] = useState(false), [wrong, setWrong] = useState<string | null>(null);
@@ -46,19 +47,19 @@ export function DialogueGameScreen({ direction, onBack }: { direction: NumberGam
     setWrong(null); positionRef.current++; setPosition(positionRef.current);
     if (positionRef.current === tokens.length) { locked.current = true; setComplete(true); void play('vi', true); }
   }
-  return <div className="screen screen-dialogue-game">
+  return <div className={"screen screen-dialogue-game" + (sentence ? " beginner-builder " + beginnerPlayClass : "")}>
     <BackButton onClick={onBack} label="К диалогам" />
     <span className="badge">Урок 9 · Диалоги</span><h1 className="screen-title">Собери фразу</h1>
     <audio ref={vi} src={sentence ? `${import.meta.env.BASE_URL}beginner/audio/games/dialogues/${index === 1 ? 'vi-price-430' : `vi-${index}`}.mp3?v=short-3` : undefined} preload="auto" onEnded={next} />
     <audio ref={ru} src={sentence ? `${import.meta.env.BASE_URL}beginner/audio/games/dialogues/${index === 1 ? 'ru-price-430' : `ru-${index}`}.mp3?v=short-3` : undefined} preload="auto" />
     {!sentence ? <div className="summary-box"><h2>Все 17 фраз собраны!</h2><p>Ошибок: {mistakes}</p><button className="big-button" onClick={() => { setMistakes(0); setIndex(0); }}>Начать заново</button></div> : <>
-      <p className="hint-text">Фраза {index + 1} из {dialogueSentences.length} · {direction === 'vi-ru' ? 'Вьетнамский → Русский' : 'Русский → Вьетнамский'}</p>
-      {(direction === 'ru-vi' || hint || complete) && <p className="dialogue-translation">{sentence.ru}</p>}
-      <div className="dialogue-controls"><button className="secondary-button" onClick={() => void play(complete ? 'vi' : direction === 'ru-vi' ? 'ru' : 'vi', complete)}>Послушать ещё раз</button>{direction === 'vi-ru' && !hint && !complete && <button className="secondary-button" onClick={() => setHint(true)}>Подсказка</button>}</div>
-      <div className={`big-number-answer dialogue-answer${complete ? ' big-number-complete' : ''}`} aria-label="Собранная фраза">{tokens.map((_, i) => <span key={i} className={`big-number-slot${i === position ? ' big-number-next' : ''}`} lang="vi">{i < position ? displayed[i] : '···'}</span>)}</div>
-      <p className="big-number-feedback" role="status">{'\u00a0'}</p>
-      {error && <div><p className="pronunciation-error" role="alert">{error}</p>{complete && <button className="secondary-button" onClick={next}>Следующая фраза</button>}</div>}
-      <div className="dialogue-word-groups">{groups.map(group => <section key={group.label}><h2>{group.label}</h2><div className="big-number-tiles">{group.words.map(word => <button key={word} lang="vi" disabled={complete} className={`big-number-tile${wrong === word ? ' big-number-wrong' : ''}`} onClick={() => choose(word)}>{word}</button>)}</div></section>)}</div>
+      <GameProgress progress={index / dialogueSentences.length * 100}>Фраза {index + 1} из {dialogueSentences.length} · Ошибок: {mistakes}</GameProgress>
+      <GamePrompt label={direction === 'ru-vi' || hint || complete ? sentence.ru : 'Слушай фразу'} long>
+        <div className="beginner-prompt-tools"><button className="secondary-button" onClick={() => void play(complete ? 'vi' : direction === 'ru-vi' ? 'ru' : 'vi', complete)}>Послушать ещё раз</button>{direction === 'vi-ru' && !hint && !complete && <button className="secondary-button" onClick={() => setHint(true)}>Подсказка</button>}</div>
+        <div className="beginner-prompt-content"><div className={`big-number-answer dialogue-answer${complete ? ' big-number-complete' : ''}`} aria-label="Собранная фраза">{tokens.map((_, i) => <span key={i} className={`big-number-slot${i === position ? ' big-number-next' : ''}`} lang="vi">{i < position ? displayed[i] : '···'}</span>)}</div></div>
+        {error && <div className="beginner-prompt-note pronunciation-error"><p role="alert">{error}</p>{complete && <button className="secondary-button" onClick={next}>Следующая фраза</button>}</div>}
+      </GamePrompt>
+      <GameChoices key={index} className="beginner-word-bank dialogue-word-groups">{groups.map(group => <section key={group.label}><h2>{group.label}</h2><div className="big-number-tiles">{group.words.map(word => <button key={word} lang="vi" disabled={complete} className={`big-number-tile${wrong === word ? ' big-number-wrong' : ''}`} onClick={() => choose(word)}>{word}</button>)}</div></section>)}</GameChoices>
     </>}
   </div>;
 }

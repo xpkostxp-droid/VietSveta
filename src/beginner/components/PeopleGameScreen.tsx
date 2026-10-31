@@ -7,6 +7,7 @@ import { BackButton } from './BackButton';
 import { PeoplePicture } from './PeoplePicture';
 import './ProfessionsGameScreen.css';
 import { makeGameSound } from './gameSounds';
+import { GamePrompt, GameChoices } from './BeginnerPlayLayout';
 type Result = { correct: number; time: number };
 export function PeopleGameScreen({ onBack }: { onBack: () => void }) {
   const group = 'people';
@@ -82,7 +83,7 @@ export function PeopleGameScreen({ onBack }: { onBack: () => void }) {
     stopSpeaking(); locked.current = true; setPhase('intro'); setTasks([]); setPaused(false);
     if (phase === 'intro') onBack();
   };
-  return <div className={"screen family-screen work-blitz" + (phase === 'playing' || phase === 'feedback' ? ' work-active' : '')}>
+  return <div className={"screen family-screen work-blitz" + (phase === 'playing' || phase === 'feedback' ? ' work-active profession-session beginner-play' : '')}>
     <BackButton onClick={back} label={group ? 'Назад' : 'К играм'} />
     <span className="badge">Урок 8 · Я, мы, они и все</span>
     <h1 className="screen-title">{title?.label ?? 'Я, мы, они и все'}</h1>
@@ -94,12 +95,9 @@ export function PeopleGameScreen({ onBack }: { onBack: () => void }) {
         /> : word && <>
         <div className="work-status"><strong>{position + 1}/{tasks.length} · ✓ {score.correct}</strong><span className="work-clock" aria-label="Осталось секунд">{Math.ceil(remaining / 1000)}</span></div>
         <div className="work-timebar"><div style={{ width: `${remaining / 50}%` }} /></div>
-        <div className={'family-card work-prompt ' + (current.reverse ? 'work-prompt-text' : '')}>
-          {!current.reverse && <PeoplePicture id={word[0]} />}
-          <h2 lang={current.reverse ? 'vi' : 'ru'}>{current.reverse ? word[1] : word[2]}</h2>
-        </div>
-        {paused ? <button className="big-button" onClick={() => { audio.current.ready(); started.current = performance.now(); setPaused(false); }}>Продолжить</button> : <div className="family-choices work-options">{options.map(option => <button key={option} lang={current.reverse ? 'ru' : 'vi'} disabled={phase !== 'playing'} className={'choice-button ' + (phase === 'feedback' ? option === answer ? 'family-correct' : option === selected ? 'family-wrong' : '' : '')} onClick={() => finishAnswer(option)}>{option}</button>)}</div>}
-        <p className="family-feedback work-feedback" role="status">{paused ? 'Игра на паузе' : '\u00a0'}</p>
+        <GamePrompt label={current.reverse ? word[1] : word[2]} lang={current.reverse ? 'vi' : 'ru'} visual={!current.reverse ? <PeoplePicture id={word[0]} /> : undefined} />
+        {paused ? <button className="big-button" onClick={() => { audio.current.ready(); started.current = performance.now(); setPaused(false); }}>Продолжить</button> : <GameChoices>{options.map(option => <button key={option} lang={current.reverse ? 'ru' : 'vi'} disabled={phase !== 'playing'} className={'choice-button ' + (phase === 'feedback' ? option === answer ? 'family-correct' : option === selected ? 'family-wrong' : '' : '')} onClick={() => finishAnswer(option)}>{option}</button>)}</GameChoices>}
+        {paused&&<p className="family-feedback work-feedback" role="status">Игра на паузе</p>}
       </>}
 
   </div>;

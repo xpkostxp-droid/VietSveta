@@ -1,0 +1,123 @@
+/* Shared photo/blank-card layout for professions, work and travel.
+   Grow into the free space above the answers; preserve the original label width. */
+.beginner-area .screen.profession-session{height:100dvh}
+.beginner-area .screen.profession-session .work-prompt{
+ position:relative;display:flex;align-items:center;justify-content:center;
+ --profession-card-size:clamp(190px,32dvh,310px);
+ width:100%;height:auto;min-height:0;flex:1 1 0;container-type:size;
+ padding:0;margin:0;overflow:visible;background:transparent;border:0;border-radius:20px;box-shadow:none;
+}
+.beginner-area .screen.profession-session .profession-photo{display:block;width:100%;height:100%;max-height:none;object-fit:contain;margin:0;border-radius:0}
+.beginner-area .screen.profession-session .work-prompt h2{color:#754322;font-size:clamp(1.6rem,6.5vw,2.3rem);line-height:1.15;font-weight:850;overflow-wrap:anywhere}
+.beginner-area .screen.profession-session .profession-caption,
+.beginner-area .screen.profession-session .work-prompt-text h2{position:absolute;bottom:10px;left:50%;right:auto;transform:translateX(-50%);width:calc(min(100%,var(--profession-card-size)) - 20px);padding:9px 12px;background:#fff6e5f5;border:1px solid #e3d0ae;border-radius:14px;box-shadow:0 2px 6px #35281926;text-align:center}
+/* Both directions use the same full-width frame and bottom label anchor. */
+.beginner-area .screen.profession-session .work-prompt-text{width:100%;align-self:stretch;padding:0;border:0;background:transparent;box-shadow:none}
+.beginner-area .screen.profession-session .work-feedback{height:0;min-height:0;flex-basis:0;overflow:hidden}
+.beginner-area .screen.profession-session .work-options{margin:0}
+@media(max-height:650px){.beginner-area .screen.profession-session .work-prompt{--profession-card-size:clamp(120px,25dvh,165px)}}
+
+.beginner-area .screen.profession-session .work-prompt:not(.work-prompt-text){border:0;background:transparent;box-shadow:none}
+.beginner-area .screen.profession-session .profession-illustration{position:absolute;bottom:0;left:0;width:100%;height:100%;height:min(100cqw,100cqh);overflow:hidden;border-radius:20px;background:#fffdf8}
+.beginner-area .screen.profession-session .profession-empty{box-shadow:inset 0 0 0 1px #d5e9e4}
+.beginner-area .screen.profession-session .profession-illustration .profession-photo{width:100%;height:100%;object-fit:cover;object-position:center top}
+
+/* Layout adapters only. Button count, answer order and game state stay in each game. */
+.beginner-area .screen.profession-session.beginner-play{max-width:720px;text-align:initial;gap:8px}
+.beginner-area .screen.profession-session.beginner-play > audio{display:none}
+.beginner-area .screen.profession-session.beginner-play .work-options{
+ display:grid;grid-template-columns:repeat(var(--play-columns,1),minmax(0,1fr));
+ grid-template-rows:repeat(var(--play-rows,3),var(--play-answer-height));gap:8px;
+ width:100%;max-width:none;margin:0;min-height:0;flex-shrink:0;
+}
+.beginner-area .screen.profession-session.beginner-play .work-options button{
+ box-sizing:border-box;width:100%;height:var(--play-answer-height);min-height:var(--play-answer-height);
+ padding:8px 12px;border:2px solid #b8ded7;border-radius:18px;background:#fff;color:#193d40;
+ font:inherit;font-weight:800;font-size:clamp(1.2rem,4.8vw,1.4rem);line-height:1.2;
+ white-space:normal;overflow-wrap:anywhere;box-shadow:none;touch-action:manipulation;
+ display:flex;align-items:center;justify-content:center;
+}
+.beginner-area .screen.profession-session.beginner-play .work-options .family-correct,
+.beginner-area .screen.profession-session.beginner-play .work-options .phone-key-correct{background:#d5f3e6;border-color:#269c7a}
+.beginner-area .screen.profession-session.beginner-play .work-options .family-wrong,
+.beginner-area .screen.profession-session.beginner-play .work-options .phone-key-wrong,
+.beginner-area .screen.profession-session.beginner-play .work-options .cube-wrong,
+.beginner-area .screen.profession-session.beginner-play .work-options .big-number-wrong{background:#f6ded7;border-color:#d78b76}
+.beginner-area .screen.profession-session.beginner-play .profession-illustration > .family-picture{
+ display:block;width:100%;height:100%;max-width:none;max-height:none;margin:0;
+ object-fit:cover;object-position:center top;border-radius:0;
+}
+.beginner-area .screen.profession-session.beginner-play .profession-illustration > svg.family-picture{object-fit:contain}
+.beginner-area .screen.profession-session.beginner-play .profession-illustration > div.family-picture{
+ display:flex;align-items:center;justify-content:center;
+ font-size:clamp(6rem,28cqw,10rem)!important;line-height:1!important;background:transparent!important;border-radius:0!important;
+}
+.beginner-area .screen.profession-session.beginner-play .work-prompt .beginner-caption-long{min-height:calc(1.15 * clamp(1.6rem,6.5vw,2.3rem) + 20px);font-size:clamp(1.05rem,4.2vw,1.4rem);max-height:65%;overflow:auto}
+.beginner-area .screen.profession-session.beginner-play .beginner-progress{font-size:1rem;gap:8px}
+.beginner-area .screen.profession-session.beginner-play .beginner-progress small{font-size:.7rem;font-weight:500;white-space:nowrap}
+.beginner-area .screen.profession-session.beginner-play .beginner-prompt-tools{position:absolute;top:10px;left:10px;right:10px;z-index:2;display:flex;justify-content:flex-end;gap:8px}
+.beginner-area .screen.profession-session.beginner-play .beginner-prompt-tools button{min-height:32px;max-width:100%;padding:4px 10px;font-size:.8rem;border-radius:12px;margin:0}
+.beginner-area .screen.profession-session.beginner-play .beginner-prompt-content{position:absolute;inset:52px 14px 80px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:0;overflow:auto}
+.beginner-area .screen.profession-session.beginner-play .beginner-prompt-note{position:absolute;top:48px;left:12px;right:12px;margin:0;font-size:.75rem;line-height:1.25;text-align:center}
+.beginner-area .screen.profession-session.beginner-play .beginner-prompt-content .family-counter{font-size:.8rem;margin:0}
+.beginner-area .screen.profession-session.beginner-play .beginner-sr-only{position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+/* A keypad and a word bank retain their native number of choices. */
+.beginner-area .screen.profession-session.beginner-play .phone-keypad{grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(4,var(--play-answer-height));gap:8px}
+.beginner-area .screen.profession-session.beginner-play .phone-key-zero{grid-column:2}
+.beginner-area .screen.profession-session.beginner-play .phone-key:disabled{opacity:1}
+.beginner-area .screen.profession-session.beginner-play .phone-display{position:absolute;top:4px;left:8px;right:48px;height:40px;padding:2px;background:transparent;border:0}
+.beginner-area .screen.profession-session.beginner-play .phone-blitz-prompt{position:absolute;top:43px;left:12px;right:12px;height:auto;font-size:.7rem}
+.beginner-area .screen.profession-session.beginner-play .phone-blitz-prompt strong{display:none}
+.beginner-area .screen.profession-session.beginner-play .phone-feedback{position:absolute;top:62px;left:12px;right:12px;min-height:0;height:auto;margin:0;font-size:.7rem}
+.beginner-area .screen.profession-session.beginner-play .phone-blitz-error{position:absolute;top:81px;left:12px;right:12px;min-height:0;height:auto;font-size:.65rem}
+.beginner-area .screen.profession-session.beginner-play .phone-replay{position:absolute;top:6px;left:auto;right:6px;display:flex;justify-content:center}
+.beginner-area .screen.profession-session.beginner-play .phone-replay button{min-height:28px;padding:2px 10px;font-size:.75rem}
+/* Cubes keep their column/row positions and clearing/falling animations. */
+.beginner-area .screen.profession-session.beginner-play .cube-position,
+.beginner-area .screen.profession-session.beginner-play .hotel-plaque-slot,
+.beginner-area .screen.profession-session.beginner-play .banknote-slot{position:relative;top:auto;width:auto;height:100%;min-width:0;padding:0;overflow:visible}
+.beginner-area .screen.profession-session.beginner-play .number-cube::before,
+.beginner-area .screen.profession-session.beginner-play .number-cube::after{display:none}
+.beginner-area .screen.profession-session.beginner-play .banknote-featured{position:absolute;inset:70px 12px 82px;width:auto;height:auto;max-width:none;max-height:none;margin:0;display:flex;align-items:center}
+.beginner-area .screen.profession-session.beginner-play .banknote-featured .banknote-view{width:100%}
+.beginner-area .screen.profession-session.beginner-play .banknote-choice .banknote-view{width:100%;max-height:100%}
+.beginner-area .screen.profession-session.beginner-play .banknote-source{position:absolute;bottom:3px;left:20px;right:20px;text-align:center;font-size:.6rem}
+.beginner-area .screen.profession-session.beginner-play .beginner-word-bank{
+ display:block;height:calc(3 * var(--play-answer-height) + 16px);min-height:0;overflow:auto;overscroll-behavior:contain;
+}
+.beginner-area .screen.profession-session.beginner-play .beginner-word-bank > .big-number-tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0}
+.beginner-area .screen.profession-session.beginner-play .beginner-word-bank section > h2{font-size:.75rem;margin:6px 0}
+.beginner-area .screen.profession-session.beginner-play .beginner-word-bank section:first-child > h2{margin-top:0}
+.beginner-area .screen.profession-session.beginner-play .beginner-word-bank section .big-number-tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0}
+.beginner-area .screen.profession-session.beginner-play .beginner-word-bank button{font-size:1rem}
+.beginner-area .screen.profession-session.beginner-play .big-number-answer{width:100%;margin:0;padding:2px;gap:4px;min-height:0;justify-content:center;overflow:auto;flex-wrap:wrap;flex-shrink:0}
+.beginner-area .screen.profession-session.beginner-play .big-number-slot{min-width:22px;min-height:24px;height:24px;padding:3px;font-size:.85rem;line-height:1.2;display:flex;align-items:center;justify-content:center}
+@media(max-height:740px){.beginner-area .screen.profession-session.beginner-play{gap:6px}}
+@media(max-height:650px){
+ .beginner-area .screen.profession-session.beginner-play .work-options button{font-size:1.15rem}
+ .beginner-area .screen.profession-session.beginner-play .beginner-word-bank button{font-size:.95rem}
+    }
+.beginner-area .screen.profession-session.beginner-play .phone-blitz-status{height:40px;min-height:40px;font-size:1rem;margin:0}
+.beginner-area .screen.profession-session.beginner-play .phone-blitz-clock{width:40px;height:40px}
+.beginner-area .screen.profession-session.beginner-play .phone-handset{font-size:22px;width:24px;height:24px}
+.beginner-area .screen.profession-session.beginner-play .phone-digits{font-size:clamp(.9rem,4vw,1.25rem)}
+.beginner-area .screen.profession-session.beginner-play .phone-replay .phone-replay-button{width:34px;height:32px;padding:0;font-size:0}
+.beginner-area .screen.profession-session.beginner-play .phone-replay-button::before{content:'↻';font-size:1.3rem}
+.beginner-area .screen.profession-session.beginner-play .beginner-cube-choices{overflow:hidden}
+.beginner-area .screen.profession-session.beginner-play .beginner-prompt-note.pronunciation-error{top:76px;max-height:54px;overflow:auto;z-index:3;background:#fffdf8}
+.beginner-area .screen.profession-session.beginner-play .beginner-prompt-note.pronunciation-error p{margin:0}
+.beginner-area .screen.profession-session.beginner-play.beginner-builder .beginner-prompt-content{inset:62px 12px 45%}
+.beginner-area .screen.profession-session.beginner-play.beginner-builder .beginner-caption-long{max-height:40%}
+.beginner-area .screen.profession-session.beginner-play .beginner-word-bank{height:calc(var(--play-rows,3) * var(--play-answer-height) + (var(--play-rows,3) - 1) * 8px)}
+
+.beginner-area .screen.profession-session.beginner-play .profession-illustration > img.family-picture{object-fit:cover!important;border-radius:0!important}
+.beginner-area .screen.profession-session.beginner-play .beginner-prompt-note{padding:4px 6px;border-radius:8px;background:#fffdf8e6}
+.beginner-area .screen.profession-session.beginner-play .big-number-answer-digits .big-number-digit-slot{min-width:14px;height:24px;flex:0 1 20px;padding:0;font-size:.85rem}
+.beginner-area .screen.profession-session.beginner-play .big-number-answer-digits .big-number-group-start{margin-left:8px}
+@media(max-height:650px){
+ .beginner-area .screen.profession-session.beginner-play.beginner-builder .beginner-prompt-content{inset:48px 12px 45%}
+ .beginner-area .screen.profession-session.beginner-play.beginner-builder .beginner-prompt-note:not(.pronunciation-error){position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip-path:inset(50%)}
+}
+
+.beginner-area .screen.profession-session.beginner-play .phone-blitz-error:not(:empty){top:43px;max-height:40px;overflow:auto;z-index:4;background:#fffdf8}
+.beginner-area .screen.profession-session.beginner-play.beginner-builder .beginner-prompt-note.pronunciation-error{top:44px;max-height:38px}

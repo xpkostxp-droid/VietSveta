@@ -2,6 +2,7 @@ import { bigNumberAudio } from '../content/games/bigNumberAudio';
 import { useEffect, useRef, useState } from 'react';
 import { BackButton } from './BackButton';
 import { bigNumbers, bigNumberWords, bigNumberTiles, matchesNumberWord } from '../content/games/bigNumbers';
+import { GamePrompt, GameChoices, GameProgress, beginnerPlayClass } from './BeginnerPlayLayout';
 export function BigNumbersGameScreen({ onBack, reverse = false }: { onBack: () => void; reverse?: boolean }) {
   const [numbers, setNumbers] = useState(bigNumbers);
   const [index, setIndex] = useState(0);
@@ -74,7 +75,7 @@ export function BigNumbersGameScreen({ onBack, reverse = false }: { onBack: () =
       lock.current = true; setComplete(true);
     }
   }
-  return <div className="screen screen-big-numbers">
+  return <div className={"screen screen-big-numbers" + (index < numbers.length ? " beginner-builder " + beginnerPlayClass : "")}>
     <BackButton onClick={onBack} label="К выбору направления" />
     <span className="badge">Урок 9 · Числа и возраст</span>
     <h1 className="screen-title">Большие числа</h1>
@@ -82,14 +83,16 @@ export function BigNumbersGameScreen({ onBack, reverse = false }: { onBack: () =
     {reverse && <audio ref={phraseRef} preload="auto" />}
     {!reverse && bigNumberTiles.map((word, i) => <audio key={word} ref={element => { voiceRefs.current[i] = element; }} src={`${import.meta.env.BASE_URL}beginner/audio/games/number-words/${i}.mp3?v=all-words-2`} preload="auto" />)}
     {index >= numbers.length ? <div className="summary-box"><h2>Все 10 чисел собраны!</h2><p>Ошибок: {mistakes}</p><button className="big-button" onClick={() => { setNumbers(bigNumbers()); setIndex(0); setAnswer([]); setMistakes(0); setWrong(null); }}>Ещё 10 чисел</button></div> : <>
-      <div className="big-number-progress">Число {index + 1} из 10</div>
-      <div className={`big-number-value${reverse ? ' big-number-value-words' : ''}`} lang={reverse ? 'vi' : undefined}>{reverse ? words.join(' ') : numbers[index].toLocaleString('ru-RU')}</div>
-      {reverse && <button className="secondary-button" disabled={!phraseReady} onClick={() => { const audio = phraseRef.current; if (audio) { audio.currentTime = 0; setAudioError(''); void audio.play().catch(() => setAudioError('Не удалось включить звук. Попробуй ещё раз.')); } }}>Послушать число</button>}
-      <p className="hint-text">{reverse ? 'Собери число цифрами — выбирай по порядку.' : 'Собери число по-вьетнамски — выбирай слова по порядку.'}</p>
-      <div className={`big-number-answer${reverse ? ' big-number-answer-digits' : ''}${complete ? ' big-number-complete' : ''}`} aria-label="Ответ" aria-live="polite">{tokens.map((_, i) => <span key={i} className={`big-number-slot${reverse ? ' big-number-digit-slot' : ''}${reverse && i > 0 && (tokens.length - i) % 3 === 0 ? ' big-number-group-start' : ''}${i === answer.length ? ' big-number-next' : ''}`}>{answer[i] || (reverse ? '·' : '···')}</span>)}</div>
-      <p className="big-number-feedback" role="status">{'\u00a0'}</p>
-      {audioError && <p role="alert" className="pronunciation-error">{audioError}</p>}
-      <div className={`big-number-tiles${reverse ? ' big-number-digit-tiles' : ''}`}>{tiles.map(word => <button key={word} lang={reverse ? undefined : 'vi'} disabled={complete || speaking} className={`big-number-tile${wrong === word ? ' big-number-wrong' : ''}`} onClick={() => choose(word)}>{word}</button>)}</div>
+      <GameProgress progress={index * 10}>Число {index + 1} из 10 · Ошибок: {mistakes}</GameProgress>
+      <GamePrompt label={reverse ? words.join(' ') : numbers[index].toLocaleString('ru-RU')} lang={reverse ? 'vi' : undefined} long={reverse}>
+        <div className="beginner-prompt-tools">{reverse && <button className="secondary-button" disabled={!phraseReady} onClick={() => { const audio = phraseRef.current; if (audio) { audio.currentTime = 0; setAudioError(''); void audio.play().catch(() => setAudioError('Не удалось включить звук. Попробуй ещё раз.')); } }}>Послушать число</button>}</div>
+        <p className="beginner-prompt-note">{reverse ? 'Собери число цифрами — выбирай по порядку.' : 'Собери число по-вьетнамски — выбирай слова по порядку.'}</p>
+        <div className="beginner-prompt-content"><div className={`big-number-answer${reverse ? ' big-number-answer-digits' : ''}${complete ? ' big-number-complete' : ''}`} aria-label="Ответ" aria-live="polite">{tokens.map((_, i) => <span key={i} className={`big-number-slot${reverse ? ' big-number-digit-slot' : ''}${reverse && i > 0 && (tokens.length - i) % 3 === 0 ? ' big-number-group-start' : ''}${i === answer.length ? ' big-number-next' : ''}`}>{answer[i] || (reverse ? '·' : '···')}</span>)}</div></div>
+        {audioError && <p role="alert" className="beginner-prompt-note pronunciation-error">{audioError}</p>}
+      </GamePrompt>
+      <GameChoices key={index} columns={3} rows={reverse ? 4 : 3} className="beginner-word-bank">
+        <div className={`big-number-tiles${reverse ? ' big-number-digit-tiles' : ''}`}>{tiles.map(word => <button key={word} lang={reverse ? undefined : 'vi'} disabled={complete || speaking} className={`big-number-tile${wrong === word ? ' big-number-wrong' : ''}`} onClick={() => choose(word)}>{word}</button>)}</div>
+      </GameChoices>
     </>}
   </div>;
 }

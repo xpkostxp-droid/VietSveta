@@ -4,6 +4,7 @@ import { restaurantWords as familyWords, restaurantOptions, restaurantIndices, r
 import { hasVietnameseVoice, onVoicesChanged, speakVietnamese, stopSpeaking } from '../domain/speech';
 import { BackButton } from './BackButton';
 import { RestaurantPicture as FamilyPicture } from './RestaurantPicture';
+import { GamePrompt, GameChoices, GameProgress, beginnerPlayClass } from './BeginnerPlayLayout';
 type Mode = 'learn' | 'blitz';
 export function RestaurantGameScreen({ onBack }: { onBack: () => void }) {
   const [category, setCategory] = useState<RestaurantCategory>('all');
@@ -36,7 +37,7 @@ export function RestaurantGameScreen({ onBack }: { onBack: () => void }) {
     timer.current = setTimeout(() => { setWins(next.wins); prepare(next.queue); }, 1800);
   };
   const mastered = Object.values(wins).filter(n => n >= 2).length;
-  return <div className="screen family-screen">
+  return <div className={"screen family-screen" + (mode && current ? " " + beginnerPlayClass : "")}>
     <BackButton onClick={mode ? exit : onBack} label={mode ? 'К выбору режима' : 'К играм'} />
     <span className="badge">Ресторан</span><h1 className="screen-title">{mode === 'learn' ? 'Ресторан · Обучение' : mode === 'blitz' ? review ? 'Повтор ошибок' : 'Блиц · Ресторан' : 'Ресторан'}</h1>
     {!mode ? <>
@@ -46,17 +47,18 @@ export function RestaurantGameScreen({ onBack }: { onBack: () => void }) {
       {restaurantCategories.map(([value,label]) => <button key={value} className="lesson-item family-mode" onClick={() => start('learn', value)}><strong>🌱 {label}</strong><span>{restaurantIndices(value).length} заданий · Обучение</span></button>)}
       <button className="lesson-item family-mode" onClick={() => start('blitz', 'all')}><strong>⚡ Блиц · Всё вперемешку</strong><span>Все 60 заданий один раз. Ошибки повторим отдельно.</span></button>
     </> : current ? <>
-      <p className="family-counter">{mode === 'learn' ? `Закреплено: ${mastered} из ${total}` : review ? `Осталось в повторе: ${queue.length}` : `Карточка ${total + 1 - queue.length} из ${total}`} · Без таймера</p>
-      <div className="family-card"><FamilyPicture id={current[0]} /><h2>{current[2]}</h2></div>
-      <div className="family-choices">{options.map(i => <button key={i} disabled={correct || wrong.includes(i)} className={'choice-button ' + (wrong.includes(i) ? 'family-wrong' : correct && i === index ? 'family-correct' : '')} onClick={() => answer(i)}>{familyWords[i][1]}</button>)}</div>
-      <p className="family-feedback" role="status">{'\u00a0'}</p>
-      {correct && <button className="secondary-button" disabled={!voice} onClick={() => speakVietnamese(restaurantSpeech(index))}>🔊 Послушать ещё</button>}
+      <GameProgress progress={100 * (mode === 'learn' ? mastered : total - queue.length) / total}>{mode === 'learn' ? `Закреплено: ${mastered} из ${total}` : review ? `Осталось в повторе: ${queue.length}` : `Карточка ${total + 1 - queue.length} из ${total}`}</GameProgress>
+      <GamePrompt label={current[2]} lang="ru" visual={<FamilyPicture id={current[0]} />}>
+        <div className="beginner-prompt-tools">{correct && <button className="secondary-button" disabled={!voice} onClick={() => speakVietnamese(restaurantSpeech(index))}>🔊 Послушать ещё</button>}</div>
+        {!voice && <p className="beginner-prompt-note">Для озвучки нужен вьетнамский голос на устройстве. Играть можно без звука.</p>}
+      </GamePrompt>
+      <GameChoices count={options.length}>{options.map(i => <button key={i} disabled={correct || wrong.includes(i)} className={'choice-button ' + (wrong.includes(i) ? 'family-wrong' : correct && i === index ? 'family-correct' : '')} onClick={() => answer(i)}>{familyWords[i][1]}</button>)}</GameChoices>
     </> : <div className="family-result">
       <FamilyPicture id="restaurant-17" /><h2>{mode === 'learn' ? 'Все слова закреплены!' : review ? 'Повтор завершён!' : 'Блиц завершён!'}</h2>
       <p>{mode === 'learn' ? `Все ${total} слов и выражений угаданы дважды без ошибки.` : review ? 'Все выбранные слова пройдены.' : `С первой попытки: ${firstCorrect} из ${total}`}</p>
       {mode === 'blitz' && errors.length > 0 && <><p>Для повторения: {errors.map(i => familyWords[i][2].toLowerCase()).join(', ')}.</p><button className="big-button" onClick={() => { const next = shuffled(errors); setErrors([]); setReview(true); prepare(next); }}>Повторить ошибки · {errors.length}</button></>}
       <button className="big-button" onClick={() => start(mode)}>Сыграть заново</button><button className="secondary-button" onClick={exit}>К выбору режима</button>
     </div>}
-    {mode && !voice && <p className="family-note">Для озвучки нужен вьетнамский голос на устройстве. Играть можно без звука.</p>}
+    {mode && !current && !voice && <p className="family-note">Для озвучки нужен вьетнамский голос на устройстве. Играть можно без звука.</p>}
   </div>;
 }
