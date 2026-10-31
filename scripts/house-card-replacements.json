@@ -1,0 +1,100 @@
+[
+  {
+    "number": 5,
+    "id": "rent",
+    "label": "Арендовать",
+    "prompt": "Use case: illustration-story. Asset type: a single square 1:1 vocabulary illustration for a Vietnamese learning game, replacing a schematic icon with rich beautiful scene. Scene: A cheerful bespectacled brown-haired adult man at a wooden table signing a house rental agreement, a friendly Vietnamese agent hands him a shiny house key, a cute fluffy orange tabby cat sits in an open moving box beside him. Through the wide open door a beautiful tropical Vietnamese home and flowering trees. Clear rental/moving-in story; paper is blank with only indistinct decorative strokes, absolutely no readable text. Style: polished warm storybook illustration with appealing expressive slightly exaggerated characters, painterly detailed 3D-like textures, charming playful realism, lush sunny Vietnamese tropical setting, cream architecture, honey/terracotta/leaf-green colors. Not a flat icon or diagram. Composition: all essential subjects concentrated centrally in upper 75% with clear silhouette; generous side margins for mobile crop, lower 15% unobtrusive for app caption. The concept must remain immediately readable at thumbnail size. No words, labels, letters, numbers, UI, border, watermark or collage.",
+    "file": "public/beginner/images/games/house/rent.webp",
+    "size": [
+      768,
+      768
+    ],
+    "generation": "Built-in imagegen"
+  },
+  {
+    "number": 6,
+    "id": "landlord",
+    "label": "Хозяин дома / арендодатель",
+    "prompt": "Use case: illustration-story. Asset type: a single square 1:1 vocabulary illustration for a Vietnamese learning game, replacing a schematic icon with rich beautiful scene. Scene: A welcoming middle-aged Vietnamese male landlord proudly standing at the entrance of his charming cream villa, showing a large key ring with several house keys in his open hand. Beside him a comically self-important fluffy orange tabby cat sits on the gatepost like the true boss of the house. Lush tropical plants, detailed wooden doorway. Landlord is the clear central main subject, friendly expressive face, no readable text. Style: polished warm storybook illustration with appealing expressive slightly exaggerated characters, painterly detailed 3D-like textures, charming playful realism, lush sunny Vietnamese tropical setting, cream architecture, honey/terracotta/leaf-green colors. Not a flat icon or diagram. Composition: all essential subjects concentrated centrally in upper 75% with clear silhouette; generous side margins for mobile crop, lower 15% unobtrusive for app caption. The concept must remain immediately readable at thumbnail size. No words, labels, letters, numbers, UI, border, watermark or collage.",
+    "file": "public/beginner/images/games/house/landlord.webp",
+    "size": [
+      768,
+      768
+    ],
+    "generation": "Built-in imagegen"
+  },
+  {
+    "number": 7,
+    "id": "land",
+    "label": "Земля",
+    "prompt": "Use case: illustration-story. Asset type: a single square 1:1 vocabulary illustration for a Vietnamese learning game, replacing a schematic icon with rich beautiful scene. Scene: An inviting open plot of rich fertile earth in a lush tropical Vietnamese neighborhood, four simple wooden survey stakes connected by thin string clearly outline the EMPTY land parcel; a little path and distant houses/palms. In foreground a fluffy orange tabby cat proudly digs a small hole, scattering a little soil. The land itself occupies most of the image and is unmistakable main subject. Warm sunlight, plants, tangible soil texture, absolutely no text. Style: polished warm storybook illustration with appealing expressive slightly exaggerated characters, painterly detailed 3D-like textures, charming playful realism, lush sunny Vietnamese tropical setting, cream architecture, honey/terracotta/leaf-green colors. Not a flat icon or diagram. Composition: all essential subjects concentrated centrally in upper 75% with clear silhouette; generous side margins for mobile crop, lower 15% unobtrusive for app caption. The concept must remain immediately readable at thumbnail size. No words, labels, letters, numbers, UI, border, watermark or collage.",
+    "file": "public/beginner/images/games/house/land.webp",
+    "size": [
+      768,
+      768
+    ],
+    "generation": "Built-in imagegen"
+  },
+  {
+    "number": 8,
+    "id": "cheap",
+    "label": "Дешёвый / недорогой",
+    "prompt": "Use case: illustration-story. Asset type: a single square 1:1 vocabulary illustration for a Vietnamese learning game, replacing a schematic icon with rich beautiful scene. Scene: A delighted bespectacled brown-haired adult man has found an affordable charming SMALL house: he holds the house key in one hand and shows only three small coins in his other palm, happily surprised by the bargain. A fluffy orange tabby cat peers curiously at the coins. The cozy modest cream cottage and tropical garden behind them are attractive and tidy. Expressive humorous scene about low cost, few coins prominent, no numbers, no words, no readable text. Style: polished warm storybook illustration with appealing expressive slightly exaggerated characters, painterly detailed 3D-like textures, charming playful realism, lush sunny Vietnamese tropical setting, cream architecture, honey/terracotta/leaf-green colors. Not a flat icon or diagram. Composition: all essential subjects concentrated centrally in upper 75% with clear silhouette; generous side margins for mobile crop, lower 15% unobtrusive for app caption. The concept must remain immediately readable at thumbnail size. No words, labels, letters, numbers, UI, border, watermark or collage.",
+    "file": "public/beginner/images/games/house/cheap.webp",
+    "size": [
+      768,
+      768
+    ],
+    "generation": "Built-in imagegen",
+    "editPrompt": "Edit target: provided affordable-house illustration. Keep the same warm detailed storybook style, man's face and glasses, ginger cat identity, tropical cottage and colors. Recompose the man's open palm containing THREE coins so it is RAISED NEXT TO HIS FACE in the UPPER THIRD of the square image, coins very clearly visible; move the cat onto a high garden wall beside his shoulder with its face also in the upper half, looking at the raised coins. His other hand still shows the house key. All essential faces, coins and key MUST be ABOVE 50% image height. Lower 45% should be unobtrusive body/garden because app caption overlays it and mobile crop removes the bottom. Keep anatomy natural and delight/humor, no text or numbers, no duplicated hands or cats."
+  },
+  {
+    "number": 9,
+    "id": "floor",
+    "label": "Этаж",
+    "prompt": "Use case: illustration-story. Asset type: a single square 1:1 vocabulary illustration for a Vietnamese learning game, replacing a schematic icon with rich beautiful scene. Scene: A beautiful three-storey tropical Vietnamese house shown as a clear dollhouse cutaway: three distinct horizontal FLOOR levels with realistic ceiling slabs separating them. The entire MIDDLE STOREY is warmly highlighted in golden sunlight, while lower and upper storeys have muted colors. On the middle storey a bespectacled brown-haired man and fluffy orange tabby cat look out together, the cat comically lounges at the balcony railing. Clear architectural teaching image of one floor/storey, no text, no floor numbers. Style: polished warm storybook illustration with appealing expressive slightly exaggerated characters, painterly detailed 3D-like textures, charming playful realism, lush sunny Vietnamese tropical setting, cream architecture, honey/terracotta/leaf-green colors. Not a flat icon or diagram. Composition: all essential subjects concentrated centrally in upper 75% with clear silhouette; generous side margins for mobile crop, lower 15% unobtrusive for app caption. The concept must remain immediately readable at thumbnail size. No words, labels, letters, numbers, UI, border, watermark or collage.",
+    "file": "public/beginner/images/games/house/floor.webp",
+    "size": [
+      768,
+      768
+    ],
+    "generation": "Built-in imagegen"
+  },
+  {
+    "number": 10,
+    "id": "stairs",
+    "label": "Лестница",
+    "prompt": "Use case: illustration-story. Asset type: a single square 1:1 vocabulary illustration for a Vietnamese learning game, replacing a schematic icon with rich beautiful scene. Scene: A lovely broad interior wooden STAIRCASE ascending diagonally in a bright cream tropical villa, elegant banister and clearly visible individual steps. A bespectacled brown-haired man halfway up the stairs carries a small moving box while a fluffy orange tabby cat confidently climbs the step immediately above him and looks back. Full staircase dominates the scene, delightful mildly comic moment, lush plants and warm natural daylight, no text. Style: polished warm storybook illustration with appealing expressive slightly exaggerated characters, painterly detailed 3D-like textures, charming playful realism, lush sunny Vietnamese tropical setting, cream architecture, honey/terracotta/leaf-green colors. Not a flat icon or diagram. Composition: all essential subjects concentrated centrally in upper 75% with clear silhouette; generous side margins for mobile crop, lower 15% unobtrusive for app caption. The concept must remain immediately readable at thumbnail size. No words, labels, letters, numbers, UI, border, watermark or collage.",
+    "file": "public/beginner/images/games/house/stairs.webp",
+    "size": [
+      768,
+      768
+    ],
+    "generation": "Built-in imagegen"
+  },
+  {
+    "number": 11,
+    "id": "elevator",
+    "label": "Лифт",
+    "prompt": "Use case: illustration-story. Asset type: a single square 1:1 vocabulary illustration for a Vietnamese learning game, replacing a schematic icon with rich beautiful scene. Scene: Inside a bright elegant Vietnamese apartment building lobby, large modern stainless-steel ELEVATOR doors stand OPEN, revealing the lit lift cabin. A bespectacled brown-haired man steps into the elevator carrying grocery bags while his fluffy orange tabby cat already sits inside waiting impatiently. The elevator and open cabin dominate the composition, visible round call button beside doors but no readable numbers or text. Warm inviting cinematic light, amusing everyday story. Style: polished warm storybook illustration with appealing expressive slightly exaggerated characters, painterly detailed 3D-like textures, charming playful realism, lush sunny Vietnamese tropical setting, cream architecture, honey/terracotta/leaf-green colors. Not a flat icon or diagram. Composition: all essential subjects concentrated centrally in upper 75% with clear silhouette; generous side margins for mobile crop, lower 15% unobtrusive for app caption. The concept must remain immediately readable at thumbnail size. No words, labels, letters, numbers, UI, border, watermark or collage.",
+    "file": "public/beginner/images/games/house/elevator.webp",
+    "size": [
+      768,
+      768
+    ],
+    "generation": "Built-in imagegen"
+  },
+  {
+    "number": 12,
+    "id": "room",
+    "label": "Комната",
+    "prompt": "Use case: illustration-story. Asset type: a single square 1:1 vocabulary illustration for a Vietnamese learning game, replacing a schematic icon with rich beautiful scene. Scene: A bright inviting nearly empty multipurpose ROOM in a tropical Vietnamese house, visible two walls meeting in corner, ceiling and polished floor, open doorway and sunny window. A bespectacled brown-haired man just moving in stands near doorway holding a small cardboard box, and a fluffy orange tabby cat sprawls contentedly in the huge sun patch in the center of the empty room as if claiming it. Room interior is the unmistakable main subject, no bed, no kitchen equipment, no sofa, no desk, no text. Style: polished warm storybook illustration with appealing expressive slightly exaggerated characters, painterly detailed 3D-like textures, charming playful realism, lush sunny Vietnamese tropical setting, cream architecture, honey/terracotta/leaf-green colors. Not a flat icon or diagram. Composition: all essential subjects concentrated centrally in upper 75% with clear silhouette; generous side margins for mobile crop, lower 15% unobtrusive for app caption. The concept must remain immediately readable at thumbnail size. No words, labels, letters, numbers, UI, border, watermark or collage.",
+    "file": "public/beginner/images/games/house/room.webp",
+    "size": [
+      768,
+      768
+    ],
+    "generation": "Built-in imagegen",
+    "editPrompt": "Edit target: provided bright empty-room illustration. Keep the architecture, tropical sunlight, polished floor, warm storybook style and man with box in the doorway. REMOVE the lounging cat from the floor and put that SAME fluffy ginger cat lounging on the wide sunlit WINDOW SILL at mid-right, with its whole body and face ABOVE THE MIDDLE of the square image, clearly visible against the window. Keep natural perspective: a thicker interior window ledge comfortably supports the cat. Lower 45% of image is now just beautiful empty polished floor, no important subjects, because the game caption overlays the lower area. Room remains clearly an empty multipurpose room, no extra furniture, no text, only one cat."
+  }
+]
