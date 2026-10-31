@@ -17,28 +17,33 @@ type Round={tasks:VerbTask[];at:number;options:number[];phase:'question'|'feedba
 export default function VerbsGameScreen({onBack}:{onBack:()=>void}){
  const [round,setRound]=useState<Round|null>(null),[feedbackPaused,setFeedbackPaused]=useState(false);
  const locked=useRef(false),saved=useRef(false),sounds=useRef<ReturnType<typeof createDragonSounds>|null>(null);
- const feedbackLeft=useRef(FEEDBACK_MS),speechDone=useRef(false);
- const clock=useFiveSecondQuestionTimer(()=>answer(null),()=>{sounds.current?.stop();stopSpeaking()});
+ const feedbackLeft=useRef(FEEDBACK_MS),speechDone=useRef(false),spokenQuestion=useRef<VerbTask|null>(null);
+ const clock=useFiveSecondQuestionTimer(()=>answer(null),()=>{sounds.current?.stop();stopSpeaking();spokenQuestion.current=null});
  const task=round?.tasks[round.at];
  const paused=clock.paused||feedbackPaused;
  useEffect(()=>{sounds.current=createDragonSounds();void sounds.current.prepare();return()=>{sounds.current?.close();stopSpeaking()}},[]);
  function begin(){
-  void sounds.current?.prepare();clock.ready();stopSpeaking();saved.current=false;locked.current=false;setFeedbackPaused(false);
+  void sounds.current?.prepare();clock.ready();stopSpeaking();saved.current=false;locked.current=false;spokenQuestion.current=null;setFeedbackPaused(false);
   const tasks=verbGameTasks();setRound({tasks,at:0,options:verbGameOptions(tasks[0].word),phase:'question',chosen:null,success:false,correct:0,time:0,answerTime:0});clock.begin();
  }
  function answer(choice:number|null){
   if(!round||!task||round.phase!=='question'||locked.current||clock.isPaused())return;
   locked.current=true;const elapsed=clock.finish(),success=choice===task.word&&elapsed<5000;
   if(elapsed>=5000)choice=null;
-  feedbackLeft.current=FEEDBACK_MS;speechDone.current=false;
+  stopSpeaking();feedbackLeft.current=FEEDBACK_MS;speechDone.current=false;
   sounds.current?.play(success?'success':'error');
   setRound({...round,phase:'feedback',chosen:choice,success,correct:round.correct+(success?1:0),time:round.time+(success?elapsed:0),answerTime:round.answerTime+elapsed});
  }
  useEffect(()=>{
+  if(round?.phase!=='question'||!task?.reverse||paused||spokenQuestion.current===task)return;
+  spokenQuestion.current=task;speakVietnamese(verbGameWords[task.word][0]);
+ },[round?.phase,task,paused]);
+ useEffect(()=>{
   if(round?.phase!=='feedback'||paused)return;
   const started=performance.now(),remaining=feedbackLeft.current;
-  const speakAt=1750-(FEEDBACK_MS-remaining);
-  const voice=speechDone.current?undefined:setTimeout(()=>{speechDone.current=true;speakVietnamese(verbGameWords[round.tasks[round.at].word][0])},Math.max(0,speakAt));
+  const speakAt=1100-(FEEDBACK_MS-remaining);
+  const shouldSpeak=round.success&&!round.tasks[round.at].reverse;
+  const voice=!shouldSpeak||speechDone.current?undefined:setTimeout(()=>{speechDone.current=true;speakVietnamese(verbGameWords[round.tasks[round.at].word][0])},Math.max(0,speakAt));
   const timer=setTimeout(()=>{
    sounds.current?.stop();stopSpeaking();
    if(round.at===round.tasks.length-1){setRound({...round,phase:'end'});return}

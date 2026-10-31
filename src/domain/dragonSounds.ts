@@ -1,5 +1,6 @@
 // The cough file is already at 25% of its source amplitude. The approved
-// playback gain adds another 0.25; do not normalize it on load.
+// playback gain is 0.25 / 3 after the requested further reduction.
+// Do not normalize the file on load.
 export function createDragonSounds(){
  let context:AudioContext|null=null,closed=false;
  const buffers:Partial<Record<'success'|'error',AudioBuffer>>={};
@@ -22,7 +23,7 @@ export function createDragonSounds(){
   play(kind:'success'|'error'){
    if(closed||!context||context.state!=='running'||!buffers[kind])return;
    stop();const source=context.createBufferSource(),level=context.createGain();
-   source.buffer=buffers[kind]!;level.gain.setValueAtTime(kind==='error'?.25:1,context.currentTime);
+   source.buffer=buffers[kind]!;level.gain.setValueAtTime(kind==='error'?(.25/3):1,context.currentTime);
    source.connect(level);level.connect(context.destination);sources.add(source);
    source.onended=()=>{sources.delete(source);source.disconnect();level.disconnect()};
    source.start(context.currentTime+(kind==='success'?.42:.65),0,kind==='error'?Math.min(1,source.buffer.duration):source.buffer.duration);

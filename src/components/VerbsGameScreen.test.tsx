@@ -2,6 +2,7 @@
 import {act} from 'react';import {createRoot,type Root} from 'react-dom/client';
 import {beforeEach,afterEach,expect,it,vi} from 'vitest';
 import VerbsGameScreen from './VerbsGameScreen';
+import {speakVietnamese} from '../domain/speech';
 import {verbGameWords,verbGameTasks,verbGameOptions} from '../content/verbGame';
 const audio=vi.hoisted(()=>({prepare:vi.fn(),play:vi.fn(),stop:vi.fn(),close:vi.fn()}));
 vi.mock('../domain/dragonSounds',()=>({createDragonSounds:()=>audio}));
@@ -44,4 +45,15 @@ it('pauses both question and feedback while hidden and saves no unfinished run',
  const prompt=node.querySelector('.verbs-prompt')!.textContent!,answer=verbGameWords.find(w=>w[1]===prompt)![0];await click(answer);await time(500);
  Object.defineProperty(document,'hidden',{configurable:true,value:true});await act(async()=>document.dispatchEvent(new Event('visibilitychange')));await time(9000);expect(node.querySelector('.at-top')!.textContent).toContain('1/52');
  Object.defineProperty(document,'hidden',{configurable:true,value:false});await click('Продолжить');await time(2150);expect(node.querySelector('.at-top')!.textContent).toContain('2/52');expect(localStorage.getItem('vietSveta.timedAttempts.v1')).toBeNull();
+});
+
+it('speaks Vietnamese questions on arrival and answers Russian questions only after a correct choice',async()=>{
+ await click('Начать');expect(speakVietnamese).not.toHaveBeenCalled();
+ const ru=node.querySelector('.verbs-prompt')!.textContent!,pair=verbGameWords.find(w=>w[1]===ru)!;
+ await click(pair[0]);await time(1100);expect(speakVietnamese).toHaveBeenCalledTimes(1);expect(speakVietnamese).toHaveBeenLastCalledWith(pair[0]);
+ await time(1550);const vn=node.querySelector('.verbs-prompt')!.textContent!;expect(speakVietnamese).toHaveBeenLastCalledWith(vn);expect(speakVietnamese).toHaveBeenCalledTimes(2);
+ await time(1000);expect(speakVietnamese).toHaveBeenCalledTimes(2);
+ const correct=verbGameWords.find(w=>w[0]===vn)![1];await click(correct);await time(2650);expect(speakVietnamese).toHaveBeenCalledTimes(2);
+ const nextRu=node.querySelector('.verbs-prompt')!.textContent!,nextCorrect=verbGameWords.find(w=>w[1]===nextRu)![0];
+ const wrong=[...node.querySelectorAll<HTMLButtonElement>('.at-options button')].find(b=>b.textContent!==nextCorrect)!;await act(async()=>wrong.click());await time(2000);expect(speakVietnamese).toHaveBeenCalledTimes(2);
 });
