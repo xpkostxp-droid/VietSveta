@@ -1187,3 +1187,8 @@ a:focus-visible {
 /* The participant's course is emphasized without hiding the other group. */
 .group-choice { background: #fffdf8; color: #0b5f59; border: 2px solid #9fcfc8; }
 .group-choice.group-preferred { background: #0f7a72; color: white; border-color: #0b5f59; box-shadow: 0 0 0 3px #eed18d, 0 7px 14px -6px #174f4966; }
+
+/* Produce photos/illustrations share the existing fixed answer geometry. */
+.harvest-stage .produce-picture{display:block;width:160px;height:116px;object-fit:contain;margin:auto}
+.harvest-picture-options .produce-picture{display:block;width:100%;height:calc(var(--play-answer-height) - 20px);object-fit:contain;margin:auto}
+@media(max-height:720px){.harvest-stage .produce-picture{height:80px}}

@@ -3,6 +3,7 @@ import { accountEntries, applyAccountEntries, type AccountEntries } from './acco
 export const supabase = createClient('https://eqdlhipzjhbzfchwjazr.supabase.co','sb_publishable_TX1Cf_ARp8EGWs37lbP3Yw_o43pfuyU',{global:{fetch:(input,init)=>fetch(input,{...init,signal:init?.signal??AbortSignal.timeout(15000)})},auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,storageKey:'vietSveta.auth.v1'}});
 export interface Member { id:string; display_name:string; is_admin:boolean; user_id:string; course_group?:'beginner'|'advanced'; ranking_since?:string|null }
 export async function memberRequest(body:Record<string,unknown>) {
+ if(body.action==='leaderboard'&&body.total===undefined&&(body.game==='harvest-fruits'||body.game==='harvest-vegetables'))body={...body,total:body.game==='harvest-fruits'?40:32};
  const {data:{session}}=await supabase.auth.getSession();
  const endpoint=body.action==='leaderboard'&&['lesson10-family','lesson11-house','lesson11-adjectives','lesson15-verbs'].includes(String(body.game))?'beginner-game-ranking':'member-access';
  const response=await fetch('https://eqdlhipzjhbzfchwjazr.supabase.co/functions/v1/'+endpoint,{

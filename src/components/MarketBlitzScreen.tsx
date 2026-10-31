@@ -3,7 +3,8 @@ import { GameRanking } from './GameRanking';
 import { updateGameRecord } from '../domain/gameRecord';
 import { createAnswerClock, formatAnswerTime, saveTimedAttempt } from '../domain/answerTime';
 import { useEffect, useRef, useState } from 'react';
-import { products } from '../content/marketProducts';
+import { products, mixedWords } from '../content/advancedProduce';
+import { ProducePicture } from './ProducePicture';
 import { readJSON, writeJSON } from '../domain/storage';
 import { speakVietnamese, stopSpeaking } from '../domain/speech';
 import { createCountdownSound } from '../domain/countdownSound';
@@ -22,8 +23,8 @@ function shuffled<T,>(items: readonly T[]): T[] {
   }
   return result;
 }
-function optionsFor(index: number) {
-  const others = products.map((_, i) => i).filter(i => i !== index && products[i][3] === products[index][3]);
+function optionsFor(index: number, category: 'all' | 'fruits' | 'vegetables') {
+  const others = products.map((_, i) => i).filter(i => i !== index && products[i][3] === products[index][3] && (category !== 'all' || mixedWords.has(products[i][1])));
   return shuffled([index, ...shuffled(others).slice(0, 2)]);
 }
 function loadErrors(): number[] {
@@ -33,7 +34,7 @@ function saveErrors(indices: number[]) { writeJSON(storageKey, indices.map(taskK
 type Phase = 'question' | 'success' | 'wrong' | 'timeout' | 'answer';
 
 export function MarketBlitzScreen({ onBack, category = 'all' }: { onBack: () => void; category?: 'all' | 'fruits' | 'vegetables' }) {
-  const tasks = allHarvestTasks.filter(t => category === 'all' || products[productForTask(t)][3] === category);
+  const tasks = allHarvestTasks.filter(t => category === 'all' ? mixedWords.has(products[productForTask(t)][1]) : products[productForTask(t)][3] === category);
   const game = category === 'all' ? 'harvest-40' : category === 'fruits' ? 'harvest-fruits' : 'harvest-vegetables';
   const title = category === 'all' ? '⚡ Суперблиц · фрукты и овощи' : category === 'fruits' ? '🍉 Фрукты' : '🥕 Овощи';
   const isReview = useRef(false);
@@ -102,7 +103,7 @@ export function MarketBlitzScreen({ onBack, category = 'all' }: { onBack: () => 
       if (position + 1 === round.length) setActive(false);
       else {
         const next = position + 1;
-        setPosition(next); setOptions(optionsFor(productForTask(round[next]))); setSelected(null);
+        setPosition(next); setOptions(optionsFor(productForTask(round[next]), category)); setSelected(null);
         setRemaining(QUESTION_MS); deadline.current = Date.now() + QUESTION_MS; answerClock.current.begin();
         locked.current = false; lastBeep.current = 5; setPhase('question');
       }
@@ -117,7 +118,7 @@ export function MarketBlitzScreen({ onBack, category = 'all' }: { onBack: () => 
     answerClock.current.reset(); setAnswerTime(0); correctTime.current=0; finishedTime.current=0;
     sound.current ??= createCountdownSound(); sound.current.unlock();
     lastBeep.current = 5;
-    stopSpeaking(); setRound(next); setPosition(0); setOptions(optionsFor(productForTask(next[0])));
+    stopSpeaking(); setRound(next); setPosition(0); setOptions(optionsFor(productForTask(next[0]), category));
     setErrors([]); setCollected([]); setSelected(null); setPhase('question');
     setRemaining(QUESTION_MS); setStreak(0); setBest(0);
     setStarted(true); setActive(true); setPaused(false); pausedRef.current = false;
@@ -179,19 +180,19 @@ export function MarketBlitzScreen({ onBack, category = 'all' }: { onBack: () => 
       <div className="market-card blitz-card harvest-compact-card">
         <div className={'harvest-stage harvest-' + phase} key={`${position}-${phase}`}>
           <div className={'harvest-prompt-content' + (exploding ? ' harvest-shake' : '')}>
-            {pictureAnswers ? <h2 className="harvest-word-prompt">{current[1]}</h2> : <div className="market-product" role="img" aria-label={current[2]}>{current[0]}</div>}
+            {pictureAnswers ? <h2 className="harvest-word-prompt">{current[1]}</h2> : <div className="market-product" role="img" aria-label={current[2]}><ProducePicture index={productForTask(round[position])}/></div>}
           </div>
         </div>
         <div className="harvest-answer-slot" aria-live="polite">
           <strong>{showAnswer ? current[2] : '\u00a0'}</strong>
         </div>
       </div>
-        <div className={'blitz-options harvest-options' + (pictureAnswers ? ' harvest-picture-options' : '')}>{options.map(i => <button key={i} aria-label={pictureAnswers ? products[i][2] : products[i][1]} className={'blitz-option' + (showAnswer && i === productForTask(round[position]) ? ' blitz-correct' : selected === i && phase === 'wrong' ? ' blitz-wrong' : '')} disabled={phase !== 'question' || paused} onClick={() => resolve(i)}>{pictureAnswers ? <span aria-hidden="true">{products[i][0]}</span> : products[i][1]}</button>)}</div>
+        <div className={'blitz-options harvest-options' + (pictureAnswers ? ' harvest-picture-options' : '')}>{options.map(i => <button key={i} aria-label={pictureAnswers ? products[i][2] : products[i][1]} className={'blitz-option' + (showAnswer && i === productForTask(round[position]) ? ' blitz-correct' : selected === i && phase === 'wrong' ? ' blitz-wrong' : '')} disabled={phase !== 'question' || paused} onClick={() => resolve(i)}>{pictureAnswers ? <ProducePicture index={i}/> : products[i][1]}</button>)}</div>
         {paused && <div className="harvest-pause-overlay"><h2>Пауза ⏸</h2><button className="big-button" onClick={resume}>Продолжить</button></div>}
       </div>
     </> : <div className="market-intro"><h2>{saved.length === 0 ? 'Весь урожай спасён! 🎉' : 'Урожай собран не весь'}</h2>
       <p className="blitz-result">Собрано {collected.length} из {round.length}</p><p>Лучшая серия: {best} 🔥</p><p>Время правильных ответов: {formatAnswerTime(correctTime.current)}</p>
-      {errors.length > 0 && <ul className="blitz-errors">{errors.map(i => <li key={i}>{products[productForTask(i)][0]} {products[productForTask(i)][2]} — <strong>{isPictureAnswer(i) ? 'узнать название' : 'вспомнить название'}</strong></li>)}</ul>}
+      {errors.length > 0 && <ul className="blitz-errors">{errors.map(i => <li key={i}>{products[productForTask(i)][2]} — <strong>{isPictureAnswer(i) ? 'узнать название' : 'вспомнить название'}</strong></li>)}</ul>}
       {saved.length > 0 && <button className="big-button" onClick={() => start(saved, true)}>Добрать урожай — {saved.length}</button>}
       <button className="secondary-button" onClick={() => start(tasks)}>Новый блиц</button>
     </div>}

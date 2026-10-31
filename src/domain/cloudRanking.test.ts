@@ -11,3 +11,8 @@ it.each([{action:'leaderboard',game:'lesson7-countries'},{action:'login',id:'tes
  await memberRequest(body);
  expect(fetch).toHaveBeenCalledWith('https://eqdlhipzjhbzfchwjazr.supabase.co/functions/v1/member-access',expect.anything());
 });
+
+it.each([['harvest-fruits',40],['harvest-vegetables',32]])('requests current %s totals in profile rankings too', async (game,total)=>{
+ await memberRequest({action:'leaderboard',game});
+ expect(fetch).toHaveBeenCalledWith(expect.anything(),expect.objectContaining({body:JSON.stringify({action:'leaderboard',game,total})}));
+});

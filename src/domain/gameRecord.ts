@@ -1,6 +1,6 @@
 import { readJSON, writeJSON } from './storage';
 export interface GameRecord { correct: number; correctTimeMs: number | null }
-function key(game: string) { return `vietSveta.gameRecord.${game}.v1`; }
+function key(game: string) { return `vietSveta.gameRecord.${game}.${game==='harvest-fruits'||game==='harvest-vegetables'?'v2':'v1'}`; }
 export function readGameRecord(game: string, _legacyKey?: string): GameRecord {
   const raw = readJSON(key(game)) as Partial<GameRecord> | undefined;
   if (raw && Number.isInteger(raw.correct) && raw.correct! >= 0 && (raw.correctTimeMs === null || typeof raw.correctTimeMs === 'number' && Number.isFinite(raw.correctTimeMs) && raw.correctTimeMs >= 0)) return raw as GameRecord;

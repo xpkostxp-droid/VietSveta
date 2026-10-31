@@ -3,7 +3,8 @@ import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { MarketBlitzScreen } from './MarketBlitzScreen';
-import { products } from '../content/marketProducts';
+import { products as allProducts, mixedWords } from '../content/advancedProduce';
+const products = allProducts.filter(p=>mixedWords.has(p[1]));
 const audio = vi.hoisted(() => ({ beep: vi.fn(), explode: vi.fn(), unlock: vi.fn(), stop: vi.fn(), close: vi.fn() }));
 vi.mock('../domain/countdownSound', () => ({ createCountdownSound: () => audio }));
 Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
@@ -17,9 +18,9 @@ async function click(label: string) {
 }
 function answer() {
   const word = node.querySelector('.harvest-word-prompt')?.textContent;
-  if (word) return products.find(p => p[1] === word)![2];
+  if (word) return allProducts.find(p => p[1] === word)![2];
   const ru = node.querySelector('[role="img"]')!.getAttribute('aria-label');
-  return products.find(p => p[2] === ru)![1];
+  return allProducts.find(p => p[2] === ru)![1];
 }
 function optionButtons() { return [...node.querySelectorAll<HTMLButtonElement>('.blitz-option')]; }
 async function chooseCorrect() {
@@ -41,7 +42,7 @@ it('has three choices, visits products once, explodes on a final error and clear
   for(let i=0;i<products.length * 2;i++) {
     const correct = answer(); expect(seen.has(correct)).toBe(false); seen.add(correct);
     const options = [...node.querySelectorAll<HTMLButtonElement>('.blitz-option')];
-    expect(options).toHaveLength(3); expect(new Set(options.map(b=>b.textContent)).size).toBe(3);
+    expect(options).toHaveLength(3); expect(new Set(options.map(b=>b.getAttribute('aria-label'))).size).toBe(3);
     if(i === products.length * 2 - 1) {
       const wrong = options.find(b=>b.getAttribute('aria-label') !== correct)!;
       await act(async () => wrong.click());
@@ -106,7 +107,7 @@ it('warns only at three, two and one seconds and reveals the answer after the ex
   expect(audio.beep).toHaveBeenCalledTimes(3);
 });
 
-it.each([['fruits',22,'harvest-fruits'],['vegetables',18,'harvest-vegetables']] as const)('finishes %s only, continues after mistakes and saves a separate timed result', async (category,total,game) => {
+it.each([['fruits',40,'harvest-fruits'],['vegetables',32,'harvest-vegetables']] as const)('finishes %s only, continues after mistakes and saves a separate timed result', async (category,total,game) => {
  await act(async()=>root.render(<MarketBlitzScreen category={category} onBack={()=>{}}/>));
  await click('Начать');
  const seen=new Set<string>();
@@ -114,7 +115,7 @@ it.each([['fruits',22,'harvest-fruits'],['vegetables',18,'harvest-vegetables']] 
   const correct=answer(); seen.add(correct);
   const word=node.querySelector('.harvest-word-prompt')?.textContent;
   const ru=node.querySelector('[role="img"]')?.getAttribute('aria-label');
-  const product=products.find(p=>word?p[1]===word:p[2]===ru)!;
+  const product=allProducts.find(p=>word?p[1]===word:p[2]===ru)!;
   expect(product[3]).toBe(category);
   await time(200);
   if(i===0){await act(async()=>optionButtons().find(b=>b.getAttribute('aria-label')!==correct)!.click());await time(700);}

@@ -1,4 +1,4 @@
-import { products } from '../content/marketProducts';
+import { products } from '../content/advancedProduce';
 export const allHarvestTasks = products.flatMap((_, i) => [i * 2, i * 2 + 1]);
 export const productForTask = (task: number) => Math.floor(task / 2);
 export const isPictureAnswer = (task: number) => task % 2 === 1;
@@ -32,6 +32,9 @@ export function orderHarvestTasks(tasks: number[]) {
   return result;
 }
 export function readHarvestErrors(current: unknown, legacy: unknown): number[] {
-  if (Array.isArray(current)) return allHarvestTasks.filter(t => current.includes(taskKey(t)));
+  if (Array.isArray(current)) {
+    const normalized=current.map(key=>typeof key==='string'?key.replace(/^ngô\|/, 'bắp / ngô|'):key);
+    return allHarvestTasks.filter(t => normalized.includes(taskKey(t)));
+  }
   return Array.isArray(legacy) ? allHarvestTasks.filter(t => legacy.includes(products[productForTask(t)][1])) : [];
 }
