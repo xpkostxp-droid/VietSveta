@@ -1,10 +1,30 @@
 import { travelWords } from '../content/games/travel';
+export const travelPhotos: Record<string, string> = {
+  'asia': import.meta.env.BASE_URL + 'travel/asia.webp',
+  'europe': import.meta.env.BASE_URL + 'travel/europe.webp',
+  'country': import.meta.env.BASE_URL + 'travel/country.webp',
+  'city': import.meta.env.BASE_URL + 'travel/city.webp',
+  'capital': import.meta.env.BASE_URL + 'travel/capital.webp',
+  'live': import.meta.env.BASE_URL + 'travel/live.webp',
+  'travel': import.meta.env.BASE_URL + 'travel/travel.webp',
+  'arrive': import.meta.env.BASE_URL + 'travel/arrive.webp',
+  'from': import.meta.env.BASE_URL + 'travel/from.webp',
+  'origin': import.meta.env.BASE_URL + 'travel/origin.webp',
+  'all': import.meta.env.BASE_URL + 'travel/all.webp',
+  'person': import.meta.env.BASE_URL + 'travel/person.webp',
+  'which': import.meta.env.BASE_URL + 'travel/which.webp',
+  'which-country': import.meta.env.BASE_URL + 'travel/which-country.webp',
+  'which-city': import.meta.env.BASE_URL + 'travel/which-city.webp',
+  'ask-country': import.meta.env.BASE_URL + 'travel/ask-country.webp',
+  'ask-city': import.meta.env.BASE_URL + 'travel/ask-city.webp',
+};
 const ink='#385464';
 function Person({ x=160, y=93 }: {x?:number;y?:number}) { return <g transform={`translate(${x} ${y})`}><path d="M-22 56Q-22 18 0 18Q22 18 22 56Z" fill="#55aaa6"/><circle cy="0" r="17" fill="#efc6a3"/><path d="M-17-3Q-18-24 2-19Q18-19 17-3L5-12L-12-7Z" fill="#564337"/><circle cx="-5" r="1.5" fill={ink}/><circle cx="5" r="1.5" fill={ink}/></g>; }
 function City({capital=false}:{capital?:boolean}) {return <g stroke={ink} strokeWidth="2.5"><path d="M55 173V91H105V173M117 173V60H166V173M178 173V108H220V173M232 173V80H269V173" fill="#9dceca"/>{[72,132,192,245].map(x=><path key={x} d={`M${x} 117v10m0 14v10`} stroke="white" strokeWidth="7"/>)}{capital&&<path d="M141 36L147 48L160 50L150 59L152 72L141 66L130 72L132 59L122 50L135 48Z" fill="#eac46b" stroke="none"/>}</g>;}
 function Landscape(){return <g stroke={ink} strokeWidth="2"><path d="M26 174L102 65L171 174M109 174L211 45L296 174" fill="#8cbbb0"/><path d="M67 174L136 104L201 174" fill="#aacbc0"/><path d="M80 174V125M59 145L80 101L101 145Z" fill="#558d77"/><path d="M235 174V126M215 148L235 104L255 148Z" fill="#558d77"/></g>;}
 export function TravelPicture({id}:{id:string}) {
  const word=travelWords.find(w=>w[0]===id);
+ if(travelPhotos[id])return <img className="family-picture profession-photo" src={travelPhotos[id]} alt="Иллюстрация города или путешествия" decoding="async"/>;
  if(word?.[4]) return <div className="family-picture" role="img" aria-label={`Флаг: ${word[2]}`} style={{fontSize:112,textAlign:'center',lineHeight:'190px',background:'#eef8f6',borderRadius:28}}>{word[4]}</div>;
  const question=['which','which-country','which-city','ask-country','ask-city','like-dalat'].includes(id);
  return <svg className="family-picture" viewBox="0 0 320 200" role="img" aria-label={`Иллюстрация: ${word?.[2]??'Путешествия'}`}>

@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
-import { travelWords, travelBlitzGroups, travelBlitzTasks, travelBlitzAnswer, travelBlitzOptions, type TravelBlitzGroup, type TravelTask } from '../content/games/travel';
+import { travelWords, travelBlitzGroups, travelBlitzTasks, travelBlitzAnswer, travelBlitzOptions, travelBlitzPool, type TravelBlitzGroup, type TravelTask } from '../content/games/travel';
 import { GameRanking } from '../../components/GameRanking';
 import { saveTimedAttempt } from '../../domain/answerTime';
 import { speakVietnamese, stopSpeaking } from '../domain/speech';
 import { BackButton } from './BackButton';
-import { TravelPicture } from './TravelPicture';
+import { TravelPicture, travelPhotos } from './TravelPicture';
 import './ProfessionsGameScreen.css';
 import './TravelGameScreen.css';
+import '../../components/SharedPlayLayout.css';
 import { makeGameSound } from './gameSounds';
 type Result = { correct: number; time: number };
 export function TravelGameScreen({ onBack, initialGroup = null }: { onBack: () => void; initialGroup?: TravelBlitzGroup | null }) {
@@ -79,11 +80,16 @@ export function TravelGameScreen({ onBack, initialGroup = null }: { onBack: () =
     return () => clearTimeout(timer);
   }, [phase, position, group, tasks, score]);
   useEffect(() => () => { stopSpeaking(); audio.current.close(); }, []);
+  useEffect(() => {
+    if (group === 'travel') travelBlitzPool(group).forEach(index => {
+      const image = new Image(); image.src = travelPhotos[travelWords[index][0]];
+    });
+  }, [group]);
   const back = () => {
     stopSpeaking(); locked.current = true; setPhase('intro'); setTasks([]); setPaused(false);
     if (phase === 'intro') { if (initialGroup) onBack(); else if (group) setGroup(null); else onBack(); }
   };
-  return <div className={"screen family-screen work-blitz travel-blitz" + (phase === 'playing' || phase === 'feedback' ? ' work-active' : '')}>
+  return <div className={"screen family-screen work-blitz travel-blitz" + (phase === 'playing' || phase === 'feedback' ? ' work-active'+(group==='travel'?' profession-session':'') : '')}>
     <BackButton onClick={back} label={group ? 'Назад' : 'К играм'} />
     <span className="badge">Урок 7 · Страны, города и путешествия</span>
     <h1 className="screen-title">{title?.label ?? 'Страны, города и путешествия'}</h1>
@@ -97,11 +103,13 @@ export function TravelGameScreen({ onBack, initialGroup = null }: { onBack: () =
         <div className="work-status"><strong>{position + 1}/{tasks.length} · ✓ {score.correct}</strong><span className="work-clock" aria-label="Осталось секунд">{Math.ceil(remaining / 1000)}</span></div>
         <div className="work-timebar"><div style={{ width: `${remaining / 50}%` }} /></div>
         <div className={'family-card work-prompt ' + (current.reverse ? 'work-prompt-text' : '')}>
-          {!current.reverse && <TravelPicture id={word[0]} />}
-          <h2 lang={current.reverse ? 'vi' : 'ru'}>{current.reverse ? word[1] : word[2]}</h2>
+          {!current.reverse && (group==='travel'
+            ? <div className="profession-illustration"><TravelPicture id={word[0]} /><h2 className="profession-caption" lang="ru">{word[2]}</h2></div>
+            : <TravelPicture id={word[0]} />)}
+          {current.reverse ? <h2 lang="vi">{word[1]}</h2> : group!=='travel'&&<h2 lang="ru">{word[2]}</h2>}
         </div>
         {paused ? <button className="big-button" onClick={() => { audio.current.ready(); started.current = performance.now(); setPaused(false); }}>Продолжить</button> : <div className="family-choices work-options">{options.map(option => <button key={option} lang={current.reverse ? 'ru' : 'vi'} disabled={phase !== 'playing'} className={'choice-button ' + (phase === 'feedback' ? option === answer ? 'family-correct' : option === selected ? 'family-wrong' : '' : '')} onClick={() => finishAnswer(option)}>{option}</button>)}</div>}
-        <p className="family-feedback work-feedback" role="status">{paused ? 'Игра на паузе' : '\u00a0'}</p>
+        {(paused || group!=='travel')&&<p className="family-feedback work-feedback" role="status">{paused ? 'Игра на паузе' : '\u00a0'}</p>}
       </>}
 
   </div>;

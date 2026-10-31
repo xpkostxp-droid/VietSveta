@@ -2,6 +2,7 @@ import { act } from 'react';
 import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { TravelGameScreen } from './TravelGameScreen';
+import { travelPhotos } from './TravelPicture';
 import { travelWords, travelBlitzTasks, travelBlitzOptions, travelBlitzAnswer } from '../content/games/travel';
 const sounds = vi.hoisted(() => ({ ready: vi.fn(), beep: vi.fn(), close: vi.fn() }));
 vi.mock('./gameSounds', () => ({ makeGameSound: () => sounds }));
@@ -100,4 +101,41 @@ it('opens the profile-linked subgroup directly and returns to the profile',()=>{
  expect(host.querySelector('.work-group-list')).toBeNull();
  act(()=>host.querySelector<HTMLButtonElement>('button')!.click());
  expect(back).toHaveBeenCalledOnce();
+});
+
+it('shows all seventeen travel photos with Russian captions through correct, wrong and timeout answers; reverse prompts contain only Vietnamese', () => {
+  start('Города и путешествия');
+  expect(host.querySelector('.profession-session')).toBeTruthy();
+  const seen = new Set<string>();
+  let reverseCount = 0;
+  for (let i = 0; i < 34; i++) {
+    const prompt = host.querySelector('.work-prompt')!;
+    const photo = prompt.querySelector<HTMLImageElement>('.profession-illustration img');
+    const correct = correctAnswer();
+    if (photo) {
+      const word = travelWords.find(w => w[1] === correct)!;
+      expect(photo.getAttribute('src')).toBe(travelPhotos[word[0]]);
+      const caption = prompt.querySelector('.profession-caption')!;
+      expect(caption.textContent).toBe(word[2]);
+      expect(caption.getAttribute('lang')).toBe('ru');
+      seen.add(word[0]);
+      if (seen.size % 3 === 0) act(() => vi.advanceTimersByTime(5000));
+      else if (seen.size % 3 === 1) click(correct);
+      else {
+        const wrong = Array.from(host.querySelectorAll<HTMLButtonElement>('.work-options button')).find(b => b.textContent !== correct)!;
+        act(() => wrong.click());
+      }
+      expect(prompt.querySelector('.profession-caption')?.textContent).toBe(word[2]);
+    } else {
+      reverseCount++;
+      expect(prompt.classList.contains('work-prompt-text')).toBe(true);
+      expect(prompt.querySelector('h2')?.getAttribute('lang')).toBe('vi');
+      expect(prompt.querySelector('svg,img')).toBeNull();
+      click(correct);
+    }
+    expect(host.querySelector('.family-correct')?.textContent).toBe(correct);
+    act(() => vi.advanceTimersByTime(1600));
+  }
+  expect(seen.size).toBe(17);
+  expect(reverseCount).toBe(17);
 });
