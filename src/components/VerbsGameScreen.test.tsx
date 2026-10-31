@@ -2,12 +2,11 @@
 import {act} from 'react';import {createRoot,type Root} from 'react-dom/client';
 import {beforeEach,afterEach,expect,it,vi} from 'vitest';
 import VerbsGameScreen from './VerbsGameScreen';
-import {speakVietnamese} from '../domain/speech';
 import {verbGameWords,verbGameTasks,verbGameOptions} from '../content/verbGame';
-const audio=vi.hoisted(()=>({prepare:vi.fn(),play:vi.fn(),stop:vi.fn(),close:vi.fn()}));
+const audio=vi.hoisted(()=>({prepare:vi.fn(),play:vi.fn(),stop:vi.fn(),close:vi.fn(),speak:vi.fn(),stopVoice:vi.fn()}));
 vi.mock('../domain/dragonSounds',()=>({createDragonSounds:()=>audio}));
 vi.mock('../domain/speech',()=>({speakVietnamese:vi.fn(),stopSpeaking:vi.fn()}));
-vi.mock('../beginner/components/gameSounds',()=>({makeGameSound:()=>({ready:vi.fn(),beep:vi.fn(),close:vi.fn()})}));
+vi.mock('../beginner/components/gameSounds',()=>({makeGameSound:()=>({ready:vi.fn(),beep:vi.fn(),close:vi.fn(),speak:vi.fn(),stopVoice:vi.fn()})}));
 vi.mock('./DragonWordScene',()=>({DragonWordScene:({word,outcome,paused}:{word:string;outcome:string;paused:boolean})=><div data-scene={outcome} data-paused={paused}>{word}</div>}));
 vi.mock('./GameRanking',()=>({GameRanking:({onStart,result,total}:{onStart:()=>void;result?:{correct:number;time:number};total:number})=><div><button onClick={onStart}>Начать</button>{result&&<p data-result>{result.correct} из {total} · {result.time}</p>}</div>}));
 Object.assign(globalThis,{IS_REACT_ACT_ENVIRONMENT:true});
@@ -48,12 +47,12 @@ it('pauses both question and feedback while hidden and saves no unfinished run',
 });
 
 it('speaks Vietnamese questions on arrival and answers Russian questions only after a correct choice',async()=>{
- await click('Начать');expect(speakVietnamese).not.toHaveBeenCalled();
+ await click('Начать');expect(audio.speak).not.toHaveBeenCalled();
  const ru=node.querySelector('.verbs-prompt')!.textContent!,pair=verbGameWords.find(w=>w[1]===ru)!;
- await click(pair[0]);await time(1100);expect(speakVietnamese).toHaveBeenCalledTimes(1);expect(speakVietnamese).toHaveBeenLastCalledWith(pair[0]);
- await time(1550);const vn=node.querySelector('.verbs-prompt')!.textContent!;expect(speakVietnamese).toHaveBeenLastCalledWith(vn);expect(speakVietnamese).toHaveBeenCalledTimes(2);
- await time(1000);expect(speakVietnamese).toHaveBeenCalledTimes(2);
- const correct=verbGameWords.find(w=>w[0]===vn)![1];await click(correct);await time(2650);expect(speakVietnamese).toHaveBeenCalledTimes(2);
+ await click(pair[0]);await time(1100);expect(audio.speak).toHaveBeenCalledTimes(1);expect(audio.speak).toHaveBeenLastCalledWith(verbGameWords.indexOf(pair));
+ await time(1550);const vn=node.querySelector('.verbs-prompt')!.textContent!;expect(audio.speak).toHaveBeenLastCalledWith(verbGameWords.findIndex(w=>w[0]===vn));expect(audio.speak).toHaveBeenCalledTimes(2);
+ await time(1000);expect(audio.speak).toHaveBeenCalledTimes(2);
+ const correct=verbGameWords.find(w=>w[0]===vn)![1];await click(correct);await time(2650);expect(audio.speak).toHaveBeenCalledTimes(2);
  const nextRu=node.querySelector('.verbs-prompt')!.textContent!,nextCorrect=verbGameWords.find(w=>w[1]===nextRu)![0];
- const wrong=[...node.querySelectorAll<HTMLButtonElement>('.at-options button')].find(b=>b.textContent!==nextCorrect)!;await act(async()=>wrong.click());await time(2000);expect(speakVietnamese).toHaveBeenCalledTimes(2);
+ const wrong=[...node.querySelectorAll<HTMLButtonElement>('.at-options button')].find(b=>b.textContent!==nextCorrect)!;await act(async()=>wrong.click());await time(2000);expect(audio.speak).toHaveBeenCalledTimes(2);
 });

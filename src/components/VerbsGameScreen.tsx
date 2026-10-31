@@ -7,7 +7,7 @@ import { verbGameWords, verbGameTasks, verbGameOptions, verbPrompt, type VerbTas
 import { createDragonSounds } from '../domain/dragonSounds';
 import { saveTimedAttempt } from '../domain/answerTime';
 import { updateGameRecord } from '../domain/gameRecord';
-import { speakVietnamese, stopSpeaking } from '../domain/speech';
+import { stopSpeaking } from '../domain/speech';
 import './AdjectiveTetris.css';
 import './SharedPlayLayout.css';
 import './VerbsGameScreen.css';
@@ -30,20 +30,20 @@ export default function VerbsGameScreen({onBack}:{onBack:()=>void}){
   if(!round||!task||round.phase!=='question'||locked.current||clock.isPaused())return;
   locked.current=true;const elapsed=clock.finish(),success=choice===task.word&&elapsed<5000;
   if(elapsed>=5000)choice=null;
-  stopSpeaking();feedbackLeft.current=FEEDBACK_MS;speechDone.current=false;
+  stopSpeaking();sounds.current?.stopVoice();feedbackLeft.current=FEEDBACK_MS;speechDone.current=false;
   sounds.current?.play(success?'success':'error');
   setRound({...round,phase:'feedback',chosen:choice,success,correct:round.correct+(success?1:0),time:round.time+(success?elapsed:0),answerTime:round.answerTime+elapsed});
  }
  useEffect(()=>{
   if(round?.phase!=='question'||!task?.reverse||paused||spokenQuestion.current===task)return;
-  spokenQuestion.current=task;speakVietnamese(verbGameWords[task.word][0]);
+  spokenQuestion.current=task;sounds.current?.speak(task.word);
  },[round?.phase,task,paused]);
  useEffect(()=>{
   if(round?.phase!=='feedback'||paused)return;
   const started=performance.now(),remaining=feedbackLeft.current;
   const speakAt=1100-(FEEDBACK_MS-remaining);
   const shouldSpeak=round.success&&!round.tasks[round.at].reverse;
-  const voice=!shouldSpeak||speechDone.current?undefined:setTimeout(()=>{speechDone.current=true;speakVietnamese(verbGameWords[round.tasks[round.at].word][0])},Math.max(0,speakAt));
+  const voice=!shouldSpeak||speechDone.current?undefined:setTimeout(()=>{speechDone.current=true;sounds.current?.speak(round.tasks[round.at].word)},Math.max(0,speakAt));
   const timer=setTimeout(()=>{
    sounds.current?.stop();stopSpeaking();
    if(round.at===round.tasks.length-1){setRound({...round,phase:'end'});return}
