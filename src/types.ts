@@ -82,6 +82,7 @@ export interface TheoryMaterial {
 }
 
 export interface FlashCard {
+  example?: { vi: string; ru: string };
   id: CardId;
   lessonId: LessonId;
   ru: string;
