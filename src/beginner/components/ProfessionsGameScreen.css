@@ -26,23 +26,26 @@
  .beginner-area .work-blitz .work-options button { height: 64px; min-height: 64px; }
 }
 
-/* Russian prompt stays on the image; Vietnamese answers remain on the buttons. */
+/* Shared photo/blank-card layout for professions, work and travel.
+   Grow into the free space above the answers; preserve the original label width. */
+.beginner-area .screen.profession-session{height:100dvh}
 .beginner-area .screen.profession-session .work-prompt{
  position:relative;display:flex;align-items:center;justify-content:center;
  --profession-card-size:clamp(190px,32dvh,310px);
- height:var(--profession-card-size);min-height:0;flex:0 0 auto;
- padding:0;margin: auto 0 0;overflow:hidden;background:#fffdf8;border-radius:20px;
+ width:100%;height:auto;min-height:0;flex:1 1 0;container-type:size;
+ padding:0;margin:0;overflow:visible;background:transparent;border:0;border-radius:20px;box-shadow:none;
 }
 .beginner-area .screen.profession-session .profession-photo{display:block;width:100%;height:100%;max-height:none;object-fit:contain;margin:0;border-radius:0}
 .beginner-area .screen.profession-session .work-prompt h2{color:#754322;font-size:clamp(1.6rem,6.5vw,2.3rem);line-height:1.15;font-weight:850;overflow-wrap:anywhere}
 .beginner-area .screen.profession-session .profession-caption,
-.beginner-area .screen.profession-session .work-prompt-text h2{position:absolute;bottom:10px;left:10px;right:10px;padding:9px 12px;background:#fff6e5f5;border:1px solid #e3d0ae;border-radius:14px;box-shadow:0 2px 6px #35281926;text-align:center}
-/* Match the photo bounds and keep both prompt labels in the same bottom slot. */
-.beginner-area .screen.profession-session .work-prompt-text{width:min(100%,var(--profession-card-size));align-self:center;margin-inline:auto;padding:0;border:0;background:#fffdf8;box-shadow:inset 0 0 0 1px #d5e9e4}
+.beginner-area .screen.profession-session .work-prompt-text h2{position:absolute;bottom:10px;left:50%;right:auto;transform:translateX(-50%);width:calc(min(100%,var(--profession-card-size)) - 20px);padding:9px 12px;background:#fff6e5f5;border:1px solid #e3d0ae;border-radius:14px;box-shadow:0 2px 6px #35281926;text-align:center}
+/* Both directions use the same full-width frame and bottom label anchor. */
+.beginner-area .screen.profession-session .work-prompt-text{width:100%;align-self:stretch;padding:0;border:0;background:transparent;box-shadow:none}
 .beginner-area .screen.profession-session .work-feedback{height:0;min-height:0;flex-basis:0;overflow:hidden}
 .beginner-area .screen.profession-session .work-options{margin:0}
 @media(max-height:650px){.beginner-area .screen.profession-session .work-prompt{--profession-card-size:clamp(120px,25dvh,165px)}}
 
 .beginner-area .screen.profession-session .work-prompt:not(.work-prompt-text){border:0;background:transparent;box-shadow:none}
-.beginner-area .screen.profession-session .profession-illustration{position:relative;height:100%;aspect-ratio:1;max-width:100%;overflow:hidden;border-radius:20px;background:#fffdf8}
-.beginner-area .screen.profession-session .profession-illustration .profession-photo{width:100%;height:100%;object-fit:cover}
+.beginner-area .screen.profession-session .profession-illustration{position:absolute;bottom:0;left:0;width:100%;height:100%;height:min(100cqw,100cqh);overflow:hidden;border-radius:20px;background:#fffdf8}
+.beginner-area .screen.profession-session .profession-empty{box-shadow:inset 0 0 0 1px #d5e9e4}
+.beginner-area .screen.profession-session .profession-illustration .profession-photo{width:100%;height:100%;object-fit:cover;object-position:center top}

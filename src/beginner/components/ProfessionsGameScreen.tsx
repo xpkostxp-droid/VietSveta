@@ -99,7 +99,7 @@ export function ProfessionsGameScreen({ onBack, initialGroup = null }: { onBack:
         <div className="work-timebar"><div style={{ width: `${remaining / 50}%` }} /></div>
         <div className={'family-card work-prompt ' + (current.reverse ? 'work-prompt-text' : '')}>
           {!current.reverse && <div className="profession-illustration"><ProfessionPicture id={word[0]} /><h2 className="profession-caption" lang="ru">{word[2]}</h2></div>}
-          {current.reverse && <h2 lang="vi">{word[1]}</h2>}
+          {current.reverse && <div className="profession-illustration profession-empty"><h2 className="profession-caption" lang="vi">{word[1]}</h2></div>}
         </div>
         {paused ? <button className="big-button" onClick={() => { audio.current.ready(); started.current = performance.now(); setPaused(false); }}>Продолжить</button> : <div className="family-choices work-options">{options.map(option => <button key={option} lang={current.reverse ? 'ru' : 'vi'} disabled={phase !== 'playing'} className={'choice-button ' + (phase === 'feedback' ? option === answer ? 'family-correct' : option === selected ? 'family-wrong' : '' : '')} onClick={() => finishAnswer(option)}>{option}</button>)}</div>}
         {paused&&<p className="family-feedback work-feedback" role="status">Игра на паузе</p>}

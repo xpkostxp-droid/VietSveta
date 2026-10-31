@@ -106,7 +106,7 @@ export function TravelGameScreen({ onBack, initialGroup = null }: { onBack: () =
           {!current.reverse && (group==='travel'
             ? <div className="profession-illustration"><TravelPicture id={word[0]} /><h2 className="profession-caption" lang="ru">{word[2]}</h2></div>
             : <TravelPicture id={word[0]} />)}
-          {current.reverse ? <h2 lang="vi">{word[1]}</h2> : group!=='travel'&&<h2 lang="ru">{word[2]}</h2>}
+          {current.reverse ? (group==='travel' ? <div className="profession-illustration profession-empty"><h2 className="profession-caption" lang="vi">{word[1]}</h2></div> : <h2 lang="vi">{word[1]}</h2>) : group!=='travel'&&<h2 lang="ru">{word[2]}</h2>}
         </div>
         {paused ? <button className="big-button" onClick={() => { audio.current.ready(); started.current = performance.now(); setPaused(false); }}>Продолжить</button> : <div className="family-choices work-options">{options.map(option => <button key={option} lang={current.reverse ? 'ru' : 'vi'} disabled={phase !== 'playing'} className={'choice-button ' + (phase === 'feedback' ? option === answer ? 'family-correct' : option === selected ? 'family-wrong' : '' : '')} onClick={() => finishAnswer(option)}>{option}</button>)}</div>}
         {(paused || group!=='travel')&&<p className="family-feedback work-feedback" role="status">{paused ? 'Игра на паузе' : '\u00a0'}</p>}
