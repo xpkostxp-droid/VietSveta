@@ -3,7 +3,7 @@ import { GameRanking } from './GameRanking';
 import { updateGameRecord } from '../domain/gameRecord';
 import { createAnswerClock, formatAnswerTime, saveTimedAttempt } from '../domain/answerTime';
 import { useEffect, useRef, useState } from 'react';
-import { products, mixedWords } from '../content/advancedProduce';
+import { products } from '../content/advancedProduce';
 import { ProducePicture } from './ProducePicture';
 import { readJSON, writeJSON } from '../domain/storage';
 import { speakVietnamese, stopSpeaking } from '../domain/speech';
@@ -23,8 +23,8 @@ function shuffled<T,>(items: readonly T[]): T[] {
   }
   return result;
 }
-function optionsFor(index: number, category: 'all' | 'fruits' | 'vegetables') {
-  const others = products.map((_, i) => i).filter(i => i !== index && products[i][3] === products[index][3] && (category !== 'all' || mixedWords.has(products[i][1])));
+function optionsFor(index: number) {
+  const others = products.map((_, i) => i).filter(i => i !== index && products[i][3] === products[index][3]);
   return shuffled([index, ...shuffled(others).slice(0, 2)]);
 }
 function loadErrors(): number[] {
@@ -33,10 +33,10 @@ function loadErrors(): number[] {
 function saveErrors(indices: number[]) { writeJSON(storageKey, indices.map(taskKey)); }
 type Phase = 'question' | 'success' | 'wrong' | 'timeout' | 'answer';
 
-export function MarketBlitzScreen({ onBack, category = 'all' }: { onBack: () => void; category?: 'all' | 'fruits' | 'vegetables' }) {
-  const tasks = allHarvestTasks.filter(t => category === 'all' ? mixedWords.has(products[productForTask(t)][1]) : products[productForTask(t)][3] === category);
-  const game = category === 'all' ? 'harvest-40' : category === 'fruits' ? 'harvest-fruits' : 'harvest-vegetables';
-  const title = category === 'all' ? '⚡ Суперблиц · фрукты и овощи' : category === 'fruits' ? '🍉 Фрукты' : '🥕 Овощи';
+export function MarketBlitzScreen({ onBack, category }: { onBack: () => void; category: 'fruits' | 'vegetables' }) {
+  const tasks = allHarvestTasks.filter(t => products[productForTask(t)][3] === category);
+  const game = category === 'fruits' ? 'harvest-fruits' : 'harvest-vegetables';
+  const title = category === 'fruits' ? '🍉 Фрукты' : '🥕 Овощи';
   const isReview = useRef(false);
   const answerClock = useRef(createAnswerClock());
   const [answerTime, setAnswerTime] = useState(0);
@@ -103,7 +103,7 @@ export function MarketBlitzScreen({ onBack, category = 'all' }: { onBack: () => 
       if (position + 1 === round.length) setActive(false);
       else {
         const next = position + 1;
-        setPosition(next); setOptions(optionsFor(productForTask(round[next]), category)); setSelected(null);
+        setPosition(next); setOptions(optionsFor(productForTask(round[next]))); setSelected(null);
         setRemaining(QUESTION_MS); deadline.current = Date.now() + QUESTION_MS; answerClock.current.begin();
         locked.current = false; lastBeep.current = 5; setPhase('question');
       }
@@ -118,7 +118,7 @@ export function MarketBlitzScreen({ onBack, category = 'all' }: { onBack: () => 
     answerClock.current.reset(); setAnswerTime(0); correctTime.current=0; finishedTime.current=0;
     sound.current ??= createCountdownSound(); sound.current.unlock();
     lastBeep.current = 5;
-    stopSpeaking(); setRound(next); setPosition(0); setOptions(optionsFor(productForTask(next[0]), category));
+    stopSpeaking(); setRound(next); setPosition(0); setOptions(optionsFor(productForTask(next[0])));
     setErrors([]); setCollected([]); setSelected(null); setPhase('question');
     setRemaining(QUESTION_MS); setStreak(0); setBest(0);
     setStarted(true); setActive(true); setPaused(false); pausedRef.current = false;
@@ -157,15 +157,15 @@ export function MarketBlitzScreen({ onBack, category = 'all' }: { onBack: () => 
     if (!isReview.current) updateGameRecord(game,{correct:collected.length,correctTimeMs:correctTime.current});
     saveTimedAttempt({game:isReview.current ? 'harvest-review' : game,correct:collected.length,total:round.length,answerTimeMs:answerClock.current.value(),correctTimeMs:correctTime.current,completed:true});
   }, [active]);
-  if(!started||(!active&&!isReview.current))return <div className="screen ranking-screen"><BackButton onClick={onBack} label="К выбору игры"/><h1 className="screen-title">{title}</h1>
-    <GameRanking game={game} total={tasks.length} onStart={()=>start(tasks)} startAtBottom startLabel={started?'Играть ещё':'Начать'} result={started?{correct:collected.length,time:correctTime.current}:undefined}/>
+  if(!started||(!active&&!isReview.current))return <div className="screen ranking-screen"><BackButton onClick={onBack} label="К играм"/><h1 className="screen-title">{title}</h1>
+    <GameRanking game={game} total={tasks.length} onStart={()=>start(tasks)} startAtBottom startLabel={started?'Играть ещё':'Начать'} result={started?{correct:collected.length,time:correctTime.current}:undefined}><small><a href={import.meta.env.BASE_URL+'market/credits.html'} target="_blank" rel="noreferrer">Источники изображений</a></small></GameRanking>
   </div>;
   const current = products[productForTask(round[position])];
   const pictureAnswers = isPictureAnswer(round[position]);
   const exploding = phase === 'wrong' || phase === 'timeout';
   const showAnswer = phase === 'success' || phase === 'answer';
   return <div className={'screen market-screen harvest-screen' + (active ? ' harvest-playing' : '')}>
-    <BackButton onClick={onBack} label="К выбору игры" />
+    <BackButton onClick={onBack} label="К играм" />
     <h1 className="screen-title">{title}</h1>
     {active ? <>
       <div className="harvest-play-header"><span>Задание {position + 1}/{round.length}</span><span>⏱ {formatAnswerTime(answerTime)} · 🧺 {collected.length}</span></div>
