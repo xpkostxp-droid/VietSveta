@@ -1,0 +1,5 @@
+.verbs-playing .verbs-play-block{margin-top:auto;display:flex;flex-direction:column;gap:8px;flex-shrink:0;min-width:0}
+.verbs-playing .dragon-scene{display:block;width:100%;height:clamp(140px,28dvh,300px);object-fit:contain;background:#c9e5df;border:3px solid #6e9e99;border-radius:20px;box-sizing:border-box}
+.verbs-playing .verbs-prompt{display:grid;place-items:center;text-align:center;min-height:76px;margin:0;padding:6px 4px;font-size:clamp(1.5rem,6.5vw,2.3rem);font-weight:850;line-height:1.12;text-wrap:balance;color:#193d40}
+.verbs-playing .at-options{margin:0}
+@media(max-height:650px){.verbs-playing .dragon-scene{height:140px}.verbs-playing .verbs-prompt{min-height:62px;font-size:1.5rem}}

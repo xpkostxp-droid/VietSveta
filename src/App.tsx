@@ -6,6 +6,7 @@ import { QuestionsBlitzScreen } from './components/QuestionsBlitzScreen';
 import { MarketGameScreen } from './components/MarketGameScreen';
 import { lazy, Suspense, useState } from 'react';
 import { GroupSelection, type CourseSection } from './components/GroupSelection';
+const VerbsGameScreen = lazy(() => import('./components/VerbsGameScreen'));
 const BeginnerApp = lazy(() => import('./beginner/App'));
 import type { CardOrder, Direction } from './types';
 import { saveLastActivity } from './domain/lastActivity';
@@ -30,6 +31,7 @@ type Screen =
   | { name: 'game' }
   | { name: 'games-menu' }
   | { name: 'battle' }
+  | { name: 'verbs' }
   | { name: 'adjectives-menu' }
   | { name: 'adjectives-tetris'; variant?:'tetris'|'rope'|'cannon' }
   | { name: 'questions-menu' }
@@ -82,8 +84,12 @@ function App({ isAdmin=false, memberId, memberName, syncStatus, onOpenProfile, c
           <button className="games-menu-key" onClick={()=>setScreen({name:'game'})}><span className="games-menu-key-icon" aria-hidden="true">🍎</span><span>Овощи-фрукты</span></button>
           <button className="games-menu-key" onClick={()=>setScreen({name:'questions-menu'})}><span className="games-menu-key-icon" aria-hidden="true">❓</span><span>Вопросительные слова</span></button>
           <button className="games-menu-key" onClick={()=>setScreen({name:'adjectives-menu'})}><span className="games-menu-key-icon" aria-hidden="true">🧪</span><span>Прилагательные</span></button>
+          <button className="games-menu-key" onClick={()=>setScreen({name:'verbs'})}><span className="games-menu-key-icon" aria-hidden="true">🐉</span><span>Глаголы</span></button>
         </nav>
       </div>;
+
+    case 'verbs':
+      return <Suspense fallback={<div className="screen"><p role="status">Загружаем игру…</p></div>}><VerbsGameScreen onBack={()=>setScreen({name:'games-menu'})}/></Suspense>;
 
     case 'adjectives-menu':
       return <div className="screen"><BackButton onClick={()=>setScreen({name:'games-menu'})} label="К играм"/><h1 className="screen-title">Прилагательные</h1><div className="market-options" style={{gap:16}}>{adjectiveSets.map((set,i)=><button key={set.title} className="big-button" onClick={()=>setScreen({name:'adjectives-tetris',variant:i===2?'cannon':i===1?'rope':'tetris'})}><span style={{fontSize:'1.2rem',fontWeight:800,lineHeight:1.4}}>{i+1}. {set.title}<br/><small>{set.words.length} слов · {set.words.length*2} заданий · {i===0?'Тетрис':i===1?'Удержи слово':'Словесная пушка'}</small></span></button>)}</div></div>;
