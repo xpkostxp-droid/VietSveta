@@ -1,24 +1,24 @@
 import { adjectiveLearning, houseLearning, houseBlitz } from '../content/games/house';
-const adjectivePngs: Record<string, string> = {
-  'big': './beginner/images/games/adjectives/01-big.png',
-  'small': './beginner/images/games/adjectives/02-small.png',
-  'high': './beginner/images/games/adjectives/03-high.png',
-  'low': './beginner/images/games/adjectives/04-low.png',
-  'long': './beginner/images/games/adjectives/05-long.png',
-  'short': './beginner/images/games/adjectives/06-short.png',
-  'many': './beginner/images/games/adjectives/07-many.png',
-  'few': './beginner/images/games/adjectives/08-few.png',
-  'beautiful': './beginner/images/games/adjectives/09-beautiful.png',
-  'ugly': './beginner/images/games/adjectives/10-ugly.png',
-  'good': './beginner/images/games/adjectives/11-good.png',
-  'poor': './beginner/images/games/adjectives/12-poor.png',
-  'substance': './beginner/images/games/adjectives/13-substance.png',
-  'amount': './beginner/images/games/adjectives/14-amount.png',
-  'quality': './beginner/images/games/adjectives/15-quality.png',
-  'quality-good': './beginner/images/games/adjectives/16-quality-good.png',
-  'quality-poor': './beginner/images/games/adjectives/17-quality-poor.png',
-  'quality-high': './beginner/images/games/adjectives/18-quality-high.png',
-  'product-quality-high': './beginner/images/games/adjectives/19-product-quality-high.png',
+const adjectivePictures: Record<string, string> = {
+  'big': import.meta.env.BASE_URL + 'beginner/images/games/adjectives/01-big.webp',
+  'small': import.meta.env.BASE_URL + 'beginner/images/games/adjectives/02-small.webp',
+  'high': import.meta.env.BASE_URL + 'beginner/images/games/adjectives/03-high.webp',
+  'low': import.meta.env.BASE_URL + 'beginner/images/games/adjectives/04-low.webp',
+  'long': import.meta.env.BASE_URL + 'beginner/images/games/adjectives/05-long.webp',
+  'short': import.meta.env.BASE_URL + 'beginner/images/games/adjectives/06-short.webp',
+  'many': import.meta.env.BASE_URL + 'beginner/images/games/adjectives/07-many.webp',
+  'few': import.meta.env.BASE_URL + 'beginner/images/games/adjectives/08-few.webp',
+  'beautiful': import.meta.env.BASE_URL + 'beginner/images/games/adjectives/09-beautiful.webp',
+  'ugly': import.meta.env.BASE_URL + 'beginner/images/games/adjectives/10-ugly.webp',
+  'good': import.meta.env.BASE_URL + 'beginner/images/games/adjectives/11-good.webp',
+  'poor': import.meta.env.BASE_URL + 'beginner/images/games/adjectives/12-poor.webp',
+  'substance': import.meta.env.BASE_URL + 'beginner/images/games/adjectives/13-substance.webp',
+  'amount': import.meta.env.BASE_URL + 'beginner/images/games/adjectives/14-amount.webp',
+  'quality': import.meta.env.BASE_URL + 'beginner/images/games/adjectives/15-quality.webp',
+  'quality-good': import.meta.env.BASE_URL + 'beginner/images/games/adjectives/16-quality-good.webp',
+  'quality-poor': import.meta.env.BASE_URL + 'beginner/images/games/adjectives/17-quality-poor.webp',
+  'quality-high': import.meta.env.BASE_URL + 'beginner/images/games/adjectives/18-quality-high.webp',
+  'product-quality-high': import.meta.env.BASE_URL + 'beginner/images/games/adjectives/19-product-quality-high.webp',
 };
 function House({ x, y, scale = 1, floors = 1, pretty = false, ugly = false }: { x: number; y: number; scale?: number; floors?: number; pretty?: boolean; ugly?: boolean }) {
   const h = 42 + Math.max(0, floors - 1) * 18;
@@ -130,10 +130,10 @@ function Concept({ id }: { id: string }) {
 }
 
 export function HousePicture({ id }: { id: string }) {
-  const housePngs: Record<string, string> = {"hotel": "hotel", "blitz-hotel-high": "hotel", "balcony": "balcony", "blitz-balcony-long": "balcony-long", "blitz-balcony-short": "balcony-short", "house": "private-house", "private-house": "private-house", "apartment": "apartment", "living-room": "living-room", "office": "office", "bedroom": "bedroom", "bathroom": "bathroom", "kitchen": "kitchen", "blitz-apartment-high": "apartment", "blitz-apartment-many-floors": "apartment", "blitz-private-big": "private-house", "blitz-private-beautiful": "private-house", "blitz-bedroom-small": "bedroom", "blitz-bathroom-small": "bathroom", "blitz-kitchen-beautiful": "kitchen", "blitz-office-big": "office"};
-  const png = adjectivePngs[id] ?? (housePngs[id] ? './beginner/images/games/house/' + housePngs[id] + '.png' : undefined);
-  if (png) return <img className="family-picture" src={png} alt={[...adjectiveLearning, ...houseLearning, ...houseBlitz].find(item => item[0] === id)?.[2] ?? 'Иллюстрация урока'} width={480} height={300} decoding="async" style={{ objectFit: 'contain', borderRadius: 18 }} />;
-  return <svg className="family-picture" viewBox="0 0 320 200" role="img" aria-label="Иллюстрация дома и прилагательного">
+  const housePictures: Record<string, string> = {"hotel": "hotel", "blitz-hotel-high": "hotel", "balcony": "balcony", "blitz-balcony-long": "balcony-long", "blitz-balcony-short": "balcony-short", "house": "private-house", "private-house": "private-house", "apartment": "apartment", "living-room": "living-room", "office": "office", "bedroom": "bedroom", "bathroom": "bathroom", "kitchen": "kitchen", "blitz-apartment-high": "apartment", "blitz-apartment-many-floors": "apartment", "blitz-private-big": "private-house", "blitz-private-beautiful": "private-house", "blitz-bedroom-small": "bedroom", "blitz-bathroom-small": "bathroom", "blitz-kitchen-beautiful": "kitchen", "blitz-office-big": "office"};
+  const picture = adjectivePictures[id] ?? (housePictures[id] ? import.meta.env.BASE_URL + 'beginner/images/games/house/' + housePictures[id] + '.webp' : undefined);
+  if (picture) return <img className="family-picture" src={picture} alt={[...adjectiveLearning, ...houseLearning, ...houseBlitz].find(item => item[0] === id)?.[2] ?? 'Иллюстрация урока'} width={768} height={480} decoding="async" />;
+  return <svg className="family-picture" viewBox="0 0 320 200" preserveAspectRatio="xMidYMin slice" role="img" aria-label="Иллюстрация дома и прилагательного">
     <rect x="4" y="4" width="312" height="192" rx="28" fill="#eef8f6"/>
     <ellipse cx="160" cy="172" rx="122" ry="9" fill="#d8eae6"/>
     <Concept id={id}/>

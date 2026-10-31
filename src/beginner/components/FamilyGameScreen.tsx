@@ -2,10 +2,13 @@ import { useEffect, useRef, useState } from 'react';
 import { advanceFamily, familyOptions, familyWords, shuffled } from '../content/games/family';
 import { hasVietnameseVoice, onVoicesChanged, speakVietnamese, stopSpeaking } from '../domain/speech';
 import { BackButton } from './BackButton';
-import { FamilyPicture } from './FamilyPicture';
+import { FamilyPicture, familyPhotos } from './FamilyPicture';
 import { GamePrompt, GameChoices, GameProgress, beginnerPlayClass } from './BeginnerPlayLayout';
 type Mode = 'learn' | 'blitz';
 export function FamilyGameScreen({ onBack }: { onBack: () => void }) {
+  useEffect(() => {
+    Object.values(familyPhotos).forEach(src => { const image = new Image(); image.src = src; });
+  }, []);
   const [mode, setMode] = useState<Mode | null>(null);
   const [queue, setQueue] = useState<number[]>([]);
   const [wins, setWins] = useState<Record<number, number>>({});
@@ -43,7 +46,7 @@ export function FamilyGameScreen({ onBack }: { onBack: () => void }) {
       <button className="lesson-item family-mode" onClick={() => start('blitz')}><strong>⚡ Блиц</strong><span>Вся семья вперемешку, каждое задание один раз. Затем можно повторить ошибки.</span></button>
     </> : current ? <>
       <GameProgress progress={100 * (mode === 'learn' ? mastered : 19 - queue.length) / 19}>{mode === 'learn' ? `Закреплено: ${mastered} из 19` : review ? `Осталось в повторе: ${queue.length}` : `Карточка ${20 - queue.length} из 19`}</GameProgress>
-      <GamePrompt label={current[2]} lang="ru" visual={<FamilyPicture id={current[0]} />}>
+      <GamePrompt long={current[2].length > 23} label={current[2]} lang="ru" visual={<FamilyPicture id={current[0]} />}>
         <div className="beginner-prompt-tools">{correct && <button className="secondary-button" disabled={!voice} onClick={() => speakVietnamese(current[1])}>🔊 Послушать ещё</button>}</div>
         {!voice && <p className="beginner-prompt-note">Для озвучки нужен вьетнамский голос на устройстве. Играть можно без звука.</p>}
       </GamePrompt>

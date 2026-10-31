@@ -51,9 +51,8 @@ const cases: [string, () => ReactNode, string | null, number][] = [
   ['people', () => <PeopleGameScreen onBack={() => {}} />, 'Начать', 3],
   ['family', () => <FamilyGameScreen onBack={() => {}} />, '🌱 Обучение', 6],
   ['family-blitz', () => <FamilyGameScreen onBack={() => {}} />, '⚡ Блиц', 6],
-  ['house', () => <HouseGameScreen onBack={() => {}} />, '🏠 Обучение · Дом', 2],
-  ['adjectives', () => <HouseGameScreen onBack={() => {}} />, '🎨 Обучение · Прилагательные', 2],
-  ['house-blitz', () => <HouseGameScreen onBack={() => {}} />, '⚡ Блиц · Всё вместе', 6],
+  ['house', () => <HouseGameScreen onBack={() => {}} />, 'Начать', 3],
+  ['adjectives', () => <HouseGameScreen game="adjectives" onBack={() => {}} />, 'Начать', 3],
   ['restaurant', () => <RestaurantGameScreen onBack={() => {}} />, null, 6],
   ['phone', () => <PhoneGameScreen onBack={() => {}} />, 'Начать', 10],
   ['cubes', () => <CubesGameScreen range="11-99" direction="vi-ru" onBack={() => {}} />, 'Начать игру', 6],
@@ -83,13 +82,14 @@ it('keeps the family six-choice learning loop and replay control inside the prom
   await act(async () => vi.advanceTimersByTime(1800));
   expect(host.querySelector('.profession-caption')?.textContent).toBe(familyWords[1][2]);
 });
-it('keeps house mastery rules and the limited learning choices while using the common frame', async () => {
-  await render(<HouseGameScreen onBack={() => {}} />); await click('🏠 Обучение · Дом');
+it('keeps house forward and reverse prompts in the shared frame with three fixed choices', async () => {
+  await render(<HouseGameScreen onBack={() => {}} />); await click('Начать');
   await click(houseLearning[0][1]);
-  expect(host.querySelectorAll('.work-options button')).toHaveLength(2);
-  await act(async () => vi.advanceTimersByTime(1800));
-  expect(host.querySelector('[data-testid="adjective-block"]')).toBeTruthy();
-  expect(host.querySelector('.profession-caption')?.textContent).toBe(houseLearning[1][2]);
+  expect(host.querySelectorAll('.work-options button')).toHaveLength(3);
+  await act(async () => vi.advanceTimersByTime(1600));
+  expect(host.querySelector('.profession-caption')?.textContent).toBe(houseLearning[0][1]);
+  expect(host.querySelector('.profession-empty')).toBeTruthy();
+  capture('house-reverse');
 });
 it('does not reveal a dialogue translation until requested and keeps every word choice after hints', async () => {
   await render(<DialogueGameScreen direction="vi-ru" onBack={() => {}} />);

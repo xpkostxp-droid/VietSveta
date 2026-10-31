@@ -40,6 +40,7 @@ type Screen =
   | { name: 'numbers-games-list' }
   | { name: 'family-game' }
   | { name: 'house-game' }
+  | { name: 'adjectives-game' }
   | { name: 'professions-game' }
   | { name: 'travel-game' }
   | { name: 'people-game' }
@@ -70,8 +71,7 @@ function App({section,onBack,isAdmin=false}:{section:BeginnerSection;onBack:()=>
 
   let screen = requestedScreen;
   if(!isAdmin) {
-    if(screen.name === 'family-game' || screen.name === 'house-game') screen = {name:'games-list'};
-    else if(['dialogue-games-list','dialogue-game-setup','dialogue-game','big-numbers-setup','big-numbers-game'].includes(screen.name)
+    if(['dialogue-games-list','dialogue-game-setup','dialogue-game','big-numbers-setup','big-numbers-game'].includes(screen.name)
       || ((screen.name === 'numbers-game-setup' || screen.name === 'numbers-game') && screen.range !== 'phone')) screen = {name:'numbers-games-list'};
   }
   switch (screen.name) {
@@ -79,7 +79,7 @@ function App({section,onBack,isAdmin=false}:{section:BeginnerSection;onBack:()=>
       return <Suspense fallback={<div className="screen"><BackButton onClick={onBack} label="К выбору группы" /><p role="status">Загружаем аудирование…</p></div>}><ListeningScreen onBack={onBack} /></Suspense>;
 
     case 'games-list':
-      return <GamesListScreen isAdmin={isAdmin} category={gamesCategory} onCategoryChange={setGamesCategory} onOpenTaxi={() => setScreen({ name: 'taxi-demo' })} onOpenQuestionTower={() => setScreen({ name: 'question-tower' })} onOpenSuperBlitz={() => setScreen({ name: 'questions-superblitz' })} onOpenRestaurant={() => setScreen({ name: 'restaurant-game' })} onOpenPeople={() => setScreen({ name: 'people-game' })} onBack={onBack} onOpenTravel={() => setScreen({ name: 'travel-game' })} onOpenProfessions={() => setScreen({ name: 'professions-game' })} onOpenFamily={() => setScreen({ name: 'family-game' })} onOpenHouse={() => setScreen({ name: 'house-game' })} onOpenLesson9={() => setScreen({ name: 'numbers-games-list' })} />;
+      return <GamesListScreen isAdmin={isAdmin} category={gamesCategory} onCategoryChange={setGamesCategory} onOpenTaxi={() => setScreen({ name: 'taxi-demo' })} onOpenQuestionTower={() => setScreen({ name: 'question-tower' })} onOpenSuperBlitz={() => setScreen({ name: 'questions-superblitz' })} onOpenRestaurant={() => setScreen({ name: 'restaurant-game' })} onOpenPeople={() => setScreen({ name: 'people-game' })} onBack={onBack} onOpenTravel={() => setScreen({ name: 'travel-game' })} onOpenProfessions={() => setScreen({ name: 'professions-game' })} onOpenFamily={() => setScreen({ name: 'family-game' })} onOpenHouse={() => setScreen({ name: 'house-game' })} onOpenAdjectives={() => setScreen({ name: 'adjectives-game' })} onOpenLesson9={() => setScreen({ name: 'numbers-games-list' })} />;
 
     case 'numbers-games-list':
       return <NumbersGamesListScreen isAdmin={isAdmin} onBack={() => setScreen({ name: 'games-list' })} onOpenDialogues={() => setScreen({ name: 'dialogue-games-list' })} onOpenBigNumbers={() => setScreen({ name: 'big-numbers-setup' })} onOpenNumbers={range => setScreen({ name: 'numbers-game-setup', range })} />;
@@ -108,8 +108,11 @@ function App({section,onBack,isAdmin=false}:{section:BeginnerSection;onBack:()=>
     case 'family-game':
       return <FamilyGameScreen onBack={() => setScreen({ name: 'games-list' })} />;
 
+    case 'adjectives-game':
+      return <HouseGameScreen key="adjectives" game="adjectives" onBack={() => setScreen({ name: 'games-list' })} />;
+
     case 'house-game':
-      return <HouseGameScreen onBack={() => setScreen({ name: 'games-list' })} />;
+      return <HouseGameScreen key="house" onBack={() => setScreen({ name: 'games-list' })} />;
 
     case 'dialogue-games-list':
       return <div className="screen"><BackButton onClick={() => setScreen({ name: 'numbers-games-list' })} label="К уроку 9" /><span className="badge">Урок 9 · Числа и возраст</span><h1 className="screen-title">Диалоги</h1><button className="lesson-item game-menu-item" onClick={() => setScreen({ name: 'dialogue-game-setup' })}><span className="game-menu-icon" aria-hidden="true">💬</span><span className="lesson-number">Собери фразу</span><span>17 фраз · Знакомство и возраст</span></button></div>;

@@ -114,3 +114,16 @@ export function advanceHouseLearning(queue: number[], wins: Record<number, numbe
   else if (nextWord < total) remaining.push(nextWord++);
   return { queue: remaining, wins: { ...wins, [index]: count }, nextWord };
 }
+
+// Each independent game asks every unique entry once in each direction.
+export type HouseGame = 'house' | 'adjectives';
+export type HouseTask = { index: number; reverse: boolean };
+export function houseGameWords(game: HouseGame) {
+  return game === 'house' ? houseLearning : adjectiveLearning;
+}
+export function houseGameTasks(game: HouseGame): HouseTask[] {
+  return shuffled(houseGameWords(game).flatMap((_, index) => [{ index, reverse: false }, { index, reverse: true }]));
+}
+export function houseGameOptions(game: HouseGame, task: HouseTask): number[] {
+  return shuffled([task.index, ...shuffled(houseGameWords(game).map((_, index) => index).filter(index => index !== task.index)).slice(0, 2)]);
+}

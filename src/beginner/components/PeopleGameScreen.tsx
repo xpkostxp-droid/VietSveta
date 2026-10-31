@@ -4,12 +4,15 @@ import { GameRanking } from '../../components/GameRanking';
 import { saveTimedAttempt } from '../../domain/answerTime';
 import { speakVietnamese, stopSpeaking } from '../domain/speech';
 import { BackButton } from './BackButton';
-import { PeoplePicture } from './PeoplePicture';
+import { PeoplePicture, peoplePhotos } from './PeoplePicture';
 import './ProfessionsGameScreen.css';
 import { makeGameSound } from './gameSounds';
 import { GamePrompt, GameChoices } from './BeginnerPlayLayout';
 type Result = { correct: number; time: number };
 export function PeopleGameScreen({ onBack }: { onBack: () => void }) {
+  useEffect(() => {
+    Object.values(peoplePhotos).forEach(src => { const image = new Image(); image.src = src; });
+  }, []);
   const group = 'people';
   const [tasks, setTasks] = useState<PeopleTask[]>([]);
   const [position, setPosition] = useState(0);
@@ -95,7 +98,7 @@ export function PeopleGameScreen({ onBack }: { onBack: () => void }) {
         /> : word && <>
         <div className="work-status"><strong>{position + 1}/{tasks.length} · ✓ {score.correct}</strong><span className="work-clock" aria-label="Осталось секунд">{Math.ceil(remaining / 1000)}</span></div>
         <div className="work-timebar"><div style={{ width: `${remaining / 50}%` }} /></div>
-        <GamePrompt label={current.reverse ? word[1] : word[2]} lang={current.reverse ? 'vi' : 'ru'} visual={!current.reverse ? <PeoplePicture id={word[0]} /> : undefined} />
+        <GamePrompt long={!current.reverse && word[2].length > 23} label={current.reverse ? word[1] : word[2]} lang={current.reverse ? 'vi' : 'ru'} visual={!current.reverse ? <PeoplePicture id={word[0]} /> : undefined} />
         {paused ? <button className="big-button" onClick={() => { audio.current.ready(); started.current = performance.now(); setPaused(false); }}>Продолжить</button> : <GameChoices>{options.map(option => <button key={option} lang={current.reverse ? 'ru' : 'vi'} disabled={phase !== 'playing'} className={'choice-button ' + (phase === 'feedback' ? option === answer ? 'family-correct' : option === selected ? 'family-wrong' : '' : '')} onClick={() => finishAnswer(option)}>{option}</button>)}</GameChoices>}
         {paused&&<p className="family-feedback work-feedback" role="status">Игра на паузе</p>}
       </>}

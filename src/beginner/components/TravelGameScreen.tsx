@@ -82,7 +82,7 @@ export function TravelGameScreen({ onBack, initialGroup = null }: { onBack: () =
   }, [phase, position, group, tasks, score]);
   useEffect(() => () => { stopSpeaking(); audio.current.close(); }, []);
   useEffect(() => {
-    if (group === 'travel') travelBlitzPool(group).forEach(index => {
+    if (group) travelBlitzPool(group).forEach(index => {
       const image = new Image(); image.src = travelPhotos[travelWords[index][0]];
     });
   }, [group]);

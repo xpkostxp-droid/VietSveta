@@ -1,0 +1,308 @@
+[
+  {
+    "group": "countries",
+    "id": "vn",
+    "scene": "Vietnam: Hoan Kiem lake and Turtle Tower in Hanoi, lush trees.",
+    "file": "public/countries/vn.webp"
+  },
+  {
+    "group": "countries",
+    "id": "ru",
+    "scene": "Russia: Saint Basil's Cathedral in Moscow, colorful onion domes.",
+    "file": "public/countries/ru.webp"
+  },
+  {
+    "group": "countries",
+    "id": "cn",
+    "scene": "China: Great Wall winding across green mountains.",
+    "file": "public/countries/cn.webp"
+  },
+  {
+    "group": "countries",
+    "id": "kr",
+    "scene": "South Korea: Gyeongbokgung palace in Seoul.",
+    "file": "public/countries/kr.webp"
+  },
+  {
+    "group": "countries",
+    "id": "jp",
+    "scene": "Japan: Mount Fuji behind traditional red pagoda and cherry blossoms.",
+    "file": "public/countries/jp.webp"
+  },
+  {
+    "group": "countries",
+    "id": "la",
+    "scene": "Laos: golden Pha That Luang stupa in Vientiane.",
+    "file": "public/countries/la.webp"
+  },
+  {
+    "group": "countries",
+    "id": "kh",
+    "scene": "Cambodia: Angkor Wat temple reflected in pool.",
+    "file": "public/countries/kh.webp"
+  },
+  {
+    "group": "countries",
+    "id": "th",
+    "scene": "Thailand: Grand Palace of Bangkok.",
+    "file": "public/countries/th.webp"
+  },
+  {
+    "group": "countries",
+    "id": "fr",
+    "scene": "France: Eiffel Tower from a park in Paris.",
+    "file": "public/countries/fr.webp"
+  },
+  {
+    "group": "countries",
+    "id": "de",
+    "scene": "Germany: Brandenburg Gate in Berlin.",
+    "file": "public/countries/de.webp"
+  },
+  {
+    "group": "countries",
+    "id": "gb",
+    "scene": "England: Big Ben and Westminster bridge in London.",
+    "file": "public/countries/gb.webp"
+  },
+  {
+    "group": "countries",
+    "id": "it",
+    "scene": "Italy: Colosseum in Rome.",
+    "file": "public/countries/it.webp"
+  },
+  {
+    "group": "countries",
+    "id": "es",
+    "scene": "Spain: Sagrada Familia in Barcelona.",
+    "file": "public/countries/es.webp"
+  },
+  {
+    "group": "countries",
+    "id": "us",
+    "scene": "USA: Statue of Liberty in New York harbor.",
+    "file": "public/countries/us.webp"
+  },
+  {
+    "group": "countries",
+    "id": "au",
+    "scene": "Australia: Sydney Opera House by harbor.",
+    "file": "public/countries/au.webp"
+  },
+  {
+    "group": "people",
+    "id": "l8-03",
+    "scene": "Vietnamese man and woman having a friendly dialogue facing one another across a cafe table, both engaged in conversation.",
+    "file": "public/people/l8-03.webp"
+  },
+  {
+    "group": "people",
+    "id": "l8-04",
+    "scene": "Vietnamese young adult politely agreeing to an older woman with a respectful small nod and attentive warm expression. Polite yes.",
+    "file": "public/people/l8-04.webp"
+  },
+  {
+    "group": "people",
+    "id": "l8-05",
+    "scene": "Vietnamese young woman politely agreeing to an older man with a small respectful bow and nod. Deferential yes.",
+    "file": "public/people/l8-05.webp"
+  },
+  {
+    "group": "people",
+    "id": "l8-06",
+    "scene": "Vietnamese person being offered a cup of tea and clearly accepting with nod and welcoming open hand. Affirmative yes.",
+    "file": "public/people/l8-06.webp"
+  },
+  {
+    "group": "people",
+    "id": "l8-13",
+    "scene": "Vietnamese adult man in smart casual office clothes introducing himself professionally, palm touching own chest. Neutral formal I.",
+    "file": "public/people/l8-13.webp"
+  },
+  {
+    "group": "people",
+    "id": "l8-14",
+    "scene": "Vietnamese young adult woman in a cosy cafe gently touching own chest while speaking warmly to friend. Soft friendly I.",
+    "file": "public/people/l8-14.webp"
+  },
+  {
+    "group": "people",
+    "id": "l8-15",
+    "scene": "Vietnamese university student talking casually to equal-age friend, thumb pointing at own chest with playful smile. Peer I.",
+    "file": "public/people/l8-15.webp"
+  },
+  {
+    "group": "people",
+    "id": "l8-16",
+    "scene": "Vietnamese adult man in street clothes speaking bluntly and assertively with thumb pointing at own chest, furrowed brow. Rough informal I, no violence.",
+    "file": "public/people/l8-16.webp"
+  },
+  {
+    "group": "people",
+    "id": "l8-17",
+    "scene": "Vietnamese adult man in street clothes addressing another man bluntly and assertively, pointing hand toward other person. Rough informal you, no violence.",
+    "file": "public/people/l8-17.webp"
+  },
+  {
+    "group": "people",
+    "id": "l8-22",
+    "scene": "Vietnamese woman in foreground gesturing with open hand toward adult Vietnamese man standing nearby, man clearly main subject. He.",
+    "file": "public/people/l8-22.webp"
+  },
+  {
+    "group": "people",
+    "id": "l8-23",
+    "scene": "Vietnamese young adult gestures toward an older Vietnamese woman in smart casual clothes nearby, woman main subject. She, older.",
+    "file": "public/people/l8-23.webp"
+  },
+  {
+    "group": "people",
+    "id": "l8-24",
+    "scene": "Vietnamese young man gestures toward adult Vietnamese woman standing nearby, woman clearly main subject. She.",
+    "file": "public/people/l8-24.webp"
+  },
+  {
+    "group": "people",
+    "id": "l8-25",
+    "scene": "Vietnamese adults gesture warmly toward younger teenage Vietnamese person nearby, teenager main subject. He or she younger.",
+    "file": "public/people/l8-25.webp"
+  },
+  {
+    "group": "people",
+    "id": "l8-28",
+    "scene": "Two Vietnamese friends seen partly from behind looking toward separate group of three adults chatting across garden. Distant group main subject. They.",
+    "file": "public/people/l8-28.webp"
+  },
+  {
+    "group": "people",
+    "id": "l8-31",
+    "scene": "Three Vietnamese friends in circle planning trip around cafe table. Speaker warmly includes friend nearest camera with welcoming gesture, everyone together in same group. Inclusive we, including listener.",
+    "file": "public/people/l8-31.webp"
+  },
+  {
+    "group": "people",
+    "id": "l8-34",
+    "scene": "Three Vietnamese coworkers together on one side of cafe table speaking as group to visiting adult seated separately opposite them. Exclusive we, listener outside speakers group.",
+    "file": "public/people/l8-34.webp"
+  },
+  {
+    "group": "people",
+    "id": "l8-37",
+    "scene": "Four Vietnamese friends in park, all four holding identical green books, every person clearly visible and doing same thing. All, everyone.",
+    "file": "public/people/l8-37.webp"
+  },
+  {
+    "group": "family",
+    "id": "family",
+    "scene": "Vietnamese father mother and two children together in warm home, naturally smiling family portrait.",
+    "file": "public/family/family.webp"
+  },
+  {
+    "group": "family",
+    "id": "grandpa-dad",
+    "scene": "Vietnamese paternal grandfather with grey hair sitting beside adult son in blue shirt and young grandchild. Grandfather foreground main subject, father links generations.",
+    "file": "public/family/grandpa-dad.webp"
+  },
+  {
+    "group": "family",
+    "id": "grandma-dad",
+    "scene": "Vietnamese paternal grandmother with silver hair beside adult son in blue shirt and young grandchild. Grandmother foreground main subject, father links generations.",
+    "file": "public/family/grandma-dad.webp"
+  },
+  {
+    "group": "family",
+    "id": "grandpa-mom",
+    "scene": "Vietnamese maternal grandfather with grey hair beside adult daughter in rose blouse and young grandchild. Grandfather foreground main subject, mother links generations.",
+    "file": "public/family/grandpa-mom.webp"
+  },
+  {
+    "group": "family",
+    "id": "grandma-mom",
+    "scene": "Vietnamese maternal grandmother with silver hair beside adult daughter in rose blouse and young grandchild. Grandmother foreground main subject, mother links generations.",
+    "file": "public/family/grandma-mom.webp"
+  },
+  {
+    "group": "family",
+    "id": "dad",
+    "scene": "Vietnamese father in thirties helping small son build wooden toy at home. Father main subject.",
+    "file": "public/family/dad.webp"
+  },
+  {
+    "group": "family",
+    "id": "mom",
+    "scene": "Vietnamese mother in thirties helping small daughter get ready for school at home. Mother main subject.",
+    "file": "public/family/mom.webp"
+  },
+  {
+    "group": "family",
+    "id": "brother-older",
+    "scene": "Vietnamese older brother aged twenty helping younger ten-year-old brother with bicycle in garden. Older brother main subject.",
+    "file": "public/family/brother-older.webp"
+  },
+  {
+    "group": "family",
+    "id": "brother-younger",
+    "scene": "Vietnamese younger brother aged ten showing toy to twenty-year-old older brother at home. Younger boy main subject.",
+    "file": "public/family/brother-younger.webp"
+  },
+  {
+    "group": "family",
+    "id": "sister-older",
+    "scene": "Vietnamese older sister aged twenty helping ten-year-old younger sister with school bag at home. Older sister main subject.",
+    "file": "public/family/sister-older.webp"
+  },
+  {
+    "group": "family",
+    "id": "sister-younger",
+    "scene": "Vietnamese younger sister aged ten showing drawing to twenty-year-old older sister at home. Younger girl main subject.",
+    "file": "public/family/sister-younger.webp"
+  },
+  {
+    "group": "family",
+    "id": "wife",
+    "scene": "Married Vietnamese couple in thirties at home. Husband turns warmly toward wife with open hand gesture. Wife main subject, subtle wedding rings.",
+    "file": "public/family/wife.webp"
+  },
+  {
+    "group": "family",
+    "id": "husband",
+    "scene": "Married Vietnamese couple in thirties at home. Wife turns warmly toward husband with open hand gesture. Husband main subject, subtle wedding rings.",
+    "file": "public/family/husband.webp"
+  },
+  {
+    "group": "family",
+    "id": "son",
+    "scene": "Vietnamese boy aged eight beside smiling mother and father at home. Parents look proudly at him, boy main subject.",
+    "file": "public/family/son.webp"
+  },
+  {
+    "group": "family",
+    "id": "daughter",
+    "scene": "Vietnamese girl aged eight beside smiling mother and father at home. Parents look proudly at her, girl main subject.",
+    "file": "public/family/daughter.webp"
+  },
+  {
+    "group": "family",
+    "id": "children",
+    "scene": "Two Vietnamese children, young boy and girl, playing wooden blocks on rug at home. Both visible.",
+    "file": "public/family/children.webp"
+  },
+  {
+    "group": "family",
+    "id": "who",
+    "scene": "Vietnamese adult asking who a person is, curious expression and open palm, second adult with face turned away in background. Leave upper right corner quiet for question-mark app icon.",
+    "file": "public/family/who.webp"
+  },
+  {
+    "group": "family",
+    "id": "who-this",
+    "scene": "Vietnamese adult introducing another adult to friend. Friend curious, gestures toward introduced person as if asking who is this. Leave upper right corner quiet for question-mark app icon.",
+    "file": "public/family/who-this.webp"
+  },
+  {
+    "group": "family",
+    "id": "all-family",
+    "scene": "Entire multigenerational Vietnamese family, grandparents parents and two children gathered on sofa, every member visible, joyful warm portrait.",
+    "file": "public/family/all-family.webp"
+  }
+]

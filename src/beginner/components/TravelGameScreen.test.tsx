@@ -103,12 +103,12 @@ it('opens the profile-linked subgroup directly and returns to the profile',()=>{
  expect(back).toHaveBeenCalledOnce();
 });
 
-it('shows all seventeen travel photos with Russian captions through correct, wrong and timeout answers; reverse prompts contain only Vietnamese', () => {
-  start('Города и путешествия');
+it.each([['Города и путешествия', 17], ['Страны', 15]])('shows every %s photo with Russian caption through feedback and only Vietnamese on reverse prompts', (group, count) => {
+  start(group as string);
   expect(host.querySelector('.profession-session')).toBeTruthy();
   const seen = new Set<string>();
   let reverseCount = 0;
-  for (let i = 0; i < 34; i++) {
+  for (let i = 0; i < Number(count) * 2; i++) {
     const prompt = host.querySelector('.work-prompt')!;
     const photo = prompt.querySelector<HTMLImageElement>('.profession-illustration img');
     const correct = correctAnswer();
@@ -136,6 +136,6 @@ it('shows all seventeen travel photos with Russian captions through correct, wro
     expect(host.querySelector('.family-correct')?.textContent).toBe(correct);
     act(() => vi.advanceTimersByTime(1600));
   }
-  expect(seen.size).toBe(17);
-  expect(reverseCount).toBe(17);
+  expect(seen.size).toBe(count);
+  expect(reverseCount).toBe(count);
 });

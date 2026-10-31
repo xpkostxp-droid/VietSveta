@@ -119,3 +119,8 @@
 
 .beginner-area .screen.profession-session.beginner-play .phone-blitz-error:not(:empty){top:43px;max-height:40px;overflow:auto;z-index:4;background:#fffdf8}
 .beginner-area .screen.profession-session.beginner-play.beginner-builder .beginner-prompt-note.pronunciation-error{top:44px;max-height:38px}
+
+/* Picture assets and optional semantic mark occupy the shared frame only. */
+.beginner-area .screen.profession-session.beginner-play .beginner-picture-wrap{position:absolute;inset:0;display:block}
+.beginner-area .screen.profession-session.beginner-play .beginner-picture-wrap > img{display:block;width:100%;height:100%;max-width:none;max-height:none;margin:0;object-fit:cover;object-position:center top;border-radius:0}
+.beginner-picture-question{position:absolute;right:14px;top:12px;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:#fff6e5ed;color:#754322;font-size:2rem;font-weight:850;line-height:1}
