@@ -3,7 +3,7 @@ vi.mock('@supabase/supabase-js', () => ({ createClient: () => ({ auth: { getSess
 import { memberRequest } from './cloud';
 beforeEach(() => { vi.stubGlobal('fetch', vi.fn(async () => ({ ok:true, json:async()=>({ rows:[] }) }))); });
 afterEach(() => { vi.unstubAllGlobals(); });
-it.each(['lesson10-family','lesson11-house','lesson11-adjectives'])('routes %s only to the dedicated authenticated read-only leaderboard', async game => {
+it.each(['lesson10-family','lesson11-house','lesson11-adjectives','lesson15-verbs'])('routes %s only to the dedicated authenticated read-only leaderboard', async game => {
  await memberRequest({action:'leaderboard',game});
  expect(fetch).toHaveBeenCalledWith('https://eqdlhipzjhbzfchwjazr.supabase.co/functions/v1/beginner-game-ranking',expect.objectContaining({method:'POST',headers:expect.objectContaining({Authorization:'Bearer test-token'}),body:JSON.stringify({action:'leaderboard',game})}));
 });

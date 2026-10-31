@@ -4,7 +4,7 @@ export const supabase = createClient('https://eqdlhipzjhbzfchwjazr.supabase.co',
 export interface Member { id:string; display_name:string; is_admin:boolean; user_id:string; course_group?:'beginner'|'advanced'; ranking_since?:string|null }
 export async function memberRequest(body:Record<string,unknown>) {
  const {data:{session}}=await supabase.auth.getSession();
- const endpoint=body.action==='leaderboard'&&['lesson10-family','lesson11-house','lesson11-adjectives'].includes(String(body.game))?'beginner-game-ranking':'member-access';
+ const endpoint=body.action==='leaderboard'&&['lesson10-family','lesson11-house','lesson11-adjectives','lesson15-verbs'].includes(String(body.game))?'beginner-game-ranking':'member-access';
  const response=await fetch('https://eqdlhipzjhbzfchwjazr.supabase.co/functions/v1/'+endpoint,{
   method:'POST',headers:{'Content-Type':'application/json',...(session?{Authorization:`Bearer ${session.access_token}`}:{})},body:JSON.stringify(body),signal:AbortSignal.timeout(15000)
  });

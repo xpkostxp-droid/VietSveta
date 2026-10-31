@@ -22,3 +22,9 @@ it('opens shared phonetics directly without choosing a group',async()=>{
  const node=document.createElement('div'),root=createRoot(node);
  try{await act(async()=>root.render(<App/>));await act(async()=>[...node.querySelectorAll('button')].find(b=>b.textContent==='Фонетика')!.click());expect(node.textContent).not.toContain('Начальная группа');expect(node.querySelector('audio')).toBeTruthy();}finally{await act(async()=>root.unmount());}
 });
+vi.mock('./VerbsGameScreen',()=>({default:({onBack}:{onBack:()=>void})=><div data-verbs-game>Игра «Глаголы»<button onClick={onBack}>К играм</button></div>}));
+it('opens Verbs from the advanced games menu and returns to that menu',async()=>{
+ const node=document.createElement('div'),root=createRoot(node);
+ const click=async(text:string)=>{const b=[...node.querySelectorAll('button')].find(b=>b.textContent?.includes(text));expect(b).toBeTruthy();await act(async()=>b!.click())};
+ try{await act(async()=>root.render(<App/>));await click('Игра');await click('Продвинутая группа');expect(node.textContent).toContain('Глаголы');await click('Глаголы');expect(node.querySelector('[data-verbs-game]')).toBeTruthy();await click('К играм');expect(node.querySelector('.games-menu-keys')).toBeTruthy()}finally{await act(async()=>root.unmount())}
+});
