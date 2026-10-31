@@ -1,0 +1,16 @@
+/* Короткие примеры на обороте карточек урока 15. */
+.flashcard-card.has-example { min-height: clamp(320px, 45dvh, 380px); }
+.flashcard-card.has-example .flashcard-text { font-size: clamp(1.4rem, 5.7vw, 2rem); }
+.flashcard-example {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 100%;
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--color-border);
+  font-size: clamp(0.95rem, 3.8vw, 1.1rem);
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+.flashcard-example [lang='ru'] { color: var(--color-muted); }
