@@ -2,7 +2,7 @@ import { MemberAvatar } from './MemberAvatar';
 import { useEffect, useState } from 'react';
 import App from '../App';
 import { cachedMember, cacheMember, memberRequest, signInMember, startAccountSync, supabase, syncAccount, rememberIdentity, restoreIdentity, forgetIdentity, type Member } from '../domain/cloud';
-import { setStorageOwner } from '../domain/accountStorage';
+import { accountEntries, storageOwner, setStorageOwner } from '../domain/accountStorage';
 import { ProfileScreen } from './ProfileScreen';
 import './AccountGate.css';
 const roster=[['svetlana','Светлана'],['lesya','Леся'],['sergey-p','Сергей П'],['sergey-k','Сергей К'],['marina','Марина'],['konstantin','Константин'],['artur','Артур'],['admin','Админ']];
@@ -14,25 +14,38 @@ function clearLegacyProgress() {
 export function AccountGate() {
  const [member,setMember]=useState<Member|null>(null),[loading,setLoading]=useState(true),[profile,setProfile]=useState(false);
  const [selected,setSelected]=useState(''),[pin,setPin]=useState(''),[error,setError]=useState(''),[busy,setBusy]=useState(false),[status,setStatus]=useState('');
- const enter=async(m:Member)=>{setStorageOwner(m.user_id,m.is_admin);cacheMember(m);if(!m.is_admin)await syncAccount(m.user_id).catch(()=>{});await rememberIdentity(m);setMember(m);setProfile(false);};
+ const enter=async(m:Member)=>{
+  setStorageOwner(m.user_id,m.is_admin);cacheMember(m);
+  // A new device must hydrate progress first; returning devices already have it.
+  if(!m.is_admin&&!Object.keys(accountEntries(m.user_id)).length)await syncAccount(m.user_id).catch(()=>{});
+  setMember(m);setProfile(false);
+  void rememberIdentity(m).catch(()=>{});
+ };
  useEffect(()=>{
   let cancelled=false;
   void (async()=>{
    try{
     clearLegacyProgress();
     const {data:{session}}=await supabase.auth.getSession();
-    if(!session)return;
+    if(!session||cancelled)return;
+    const saved=cachedMember();
+    // A cached profile alone never opens the app: it must match the restored session.
+    // Server operations continue to enforce authorization while we verify in the background.
+    const returning=saved?.user_id===session.user.id&&(saved.is_admin||Object.keys(accountEntries(saved.user_id)).length>0);
+    if(returning){await enter(saved);if(cancelled)return;setLoading(false);}
     let m:Member;
     try{m=(await memberRequest({action:'profile'})).profile;}catch(e){
+     if(cancelled||(returning&&storageOwner()!==session.user.id))return;
      if((e as {status?:number}).status===401||(e as {status?:number}).status===403){await supabase.auth.signOut({scope:'local'});return;}
      const cached=cachedMember();if(!cached||cached.user_id!==session.user.id)throw e;m=cached;
     }
-    if(!cancelled)await enter(m);
+    if(returning&&storageOwner()!==session.user.id)return;
+    if(!cancelled){if(returning){cacheMember(m);setStorageOwner(m.user_id,m.is_admin);setMember(m);}else await enter(m);}
    }catch{if(!cancelled)setError('Не удалось проверить вход. Проверь подключение и попробуй снова.');}
    finally{if(!cancelled)setLoading(false);}
   })();return()=>{cancelled=true;};
  },[]);
- useEffect(()=>member&&!member.is_admin?startAccountSync(member.user_id,setStatus):undefined,[member]);
+ useEffect(()=>member&&!member.is_admin?startAccountSync(member.user_id,setStatus):undefined,[member?.user_id,member?.is_admin]);
  // A signed-out or expired session immediately closes the application.
  useEffect(()=>{const {data}=supabase.auth.onAuthStateChange(event=>{if(event==='SIGNED_OUT'){setStorageOwner(null);setMember(null);setProfile(false);localStorage.removeItem('vietSveta.member.v1');}});return()=>data.subscription.unsubscribe();},[]);
  const login=async()=>{setBusy(true);setError('');try{clearLegacyProgress();await enter(await signInMember(selected,pin));setPin('');}catch(e){setError((e as Error).message);setPin('');}finally{setBusy(false);}};
