@@ -14,6 +14,7 @@
 
 import type { Lesson, TheoryMaterial } from '../types';
 import { lesson15Theory } from './theory/lesson15';
+import { lesson44Theory } from './theory/lesson44';
 import { lesson42Theory } from './theory/lesson42';
 import { lesson52Theory } from './theory/lesson52';
 
@@ -46,6 +47,7 @@ export const lessons: Lesson[] = [
 const theoryByLessonId: Record<string, TheoryMaterial['sections']> = {
   'lesson-15': lesson15Theory,
   'lesson-42': lesson42Theory,
+  'lesson-44': lesson44Theory,
   'lesson-52': lesson52Theory,
 };
 
