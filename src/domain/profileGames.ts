@@ -13,6 +13,9 @@ export const profileGames = [
  {id:'lesson7-countries',title:'Страны'},
  {id:'lesson7-travel',title:'Города и путешествия'},
  {id:'lesson8-people',title:'Люди и обращения'},
+ {id:'lesson10-family',title:'Семья'},
+ {id:'lesson11-house',title:'Дом'},
+ {id:'lesson11-adjectives',title:'Прилагательные'},
  {id:'lesson9-phone',title:'Цифры 1–10 · номер телефона'},
 ] as const;
 export type ProfileGameId = typeof profileGames[number]['id'];

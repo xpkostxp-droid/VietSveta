@@ -4,6 +4,8 @@ import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { HouseGameScreen } from './HouseGameScreen';
 import { houseGameWords, houseGameTasks, houseGameOptions, type HouseGame } from '../content/games/house';
 vi.mock('../domain/speech', () => ({ speakVietnamese: vi.fn(), stopSpeaking: vi.fn(), hasVietnameseVoice: () => true, onVoicesChanged: () => () => {} }));
+vi.mock('../../components/GameRanking', () => ({ GameRanking: ({ game, total, onStart, result, startLabel }: any) => <section className="game-ranking" data-game={game}><h2>Лучшие попытки</h2>{result && <p>Правильно: {result.correct} из {total}</p>}<button onClick={onStart}>{startLabel}</button></section> }));
+vi.mock('../../domain/answerTime', () => ({ saveTimedAttempt: vi.fn() }));
 (globalThis as any).IS_REACT_ACT_ENVIRONMENT = true;
 let host: HTMLDivElement, root: ReturnType<typeof createRoot>;
 beforeEach(() => { vi.useFakeTimers(); host = document.createElement('div'); document.body.append(host); root = createRoot(host); });

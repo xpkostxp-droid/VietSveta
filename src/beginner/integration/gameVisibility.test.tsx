@@ -23,9 +23,9 @@ it('removes an already-open restricted menu immediately if the admin flag is los
  await open(false);expect(node.querySelectorAll('.game-menu-item')).toHaveLength(1);expect(node.textContent).toContain('Номер телефона');
 });
 
-it.each([['Урок 11 · Дом','Дом','36'],['Урок 11 · Прилагательные','Прилагательные','38']])('opens %s directly for participants',async(label,title,total)=>{
+it.each([['Урок 11 · Дом','Дом','36'],['Урок 11 · Прилагательные','Прилагательные','38']])('opens %s directly for participants',async(label,title)=>{
  await open(false);await act(async()=>Array.from(node.querySelectorAll('button')).find(b=>b.textContent?.includes(label))!.click());
  expect(node.querySelector('h1')?.textContent).toBe(title);
- expect(node.textContent).toContain(total+' заданий');
+ expect(node.querySelector('.game-ranking')).toBeTruthy();expect(node.querySelector('img')).toBeNull();expect(node.querySelector('.ranking-start')?.textContent).toBe('Начать');
  expect(node.textContent).not.toContain('Блиц');expect(node.textContent).not.toContain('Обучение');
 });
