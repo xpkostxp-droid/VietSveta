@@ -89,13 +89,11 @@
 .beginner-area .screen.profession-session.beginner-play .beginner-word-bank section > h2{font-size:.75rem;margin:6px 0}
 .beginner-area .screen.profession-session.beginner-play .beginner-word-bank section:first-child > h2{margin-top:0}
 .beginner-area .screen.profession-session.beginner-play .beginner-word-bank section .big-number-tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0}
-.beginner-area .screen.profession-session.beginner-play .beginner-word-bank button{font-size:1rem}
 .beginner-area .screen.profession-session.beginner-play .big-number-answer{width:100%;margin:0;padding:2px;gap:4px;min-height:0;justify-content:center;overflow:auto;flex-wrap:wrap;flex-shrink:0}
 .beginner-area .screen.profession-session.beginner-play .big-number-slot{min-width:22px;min-height:24px;height:24px;padding:3px;font-size:.85rem;line-height:1.2;display:flex;align-items:center;justify-content:center}
 @media(max-height:740px){.beginner-area .screen.profession-session.beginner-play{gap:6px}}
 @media(max-height:650px){
  .beginner-area .screen.profession-session.beginner-play .work-options button{font-size:1.15rem}
- .beginner-area .screen.profession-session.beginner-play .beginner-word-bank button{font-size:.95rem}
     }
 .beginner-area .screen.profession-session.beginner-play .phone-blitz-status{height:40px;min-height:40px;font-size:1rem;margin:0}
 .beginner-area .screen.profession-session.beginner-play .phone-blitz-clock{width:40px;height:40px}
