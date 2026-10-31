@@ -44,3 +44,6 @@
 .digit-battle-intro small{color:#71817c}
 @media(max-height:650px){.beginner-area .screen.digit-battle-screen{gap:6px}.digit-battle-header{height:40px}.digit-score{min-height:38px}.digit-feedback{height:14px;line-height:14px}.beginner-area .screen.profession-session.beginner-play.digit-battle-screen .digit-keypad button{font-size:1.6rem}.digit-battle-clock{width:38px;height:38px}}
 @media(prefers-reduced-motion:reduce){.digit-falling-cube{transition:none}.digit-falling-cube.is-popping,.digit-falling-cube.is-popping::after{animation-duration:.01s}}
+
+.beginner-area .screen.digit-battle-picker p{margin:0;color:#617673;font-size:.9rem;line-height:1.4}
+.beginner-area .digit-battle-picker>.big-button{margin-top:auto}

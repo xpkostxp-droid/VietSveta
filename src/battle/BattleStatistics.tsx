@@ -2,7 +2,7 @@ import { useEffect,useState } from 'react';
 import { supabase } from '../domain/cloud';
 import { battleRanking,battleOpponents,type BattleStats } from './battleRanking';
 import './BattleStatistics.css';
-export function BattleStatistics({onPlay}:{onPlay:()=>void}){
+export function BattleStatistics({onPlay,startLabel='Играть'}:{onPlay:()=>void;startLabel?:string}){
  const [data,setData]=useState<BattleStats>({viewer_id:'',matches:[]}),[busy,setBusy]=useState(true),[error,setError]=useState(''),[retry,setRetry]=useState(0),[expanded,setExpanded]=useState<string|null>(null);
  useEffect(()=>{
   let alive=true;setBusy(true);setError('');
@@ -21,6 +21,6 @@ export function BattleStatistics({onPlay}:{onPlay:()=>void}){
    {expanded&&<section className="battle-stats-details" aria-label="Результаты по соперникам"><h3>{rows.find(r=>r.id===expanded)?.name} · соперники</h3>{battleOpponents(data.matches,expanded).map(row=><div className="battle-stats-opponent" key={row.id}><strong>{row.name}</strong><span>{row.played} матчей · {row.wins} побед · {row.losses} пораж.</span><span>Последний счёт <b>{row.score}</b></span></div>)}<p className="battle-stats-caption">Счёт со стороны выбранного игрока</p></section>}
   </>}
   <p className="battle-stats-caption">Только завершённые матчи с людьми · за всё время</p>
-  <button className="big-button battle-stats-play" onClick={onPlay}>Играть</button>
+  <button className="big-button battle-stats-play" onClick={onPlay}>{startLabel}</button>
  </section>;
 }

@@ -29,3 +29,10 @@ it('retries a failed request',async()=>{
  await act(async()=>[...node.querySelectorAll('button')].find(b=>b.textContent==='Повторить')!.click());
  expect(node.textContent).toContain('Пока нет завершённых батлов');
 });
+
+it('supports the beginner Start label while retaining the shared statistics',async()=>{
+ rpc.mockResolvedValue({data:{viewer_id:'a',matches:[]},error:null});const play=vi.fn();
+ await act(async()=>root.render(<BattleStatistics onPlay={play} startLabel="Начать"/>));
+ await act(async()=>node.querySelector<HTMLButtonElement>('.battle-stats-play')!.click());expect(play).toHaveBeenCalledOnce();
+ expect(node.querySelector('.battle-stats-play')?.textContent).toBe('Начать');expect(rpc).toHaveBeenCalledWith('battle_statistics');
+});

@@ -1,3 +1,4 @@
+import { TopicWheel } from '../../battle/TopicWheel';
 import { useBattleResultSound } from '../../battle/useBattleResultSound';
 import { readyBattleDigitAudio, playBattleDigit } from '../../battle/resultAudio';
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
@@ -27,13 +28,13 @@ export function DigitBattleStage({ state, now, paused = false, onResume }: { sta
   {paused && <div className="digit-pause"><strong>Пауза</strong><button className="big-button" onClick={onResume}>Продолжить</button></div>}
  </div>;
 }
-export function DigitBattleScreen({ onBack, playerName = 'Ты' }: { onBack: () => void; playerName?: string }) {
+export function DigitBattleScreen({ onBack, playerName = 'Ты', showPicker = false }: { onBack: () => void; playerName?: string; showPicker?: boolean }) {
  const [playing,setPlaying] = useState(false), [session,setSession] = useState(0);
  const [sound] = useState(makeGameSound);
  useEffect(() => () => sound.close(), [sound]);
  const start = () => { sound.ready(); readyBattleDigitAudio(); setSession(n=>n+1); setPlaying(true); };
- if (!playing) return <div className="screen digit-battle-intro"><BackButton onClick={onBack} label="К играм"/><span className="badge">Тест · Только для администратора</span><h1>Батл · Цифры 0–9</h1><p>Прочитай слово на падающем кубике и нажми цифру. Первый правильный ответ забирает кубик.</p><p>Собери 8 кубиков раньше бота. На каждый кубик — 5 секунд. После ошибки у соперника остаётся время.</p><button className="big-button" onClick={start}>Сыграть с ботом</button><small>Тренировка · без рейтинга</small></div>;
- return <DigitBattleMatch key={session} playerName={playerName} sound={sound} onBack={onBack} onReplay={start}/>;
+ if (!playing) return <div className={"screen digit-battle-intro"+(showPicker?" digit-battle-picker":"")}><BackButton onClick={onBack} label={showPicker?"К статистике":"К батлам"}/>{showPicker?<><h1 className="screen-title">Батл</h1><div className="battle-label">Выбери игру</div><TopicWheel items={[{id:'digits',title:'Цифры 0–9'}]} value="digits" onChange={()=>{}} label="Выбери игру"/></>:<><span className="badge">Батл · С ботом</span><h1>Батл · Цифры 0–9</h1></>}{showPicker?<p className="digit-picker-note">5 секунд на ответ · Победа при 8 кубиках</p>:<><p>Прочитай слово на падающем кубике и нажми цифру. Первый правильный ответ забирает кубик.</p><p>Собери 8 кубиков раньше бота. На каждый кубик — 5 секунд. После ошибки у соперника остаётся время.</p></>}<button className="big-button" onClick={start}>Сыграть с ботом</button><small>Тренировка · без рейтинга</small></div>;
+ return <DigitBattleMatch key={session} playerName={playerName} sound={sound} onBack={showPicker?()=>setPlaying(false):onBack} onReplay={start}/>;
 }
 function DigitBattleMatch({ playerName, sound, onBack, onReplay }: { playerName: string; sound: ReturnType<typeof makeGameSound>; onBack: () => void; onReplay: () => void }) {
  const [game] = useState(createDigitBattle), [state,setState] = useState(game.initial), [now,setNow] = useState(Date.now), [paused,setPaused] = useState(document.hidden);
@@ -64,7 +65,7 @@ function DigitBattleMatch({ playerName, sound, onBack, onReplay }: { playerName:
   if (resolved && heard.current !== state.round) { heard.current = state.round; if (!state.winner) sound.pop(); else if (state.phase !== 'finished') sound.beep(2); }
  }, [state.round,state.phase,seconds,paused,sound]);
  return <div className={'screen ' + beginnerPlayClass + ' digit-battle-screen'}>
-  <header className="digit-battle-header"><button className="digit-back" onClick={onBack} aria-label="К играм">←</button><strong>Раунд {state.round}</strong><span className="digit-battle-clock" aria-label="Время на ответ" style={{ '--clock-progress': `${paused || resolved ? 0 : state.phase === 'ready' ? 100 : Math.max(0,(state.startsAt+5000-now)/50)}%` } as CSSProperties}>{paused ? 'Ⅱ' : resolved ? '✓' : seconds}</span></header>
+  <header className="digit-battle-header"><button className="digit-back" onClick={onBack} aria-label="К батлам">←</button><strong>Раунд {state.round}</strong><span className="digit-battle-clock" aria-label="Время на ответ" style={{ '--clock-progress': `${paused || resolved ? 0 : state.phase === 'ready' ? 100 : Math.max(0,(state.startsAt+5000-now)/50)}%` } as CSSProperties}>{paused ? 'Ⅱ' : resolved ? '✓' : seconds}</span></header>
   <DigitBattleStage state={state} now={now} paused={paused} onResume={() => { sound.ready(); readyBattleDigitAudio(); setState(game.resume()); setNow(Date.now()); setPaused(false); }}/>
   <div className="digit-score" aria-label="Счёт"><span><i/ ><span title={playerName}>{playerName}</span><strong>{state.cubes.human.length}</strong></span><span><i/><span>Бот</span><strong>{state.cubes.bot.length}</strong></span></div>
   <div className="digit-feedback" aria-hidden="true"/>
