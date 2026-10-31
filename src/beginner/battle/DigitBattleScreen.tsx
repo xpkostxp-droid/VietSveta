@@ -11,21 +11,17 @@ function cubePosition(index: number, side: DigitSide) {
 }
 export function DigitBattleStage({ state, now, paused = false, onResume }: { state: DigitBattleState; now: number; paused?: boolean; onResume?: () => void }) {
  const resolved = state.phase === 'result' || state.phase === 'finished';
- const moving = resolved && state.winner !== null && now < state.resultAt + 700;
- const showPrompt = state.phase === 'question' || (resolved && now < state.resultAt + 700);
- const index = state.winner ? state.cubes[state.winner].length - 1 : 0;
- const row = Math.floor(index / 2), column = state.winner === 'human' ? index % 2 : 1 - index % 2;
+ const showPrompt = state.phase === 'question' || (resolved && state.winner === null && now < state.resultAt + 180);
  const progress = Math.max(0, Math.min(1, ((resolved ? state.resultAt : now) - state.startsAt) / DIGIT_ROUND_MS));
- const targetX = state.winner === 'human' ? `calc(var(--small-cube) * ${column + .5} + 10px)` : `calc(100% - var(--small-cube) * ${2 - column - .5} - 10px)`;
- const style = { '--fall-y': `${12 + progress * 68}%`, '--target-x': targetX, '--target-y': `calc(100% - 10px - var(--small-cube) * ${row + .5})` } as CSSProperties;
+ const style = { '--fall-y': `${12 + progress * 68}%` } as CSSProperties;
  return <div className="digit-glass" style={style} aria-label="Общий стакан">
   <div className="digit-glass-rim" aria-hidden="true"/>
   {(['human','bot'] as const).map(side => <div className={'digit-stack digit-stack-' + side} key={side} aria-label={side === 'human' ? 'Твои кубики' : 'Кубики бота'}>
-   {state.cubes[side].map((digit, i) => <div key={i} className={'digit-small-cube digit-cube ' + (moving && state.winner === side && i === index ? 'is-landing' : '')} style={cubePosition(i,side)}>{digit}</div>)}
+   {state.cubes[side].map((digit, i) => <div key={i} className="digit-small-cube digit-cube" style={cubePosition(i,side)}>{digit}</div>)}
   </div>)}
-  {showPrompt && <div key={state.round} className={'digit-falling-cube digit-cube' + (resolved ? state.winner ? ` is-collected to-${state.winner}` : ' is-exploding' : '')} lang="vi">{phoneDigitWords[state.digit]}</div>}
-  {state.phase === 'ready' && <div className="digit-field-message"><span>{state.round === 1 ? 'Приготовься!' : 'Следующий кубик'}</span>{state.round === 1 && <strong>{Math.max(1,Math.ceil((state.startsAt-now)/1000))}</strong>}</div>}
-  {state.phase === 'finished' && now >= state.resultAt + 700 && <div className="digit-field-message digit-victory"><strong>{state.winner === 'human' ? 'Ты победил!' : 'Бот победил'}</strong><span>8 кубиков собрано</span></div>}
+  {showPrompt && <div key={state.round} className={'digit-falling-cube digit-cube' + (resolved ? ' is-popping' : '')} lang="vi">{phoneDigitWords[state.digit]}</div>}
+  {state.phase === 'ready' && state.round === 1 && <div className="digit-field-message"><strong>{Math.max(1,Math.ceil((state.startsAt-now)/1000))}</strong></div>}
+  {state.phase === 'finished' && now >= state.resultAt + 700 && <div className="digit-field-message digit-victory"><strong>{state.winner === 'human' ? 'Ты победил!' : 'Бот победил'}</strong></div>}
   {paused && <div className="digit-pause"><strong>Пауза</strong><button className="big-button" onClick={onResume}>Продолжить</button></div>}
  </div>;
 }
@@ -55,14 +51,13 @@ function DigitBattleMatch({ playerName, sound, onBack, onReplay }: { playerName:
   if (paused) return;
   const key = `${state.round}:${state.phase}:${seconds}`;
   if (!resolved && seconds >= 1 && seconds <= 3 && beeped.current !== key) { beeped.current = key; sound.beep(seconds); }
-  if (resolved && heard.current !== state.round) { heard.current = state.round; if (state.winner) sound.beep(2); else sound.crash(); }
+  if (resolved && heard.current !== state.round) { heard.current = state.round; if (state.winner) sound.beep(2); else sound.pop(); }
  }, [state.round,state.phase,seconds,paused,sound]);
- const feedback = resolved ? state.winner === 'human' ? 'Твой кубик!' : state.winner === 'bot' ? 'Кубик бота' : 'Кубик исчез — без очков' : state.humanAnswered ? 'Промах! У бота ещё есть время' : state.botAnswered ? 'Бот ошибся — отвечай!' : '';
  return <div className={'screen ' + beginnerPlayClass + ' digit-battle-screen'}>
   <header className="digit-battle-header"><button className="digit-back" onClick={onBack} aria-label="К играм">←</button><strong>Раунд {state.round}</strong><span className="digit-battle-clock" aria-label="Время на ответ" style={{ '--clock-progress': `${paused || resolved ? 0 : state.phase === 'ready' ? 100 : Math.max(0,(state.startsAt+5000-now)/50)}%` } as CSSProperties}>{paused ? 'Ⅱ' : resolved ? '✓' : seconds}</span></header>
   <DigitBattleStage state={state} now={now} paused={paused} onResume={() => { sound.ready(); setState(game.resume()); setNow(Date.now()); setPaused(false); }}/>
   <div className="digit-score" aria-label="Счёт"><span><i/ ><span title={playerName}>{playerName}</span><strong>{state.cubes.human.length}</strong></span><span><i/><span>Бот</span><strong>{state.cubes.bot.length}</strong></span></div>
-  <div className="digit-feedback" role="status">{paused ? 'Игра на паузе' : feedback || '\u00a0'}</div>
+  <div className="digit-feedback" aria-hidden="true"/>
   <div className="digit-keypad-slot"><GameChoices count={10} columns={3} rows={4} className="digit-keypad" label="Телефонная клавиатура">{keypad.map(digit=><button key={digit} className={(digit === 0 ? 'digit-key-zero ' : '') + (state.humanChoice === digit && digit !== state.digit ? 'digit-key-wrong ' : '') + (resolved && digit === state.digit ? 'digit-key-correct' : '')} disabled={paused || state.phase !== 'question' || state.humanAnswered} onClick={() => { setState(game.answer(digit,state.round)); setNow(Date.now()); }}>{digit}</button>)}</GameChoices>
    {state.phase === 'finished' && now >= state.resultAt + 1100 && <div className="digit-replay"><button className="big-button" onClick={onReplay}>Реванш с ботом</button></div>}
   </div>

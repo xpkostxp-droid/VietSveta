@@ -15,14 +15,11 @@
 .digit-small-cube{width:var(--small-cube);height:var(--small-cube);bottom:calc(10px + var(--cube-row) * var(--small-cube));font-size:calc(var(--small-cube) * .5);z-index:2}
 .digit-stack-human .digit-small-cube{left:calc(10px + var(--cube-column) * var(--small-cube))}
 .digit-stack-bot .digit-small-cube{right:calc(10px + (1 - var(--cube-column)) * var(--small-cube));--cube-top:#ffc6a2;--cube-bottom:#ff8879;border-color:#ffe2cb;box-shadow:inset 2px 2px 3px #fff,inset -3px -3px 4px #d4585a80,0 2px 3px #3c677944;color:#6b3b36}
-.digit-small-cube.is-landing{visibility:hidden}
 .digit-falling-cube{left:50%;top:var(--fall-y);transform:translate(-50%,-50%);width:var(--big-cube);height:var(--big-cube);font-size:calc(var(--big-cube) * .33);z-index:3;transition:top 33ms linear}
-.digit-falling-cube::after{content:'';position:absolute;bottom:100%;left:12%;right:12%;height:65px;background:linear-gradient(transparent,#9bdcff55);z-index:-1}
-.digit-falling-cube.is-collected{animation:digit-collect .7s cubic-bezier(.25,.8,.35,1) both;transition:none}
-.digit-falling-cube.to-bot{--cube-top:#ffc6a2;--cube-bottom:#ff8879;border-color:#ffe2cb}
-.digit-falling-cube.is-exploding{animation:digit-burst .65s ease-out both;transition:none}
-@keyframes digit-collect{from{left:50%;top:var(--fall-y);width:var(--big-cube);height:var(--big-cube);font-size:calc(var(--big-cube) * .33)}to{left:var(--target-x);top:var(--target-y);width:var(--small-cube);height:var(--small-cube);font-size:calc(var(--small-cube) * .3)}}
-@keyframes digit-burst{0%{opacity:1;transform:translate(-50%,-50%) scale(1)}35%{opacity:1;filter:brightness(1.7);transform:translate(-50%,-50%) scale(1.15) rotate(8deg);box-shadow:0 0 20px 14px #ffc97188}100%{opacity:0;filter:blur(5px);transform:translate(-50%,-50%) scale(1.65) rotate(-10deg)}}
+.digit-falling-cube.is-popping{animation:digit-pop .18s ease-out both;transition:none}
+.digit-falling-cube.is-popping::after{content:'';position:absolute;inset:-5%;border:2px solid #c1e7ed;border-radius:50%;animation:digit-pop-ring .18s ease-out both}
+@keyframes digit-pop{0%{opacity:1;transform:translate(-50%,-50%) scale(1)}35%{opacity:.65;transform:translate(-50%,-50%) scale(1.035)}100%{opacity:0;transform:translate(-50%,-50%) scale(.92)}}
+@keyframes digit-pop-ring{from{opacity:.65;transform:scale(.8)}to{opacity:0;transform:scale(1.2)}}
 .digit-field-message{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#29545b;text-align:center;font-size:1rem;z-index:6;pointer-events:none}
 .digit-field-message>strong{font-size:3.2rem}
 .digit-victory>strong{font-size:clamp(1.4rem,6cqw,2.3rem)}
@@ -46,4 +43,4 @@
 .digit-replay>button{width:80%}
 .digit-battle-intro small{color:#71817c}
 @media(max-height:650px){.beginner-area .screen.digit-battle-screen{gap:6px}.digit-battle-header{height:40px}.digit-score{min-height:38px}.digit-feedback{height:14px;line-height:14px}.beginner-area .screen.profession-session.beginner-play.digit-battle-screen .digit-keypad button{font-size:1.6rem}.digit-battle-clock{width:38px;height:38px}}
-@media(prefers-reduced-motion:reduce){.digit-falling-cube{transition:none}.digit-falling-cube.is-collected{animation-duration:.01s}.digit-falling-cube.is-exploding{animation-duration:.01s}}
+@media(prefers-reduced-motion:reduce){.digit-falling-cube{transition:none}.digit-falling-cube.is-popping,.digit-falling-cube.is-popping::after{animation-duration:.01s}}
