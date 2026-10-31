@@ -1,0 +1,282 @@
+[
+  {
+    "group": "vegetables",
+    "number": 1,
+    "vi": "khoai tây",
+    "ru": "картофель",
+    "path": "market/approved/vegetables-01-v2.webp",
+    "crop": [
+      3,
+      3,
+      509,
+      295
+    ],
+    "approved_sheet": "exec-3fc0ea4a-5e64-4aa4-9e30-97c6e4c8f34e.png"
+  },
+  {
+    "group": "vegetables",
+    "number": 2,
+    "vi": "bắp / ngô",
+    "ru": "кукуруза — южное / северное название",
+    "path": "market/approved/vegetables-02-v2.webp",
+    "crop": [
+      515,
+      3,
+      1020,
+      295
+    ],
+    "approved_sheet": "exec-3fc0ea4a-5e64-4aa4-9e30-97c6e4c8f34e.png"
+  },
+  {
+    "group": "vegetables",
+    "number": 4,
+    "vi": "ớt ngọt",
+    "ru": "сладкий перец",
+    "path": "market/approved/vegetables-04-v2.webp",
+    "crop": [
+      3,
+      301,
+      509,
+      598
+    ],
+    "approved_sheet": "exec-3fc0ea4a-5e64-4aa4-9e30-97c6e4c8f34e.png"
+  },
+  {
+    "group": "vegetables",
+    "number": 8,
+    "vi": "súp lơ",
+    "ru": "цветная капуста",
+    "path": "market/approved/vegetables-08-v2.webp",
+    "crop": [
+      515,
+      301,
+      1020,
+      598
+    ],
+    "approved_sheet": "exec-3fc0ea4a-5e64-4aa4-9e30-97c6e4c8f34e.png"
+  },
+  {
+    "group": "vegetables",
+    "number": 9,
+    "vi": "dưa chuột",
+    "ru": "огурец",
+    "path": "market/approved/vegetables-09-v2.webp",
+    "crop": [
+      3,
+      604,
+      509,
+      885
+    ],
+    "approved_sheet": "exec-3fc0ea4a-5e64-4aa4-9e30-97c6e4c8f34e.png"
+  },
+  {
+    "group": "vegetables",
+    "number": 10,
+    "vi": "cà chua",
+    "ru": "помидор",
+    "path": "market/approved/vegetables-10-v2.webp",
+    "crop": [
+      515,
+      604,
+      1020,
+      885
+    ],
+    "approved_sheet": "exec-3fc0ea4a-5e64-4aa4-9e30-97c6e4c8f34e.png"
+  },
+  {
+    "group": "vegetables",
+    "number": 12,
+    "vi": "củ cải đỏ",
+    "ru": "красный редис",
+    "path": "market/approved/vegetables-12-v2.webp",
+    "crop": [
+      3,
+      891,
+      509,
+      1187
+    ],
+    "approved_sheet": "exec-3fc0ea4a-5e64-4aa4-9e30-97c6e4c8f34e.png"
+  },
+  {
+    "group": "vegetables",
+    "number": 13,
+    "vi": "củ cải trắng",
+    "ru": "белая редька, дайкон",
+    "path": "market/approved/vegetables-13-v2.webp",
+    "crop": [
+      515,
+      891,
+      1020,
+      1187
+    ],
+    "approved_sheet": "exec-3fc0ea4a-5e64-4aa4-9e30-97c6e4c8f34e.png"
+  },
+  {
+    "group": "vegetables",
+    "number": 15,
+    "vi": "sả",
+    "ru": "лемонграсс",
+    "path": "market/approved/vegetables-15-v2.webp",
+    "crop": [
+      3,
+      1193,
+      509,
+      1532
+    ],
+    "approved_sheet": "exec-3fc0ea4a-5e64-4aa4-9e30-97c6e4c8f34e.png"
+  },
+  {
+    "group": "vegetables",
+    "number": 16,
+    "vi": "rau",
+    "ru": "овощи, зелень",
+    "path": "market/approved/vegetables-16-v2.webp",
+    "crop": [
+      515,
+      1193,
+      1020,
+      1532
+    ],
+    "approved_sheet": "exec-3fc0ea4a-5e64-4aa4-9e30-97c6e4c8f34e.png"
+  },
+  {
+    "group": "fruits",
+    "number": 1,
+    "vi": "chôm chôm",
+    "ru": "рамбутан",
+    "path": "market/approved/fruits-01-v2.webp",
+    "crop": [
+      3,
+      3,
+      508,
+      287
+    ],
+    "approved_sheet": "exec-96fc1926-2a86-41b6-8916-a257bffca9d1.png"
+  },
+  {
+    "group": "fruits",
+    "number": 2,
+    "vi": "vải",
+    "ru": "личи",
+    "path": "market/approved/fruits-02-v2.webp",
+    "crop": [
+      514,
+      3,
+      1020,
+      287
+    ],
+    "approved_sheet": "exec-96fc1926-2a86-41b6-8916-a257bffca9d1.png"
+  },
+  {
+    "group": "fruits",
+    "number": 3,
+    "vi": "mít",
+    "ru": "джекфрут",
+    "path": "market/approved/fruits-03-v2.webp",
+    "crop": [
+      3,
+      293,
+      508,
+      591
+    ],
+    "approved_sheet": "exec-96fc1926-2a86-41b6-8916-a257bffca9d1.png"
+  },
+  {
+    "group": "fruits",
+    "number": 4,
+    "vi": "chanh",
+    "ru": "лайм, лимон",
+    "path": "market/approved/fruits-04-v2.webp",
+    "crop": [
+      514,
+      293,
+      1020,
+      591
+    ],
+    "approved_sheet": "exec-96fc1926-2a86-41b6-8916-a257bffca9d1.png"
+  },
+  {
+    "group": "fruits",
+    "number": 7,
+    "vi": "bưởi",
+    "ru": "помело",
+    "path": "market/approved/fruits-07-v2.webp",
+    "crop": [
+      3,
+      597,
+      508,
+      906
+    ],
+    "approved_sheet": "exec-96fc1926-2a86-41b6-8916-a257bffca9d1.png"
+  },
+  {
+    "group": "fruits",
+    "number": 8,
+    "vi": "xoài",
+    "ru": "манго",
+    "path": "market/approved/fruits-08-v2.webp",
+    "crop": [
+      514,
+      597,
+      1020,
+      906
+    ],
+    "approved_sheet": "exec-96fc1926-2a86-41b6-8916-a257bffca9d1.png"
+  },
+  {
+    "group": "fruits",
+    "number": 11,
+    "vi": "mâm xôi",
+    "ru": "малина",
+    "path": "market/approved/fruits-11-v2.webp",
+    "crop": [
+      3,
+      912,
+      508,
+      1196
+    ],
+    "approved_sheet": "exec-96fc1926-2a86-41b6-8916-a257bffca9d1.png"
+  },
+  {
+    "group": "fruits",
+    "number": 16,
+    "vi": "đào",
+    "ru": "персик",
+    "path": "market/approved/fruits-16-v2.webp",
+    "crop": [
+      514,
+      912,
+      1020,
+      1196
+    ],
+    "approved_sheet": "exec-96fc1926-2a86-41b6-8916-a257bffca9d1.png"
+  },
+  {
+    "group": "fruits",
+    "number": 17,
+    "vi": "hồng",
+    "ru": "хурма",
+    "path": "market/approved/fruits-17-v2.webp",
+    "crop": [
+      3,
+      1202,
+      508,
+      1532
+    ],
+    "approved_sheet": "exec-96fc1926-2a86-41b6-8916-a257bffca9d1.png"
+  },
+  {
+    "group": "fruits",
+    "number": 18,
+    "vi": "ổi",
+    "ru": "гуава",
+    "path": "market/approved/fruits-18-v2.webp",
+    "crop": [
+      514,
+      1202,
+      1020,
+      1532
+    ],
+    "approved_sheet": "exec-96fc1926-2a86-41b6-8916-a257bffca9d1.png"
+  }
+]
