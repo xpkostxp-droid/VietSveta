@@ -39,7 +39,13 @@ Deno.serve(async req=>{
    const {data:players,error:playersError}=await admin.from('participants').select('id,display_name,user_id,ranking_since').eq('active',true).eq('is_admin',false);
    if(playersError)throw playersError;
    const rows=await Promise.all((players??[]).map(async p=>{
-    const {data,error}=await admin.from('game_attempts').select('correct,correct_time_ms').eq('game',body.game).eq('user_id',p.user_id).gte('created_at',p.ranking_since??'1970-01-01T00:00:00Z').order('correct',{ascending:false}).order('correct_time_ms').limit(1);
+    let query=admin.from('game_attempts').select('correct,correct_time_ms').eq('game',body.game).eq('user_id',p.user_id).gte('created_at',p.ranking_since??'1970-01-01T00:00:00Z');
+    if(body.game==='harvest-fruits'||body.game==='harvest-vegetables'){
+     const expected=body.game==='harvest-fruits'?[22,40]:[18,32];
+     if(body.total!==undefined&&!expected.includes(body.total))throw new Error('total');
+     query=query.eq('total',body.total??expected[0]);
+    }
+    const {data,error}=await query.order('correct',{ascending:false}).order('correct_time_ms').limit(1);
     if(error)throw error;
     return {id:p.id,name:p.display_name,best:data?.[0]??null};
    }));

@@ -21,7 +21,8 @@ function saveRanking(key:string,rows:RankedRows) {
 }
 export function GameRanking({game,total,onStart,startLabel='Начать игру',result,children,startAtBottom=false}:{game:string;total:number;onStart:()=>void;startLabel?:string;result?:Result;children?:React.ReactNode;startAtBottom?:boolean}) {
  const member=cachedMember();
- const key=`${member?.user_id}:${member?.ranking_since??''}:${game}`;
+ const produceGame=game==='harvest-fruits'||game==='harvest-vegetables';
+ const key=`${member?.user_id}:${member?.ranking_since??''}:${game}${produceGame?':'+total:''}`;
  const [ranking,setRanking]=useState(()=>({key,rows:readRanking(key)}));
  const rows=ranking.key===key?ranking.rows:readRanking(key);
  const [busy,setBusy]=useState(true);
@@ -36,7 +37,7 @@ export function GameRanking({game,total,onStart,startLabel='Начать игр�
     // Only a completed run needs to wait for upload. Menu reads must not
     // wait for the full learning-state sync, which already runs in the background.
     if(member&&result)await syncAccount(member.user_id);
-    const data=await memberRequest({action:'leaderboard',game});
+    const data=await memberRequest({action:'leaderboard',game,...(produceGame?{total}:{})});
     const next=rankPlayers(data.rows as RankingRow[]);
     saveRanking(key,next);
     if(!alive)return;
