@@ -17,7 +17,7 @@ export function shuffled<T>(items: readonly T[]): T[] {
   return result;
 }
 export function familyOptions(index: number): number[] {
-  return shuffled([index, ...shuffled(familyWords.map((_, i) => i).filter(i => i !== index)).slice(0, 5)]);
+  return shuffled([index, ...shuffled(familyWords.map((_, i) => i).filter(i => i !== index)).slice(0, 2)]);
 }
 // A failed card returns after other cards; learning requires two clean recalls.
 export function advanceFamily(queue: number[], wins: Record<number, number>, failed: boolean, learning: boolean) {
@@ -26,4 +26,9 @@ export function advanceFamily(queue: number[], wins: Record<number, number>, fai
   const next = queue.slice(1);
   if (learning && count < 2) next.splice(Math.min(3, next.length), 0, index);
   return { queue: next, wins: { ...wins, [index]: count } };
+}
+
+export type FamilyTask = { index: number; reverse: boolean };
+export function familyTasks(): FamilyTask[] {
+  return shuffled(familyWords.flatMap((_, index) => [{ index, reverse: false }, { index, reverse: true }]));
 }

@@ -49,8 +49,7 @@ const cases: [string, () => ReactNode, string | null, number][] = [
   ['countries', () => <TravelGameScreen initialGroup="countries" onBack={() => {}} />, 'Начать', 3],
   ['travel', () => <TravelGameScreen initialGroup="travel" onBack={() => {}} />, 'Начать', 3],
   ['people', () => <PeopleGameScreen onBack={() => {}} />, 'Начать', 3],
-  ['family', () => <FamilyGameScreen onBack={() => {}} />, '🌱 Обучение', 6],
-  ['family-blitz', () => <FamilyGameScreen onBack={() => {}} />, '⚡ Блиц', 6],
+  ['family', () => <FamilyGameScreen onBack={() => {}} />, 'Начать', 3],
   ['house', () => <HouseGameScreen onBack={() => {}} />, 'Начать', 3],
   ['adjectives', () => <HouseGameScreen game="adjectives" onBack={() => {}} />, 'Начать', 3],
   ['restaurant', () => <RestaurantGameScreen onBack={() => {}} />, null, 6],
@@ -72,15 +71,15 @@ it.each(cases)('uses the shared prompt/label and retains native choices in %s', 
   expect(host.querySelector('.work-timebar')).toBeTruthy();
   capture(name);
 });
-it('keeps the family six-choice learning loop and replay control inside the prompt after an answer', async () => {
-  await render(<FamilyGameScreen onBack={() => {}} />); await click('🌱 Обучение');
+it('keeps the family three-choice game and replay control inside the prompt after an answer', async () => {
+  await render(<FamilyGameScreen onBack={() => {}} />); await click('Начать');
   await click(familyWords[0][1]);
   expect(host.querySelector('.work-options .family-correct')?.textContent).toBe(familyWords[0][1]);
   expect(host.querySelector('.work-prompt .beginner-prompt-tools button')).toBeTruthy();
-  expect(host.querySelectorAll('.work-options button')).toHaveLength(6);
+  expect(host.querySelectorAll('.work-options button')).toHaveLength(3);
   capture('family-feedback');
-  await act(async () => vi.advanceTimersByTime(1800));
-  expect(host.querySelector('.profession-caption')?.textContent).toBe(familyWords[1][2]);
+  await act(async () => vi.advanceTimersByTime(1600));
+  expect(host.querySelector('.profession-caption')?.textContent).toBe(familyWords[0][1]);
 });
 it('keeps house forward and reverse prompts in the shared frame with three fixed choices', async () => {
   await render(<HouseGameScreen onBack={() => {}} />); await click('Начать');
