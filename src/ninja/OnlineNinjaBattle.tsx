@@ -1,3 +1,4 @@
+import { useBattleResultSound } from '../battle/useBattleResultSound';
 import {useEffect,useRef,useState} from 'react';
 import {BackButton} from '../components/BackButton';
 import type {Match} from '../battle/battleTypes';
@@ -39,6 +40,7 @@ export function OnlineNinjaBattle({match,now,busy,locked,error,sound,onReady,onA
  },[loaded,match.id,scene.round,scene.events.map(e=>`${e.kind}:${e.side}:${e.at}`).join(','),sound]);
  useEffect(()=>()=>stopSpeaking(),[]);
  const final=scene.phase==='finished';
+ useBattleResultSound(final?match.id:null,final?(scene.scoreHuman>scene.scoreBot?'victory':'defeat'):null);
  const reveal=scene.events.some(e=>(e.kind==='hit'&&now>=e.at+190)||(e.kind==='splat'&&now>=e.at+300));
  const canAnswer=loaded&&match.status==='active'&&scene.phase==='question'&&now<scene.startsAt+5000&&!match.answered&&!locked&&!busy;
  const options=(scene.phase==='result'||final)?match.last_result?.options:match.task?.options;

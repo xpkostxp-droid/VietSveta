@@ -1,6 +1,7 @@
+import { readyBattleResultAudio } from '../battle/resultAudio';
 export function createNinjaSound(){
  let ctx:AudioContext|null=null;
- const ready=()=>{try{ctx??=new AudioContext();void ctx.resume();}catch{}};
+ const ready=()=>{readyBattleResultAudio();try{ctx??=new AudioContext();void ctx.resume();}catch{}};
  const beep=(digit:number)=>{try{
   const context=ctx;if(!context)return;
   const play=()=>{try{

@@ -3,6 +3,8 @@ import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import BeginnerApp from '../App';
 import { phoneDigitWords } from '../content/games/phone';
+const voices = vi.hoisted(()=>({result:vi.fn(()=>vi.fn()),digit:vi.fn(()=>vi.fn()),ready:vi.fn()}));
+vi.mock('../../battle/resultAudio',()=>({playBattleResultSound:voices.result,playBattleDigit:voices.digit,readyBattleDigitAudio:voices.ready}));
 const sound = vi.hoisted(()=>({ready:vi.fn(),beep:vi.fn(),crash:vi.fn(),pop:vi.fn(),close:vi.fn()}));
 vi.mock('../components/gameSounds',()=>({makeGameSound:()=>sound}));
 Object.assign(globalThis,{IS_REACT_ACT_ENVIRONMENT:true});
@@ -22,12 +24,14 @@ it('plays a full eight-cube match, keeps scores below the glass and has no botto
  expect([...host.querySelectorAll('.digit-keypad button')].map(b=>b.textContent)).toEqual(['1','2','3','4','5','6','7','8','9','0']);expect(host.textContent).not.toContain('Завершить');
  for(let i=0;i<8;i++){
   act(()=>vi.advanceTimersByTime(i===0?3003:1815));
+  expect(voices.digit).toHaveBeenCalledTimes(i+1);
   expect(host.querySelector('.digit-feedback')?.textContent).toBe('');
   const word=host.querySelector('.digit-falling-cube')!.textContent!;click(String(phoneDigitWords.indexOf(word)));
   expect(host.querySelector('.digit-falling-cube')).toBeNull();
   expect(host.querySelectorAll('.digit-stack-human .digit-small-cube')).toHaveLength(i+1);
  }
  act(()=>vi.advanceTimersByTime(1155));
+ expect(voices.result).toHaveBeenCalledTimes(1);expect(voices.result).toHaveBeenCalledWith('victory');
  expect(host.textContent).toContain('Ты победил!');expect(host.querySelectorAll('.digit-stack-human .digit-small-cube')).toHaveLength(8);expect(host.querySelector('.digit-score')?.textContent).toContain('Константин8');
  expect(host.querySelector('.digit-glass')!.nextElementSibling).toBe(host.querySelector('.digit-score'));
  expect(host.querySelectorAll('.digit-keypad button')).toHaveLength(10);click('Реванш с ботом');expect(host.querySelector('.digit-score')?.textContent).toContain('Константин0');

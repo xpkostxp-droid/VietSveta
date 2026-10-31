@@ -1,3 +1,5 @@
+import { useBattleResultSound } from '../../battle/useBattleResultSound';
+import { readyBattleDigitAudio, playBattleDigit } from '../../battle/resultAudio';
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { BackButton } from '../components/BackButton';
 import { GameChoices, beginnerPlayClass } from '../components/BeginnerPlayLayout';
@@ -29,13 +31,21 @@ export function DigitBattleScreen({ onBack, playerName = 'Ты' }: { onBack: () 
  const [playing,setPlaying] = useState(false), [session,setSession] = useState(0);
  const [sound] = useState(makeGameSound);
  useEffect(() => () => sound.close(), [sound]);
- const start = () => { sound.ready(); setSession(n=>n+1); setPlaying(true); };
+ const start = () => { sound.ready(); readyBattleDigitAudio(); setSession(n=>n+1); setPlaying(true); };
  if (!playing) return <div className="screen digit-battle-intro"><BackButton onClick={onBack} label="К играм"/><span className="badge">Тест · Только для администратора</span><h1>Батл · Цифры 0–9</h1><p>Прочитай слово на падающем кубике и нажми цифру. Первый правильный ответ забирает кубик.</p><p>Собери 8 кубиков раньше бота. На каждый кубик — 5 секунд. После ошибки у соперника остаётся время.</p><button className="big-button" onClick={start}>Сыграть с ботом</button><small>Тренировка · без рейтинга</small></div>;
  return <DigitBattleMatch key={session} playerName={playerName} sound={sound} onBack={onBack} onReplay={start}/>;
 }
 function DigitBattleMatch({ playerName, sound, onBack, onReplay }: { playerName: string; sound: ReturnType<typeof makeGameSound>; onBack: () => void; onReplay: () => void }) {
  const [game] = useState(createDigitBattle), [state,setState] = useState(game.initial), [now,setNow] = useState(Date.now), [paused,setPaused] = useState(document.hidden);
- const beeped = useRef(''), heard = useRef(0);
+ const beeped = useRef(''), heard = useRef(0), spoken = useRef(0), stopVoice = useRef<() => void>(()=>{});
+ useBattleResultSound(state.phase==='finished'?'digit-bot':null,state.phase==='finished'?(state.winner==='human'?'victory':'defeat'):null);
+ useEffect(() => {
+  if (paused || state.phase === 'finished') { stopVoice.current(); return; }
+  if (state.phase !== 'question' || spoken.current === state.round) return;
+  spoken.current = state.round; stopVoice.current();
+  stopVoice.current = playBattleDigit(state.digit);
+ }, [state.phase,state.round,state.digit,paused]);
+ useEffect(()=>()=>stopVoice.current(),[]);
  useEffect(() => {
   if (paused) { game.pause(); return; }
   const timer = setInterval(() => { setState(game.poll()); setNow(Date.now()); }, 33);
@@ -51,11 +61,11 @@ function DigitBattleMatch({ playerName, sound, onBack, onReplay }: { playerName:
   if (paused) return;
   const key = `${state.round}:${state.phase}:${seconds}`;
   if (!resolved && seconds >= 1 && seconds <= 3 && beeped.current !== key) { beeped.current = key; sound.beep(seconds); }
-  if (resolved && heard.current !== state.round) { heard.current = state.round; if (state.winner) sound.beep(2); else sound.pop(); }
+  if (resolved && heard.current !== state.round) { heard.current = state.round; if (!state.winner) sound.pop(); else if (state.phase !== 'finished') sound.beep(2); }
  }, [state.round,state.phase,seconds,paused,sound]);
  return <div className={'screen ' + beginnerPlayClass + ' digit-battle-screen'}>
   <header className="digit-battle-header"><button className="digit-back" onClick={onBack} aria-label="К играм">←</button><strong>Раунд {state.round}</strong><span className="digit-battle-clock" aria-label="Время на ответ" style={{ '--clock-progress': `${paused || resolved ? 0 : state.phase === 'ready' ? 100 : Math.max(0,(state.startsAt+5000-now)/50)}%` } as CSSProperties}>{paused ? 'Ⅱ' : resolved ? '✓' : seconds}</span></header>
-  <DigitBattleStage state={state} now={now} paused={paused} onResume={() => { sound.ready(); setState(game.resume()); setNow(Date.now()); setPaused(false); }}/>
+  <DigitBattleStage state={state} now={now} paused={paused} onResume={() => { sound.ready(); readyBattleDigitAudio(); setState(game.resume()); setNow(Date.now()); setPaused(false); }}/>
   <div className="digit-score" aria-label="Счёт"><span><i/ ><span title={playerName}>{playerName}</span><strong>{state.cubes.human.length}</strong></span><span><i/><span>Бот</span><strong>{state.cubes.bot.length}</strong></span></div>
   <div className="digit-feedback" aria-hidden="true"/>
   <div className="digit-keypad-slot"><GameChoices count={10} columns={3} rows={4} className="digit-keypad" label="Телефонная клавиатура">{keypad.map(digit=><button key={digit} className={(digit === 0 ? 'digit-key-zero ' : '') + (state.humanChoice === digit && digit !== state.digit ? 'digit-key-wrong ' : '') + (resolved && digit === state.digit ? 'digit-key-correct' : '')} disabled={paused || state.phase !== 'question' || state.humanAnswered} onClick={() => { setState(game.answer(digit,state.round)); setNow(Date.now()); }}>{digit}</button>)}</GameChoices>

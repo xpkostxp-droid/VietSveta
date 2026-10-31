@@ -1,3 +1,4 @@
+import { useBattleResultSound } from '../battle/useBattleResultSound';
 import {useEffect,useRef,useState} from 'react';
 import {BackButton} from '../components/BackButton';
 import {products} from '../content/marketProducts';
@@ -55,6 +56,7 @@ function NinjaMatch({topic,human,bot,sound,onBack,onReplay}:{topic:NinjaTopic;hu
   if(countdown>=1&&countdown<=3&&lastBeep.current!==countdown){lastBeep.current=countdown;sound.beep(countdown);}
  },[countdown,sound]);
  const finished=state.phase==='finished',result=state.phase==='result';
+ useBattleResultSound(finished?'ninja-bot':null,finished?(state.scoreHuman>state.scoreBot?'victory':'defeat'):null);
  const reveal=state.events.some(e=>(e.kind==='hit'&&now>=e.at+190)||(e.kind==='splat'&&now>=e.at+300));
  const seconds=Math.max(0,Math.ceil((state.startsAt+5000-now)/1000));
  const extra=state.round>=state.baseRounds;

@@ -1,6 +1,8 @@
 import {act,StrictMode} from 'react';
 import {createRoot} from 'react-dom/client';
 import {afterEach,beforeEach,expect,it,vi} from 'vitest';
+const finale=vi.hoisted(()=>vi.fn(()=>vi.fn()));
+vi.mock('../battle/resultAudio',()=>({playBattleResultSound:finale,readyBattleResultAudio:vi.fn()}));
 const speech=vi.hoisted(()=>vi.fn());
 const beep=vi.hoisted(()=>vi.fn());
 vi.mock('./ninjaSound',()=>({createNinjaSound:()=>({ready:vi.fn(),beep,play:vi.fn(),close:vi.fn()})}));
@@ -10,7 +12,7 @@ import {NinjaScreen} from './NinjaScreen';
 import {products} from '../content/marketProducts';
 Object.assign(globalThis,{IS_REACT_ACT_ENVIRONMENT:true});
 let node:HTMLDivElement,root:ReturnType<typeof createRoot>;
-beforeEach(()=>{localStorage.clear();vi.useFakeTimers();vi.spyOn(Math,'random').mockReturnValue(.99);speech.mockReset();beep.mockReset();vi.stubGlobal('Image',class {onload:(()=>void)|null=null;onerror:(()=>void)|null=null;set src(_:string){void Promise.resolve().then(()=>this.onload?.());}});node=document.createElement('div');document.body.append(node);root=createRoot(node);});
+beforeEach(()=>{localStorage.clear();vi.useFakeTimers();vi.spyOn(Math,'random').mockReturnValue(.99);speech.mockReset();beep.mockReset();finale.mockClear();vi.stubGlobal('Image',class {onload:(()=>void)|null=null;onerror:(()=>void)|null=null;set src(_:string){void Promise.resolve().then(()=>this.onload?.());}});node=document.createElement('div');document.body.append(node);root=createRoot(node);});
 afterEach(async()=>{await act(async()=>root.unmount());node.remove();vi.useRealTimers();vi.restoreAllMocks();vi.unstubAllGlobals();});
 const click=async(label:string)=>act(async()=>[...node.querySelectorAll('button')].find(b=>b.textContent===label)!.click());
 const advance=async(ms:number)=>act(async()=>vi.advanceTimersByTimeAsync(ms));
@@ -70,4 +72,15 @@ it('speaks and highlights the correct answer when the bot slices the fruit',asyn
  const img=node.querySelector('.ninja-produce img') as HTMLImageElement,p=Number(img.src.match(/produce-(\d+)/)![1]);
  await advance(1100);await advance(1);expect(speech).toHaveBeenCalledTimes(1);expect(speech).toHaveBeenCalledWith(products[p][1]);
  expect(node.querySelector('.is-correct')?.textContent).toBe(products[p][1]);expect([...node.querySelectorAll('.battle-score strong')].map(n=>n.textContent)).toEqual(['0','1']);
+});
+
+it.each(['fruits','vegetables','all'] as const)('uses the shared victory sound for the %s bot battle',async(topic)=>{
+ await act(async()=>root.render(<NinjaScreen onBack={()=>{}} testSetup={{topic,gender:'man',sound:{ready:vi.fn(),beep:vi.fn(),play:vi.fn(),close:vi.fn()}}}/>));
+ await advance(3100);
+ const count=Math.min(10,products.filter(p=>topic==='all'||p[3]===topic).length);
+ for(let i=0;i<count;i++){
+  const p=Number((node.querySelector('.ninja-produce img') as HTMLImageElement).src.match(/produce-(\d+)/)![1]);
+  await click(products[p][1]);await advance(i===count-1?1800:2500);
+ }
+ expect(finale).toHaveBeenCalledTimes(1);expect(finale).toHaveBeenCalledWith('victory');await advance(1000);expect(finale).toHaveBeenCalledTimes(1);
 });

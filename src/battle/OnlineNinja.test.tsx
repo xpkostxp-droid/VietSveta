@@ -1,6 +1,8 @@
 import {act} from 'react';
 import {createRoot} from 'react-dom/client';
 import {beforeEach,afterEach,expect,it,vi} from 'vitest';
+const finale=vi.hoisted(()=>vi.fn(()=>vi.fn()));
+vi.mock('./resultAudio',()=>({playBattleResultSound:finale,readyBattleResultAudio:vi.fn()}));
 const fx=vi.hoisted(()=>({rpc:vi.fn(),beep:vi.fn(),play:vi.fn(),speak:vi.fn()}));
 vi.mock('./BattleCourt',()=>({preloadCourt:async()=>{},BattleCourt:()=>null}));
 vi.mock('../domain/cloud',()=>({supabase:{rpc:fx.rpc}}));
@@ -40,4 +42,12 @@ it('waits for arena loading before telling the server that the client is ready',
  const loads:(()=>void)[]=[];vi.stubGlobal('Image',class {onload:(()=>void)|null=null;onerror:(()=>void)|null=null;set src(_:string){loads.push(()=>this.onload?.());}});snapshot.match.starts_at=null;
  await act(async()=>root.render(<BattleScreen onBack={()=>{}}/>));expect(fx.rpc.mock.calls.some(c=>c[1]?.p_action==='ready')).toBe(false);
  await act(async()=>loads.forEach(load=>load()));expect(fx.rpc).toHaveBeenCalledWith('battle_preview',expect.objectContaining({p_action:'ready',p_payload:{match:'ninja-online'}}));
+});
+
+it.each(['host','guest'] as const)('plays the correct local result for the %s participant exactly once',async(side)=>{
+ snapshot.match.side=side;snapshot.match.status='finished';snapshot.match.score_host=8;snapshot.match.score_guest=5;snapshot.match.round=10;
+ snapshot.match.last_result={round:9,starts_at:new Date(Date.now()-6000).toISOString(),at:new Date(Date.now()-2000).toISOString(),winner:'host',word:'банан',options:['táo','chuối','xoài'],answer:1,misses:[]};
+ await act(async()=>root.render(<BattleScreen onBack={()=>{}}/>));
+ expect(finale).toHaveBeenCalledTimes(1);expect(finale).toHaveBeenCalledWith(side==='host'?'victory':'defeat');
+ await advance(1000);expect(finale).toHaveBeenCalledTimes(1);
 });

@@ -1,3 +1,5 @@
+import { useBattleResultSound } from './useBattleResultSound';
+import { playBattleResultSound, readyBattleResultAudio } from './resultAudio';
 import { useEffect, useRef, useState } from 'react';
 import './BattleCinema.css';
 import {BattleCourt} from './BattleCourt';
@@ -20,9 +22,9 @@ function VideoBattleCinema({ lobby, result, compact=false }: { lobby: boolean; r
  const play = (outcome: Outcome, audible = false) => {
   Object.values(videos.current).forEach(v => v?.pause());
   const video = videos.current[outcome];
-  setSelected(outcome); setEnded(false); setNeedsPlay(false); setMuted(!audible);
+  setSelected(outcome); setEnded(false); setNeedsPlay(false); setMuted(result ? true : !audible);
   if (!video) return;
-  video.muted = !audible;
+  video.muted = result ? true : !audible;
   video.currentTime = 0;
   void video.play().catch(() => {
    // Safari may reject sound before this particular video has been tapped.
@@ -32,7 +34,7 @@ function VideoBattleCinema({ lobby, result, compact=false }: { lobby: boolean; r
   });
  };
  useEffect(() => {
-  if (result) play(result.outcome, true);
+  if (result) play(result.outcome, false);
   else { Object.values(videos.current).forEach(v => v?.pause()); setSelected(null); }
  }, [result?.key]);
  useEffect(() => () => Object.values(videos.current).forEach(v => v?.pause()), []);
@@ -58,7 +60,7 @@ function VideoBattleCinema({ lobby, result, compact=false }: { lobby: boolean; r
   </div>
   <div className="battle-cinema-actions">
    {lobby ? <><button onClick={() => play('near', true)}>Мой смэш</button><button onClick={() => play('far', true)}>Смэш соперника</button></>
-    : result&&<button aria-label={needsPlay?'Смотреть смэш':'Повторить смэш со звуком'} onClick={() => play(result.outcome, true)}>{compact?(needsPlay?'▶ Смэш':'↻ Со звуком'):needsPlay?'▶ Смотреть смэш':'Повторить со звуком'}</button>}
+    : result&&<button aria-label={needsPlay?'Смотреть смэш':'Повторить смэш со звуком'} onClick={() => { readyBattleResultAudio(); playBattleResultSound(result.outcome==='near'?'victory':'defeat'); play(result.outcome, false); }}>{compact?(needsPlay?'▶ Смэш':'↻ Со звуком'):needsPlay?'▶ Смотреть смэш':'Повторить со звуком'}</button>}
    {lobby && needsPlay && <button onClick={() => play(active, true)}>▶ Запустить ролик</button>}
    {selected && failed[active] && <button onClick={() => { setFailed(s => ({ ...s, [active]: false })); videos.current[active]?.load(); play(active, true); }}>Повторить загрузку</button>}
   </div>
@@ -66,21 +68,21 @@ function VideoBattleCinema({ lobby, result, compact=false }: { lobby: boolean; r
 }
 
 export function BattleCinema({lobby,result,compact=false,players,nearBlue=true,round=1}:{lobby:boolean;result:CinemaResult|null;compact?:boolean;players?:CourtPlayers;nearBlue?:boolean;round?:number}){
+ useBattleResultSound(result?.key??null,result?(result.outcome==='near'?'victory':'defeat'):null);
  if(players&&(players.near==='woman'||players.far==='woman'))return result?<PlayerFinale key={result.key} result={result} compact={compact} players={players} nearBlue={nearBlue} round={round}/>:null;
  return <VideoBattleCinema lobby={lobby} result={result} compact={compact}/>;
 }
 function PlayerFinale({result,compact,players,nearBlue,round}:{result:CinemaResult;compact:boolean;players:CourtPlayers;nearBlue:boolean;round:number}){
  const [started,setStarted]=useState(Date.now),[ended,setEnded]=useState(false),[needsPlay,setNeedsPlay]=useState(false);
- const audio=useRef<HTMLAudioElement>(null);
- const play=()=>{setStarted(Date.now());setEnded(false);setNeedsPlay(false);if(audio.current){audio.current.currentTime=0;void audio.current.play().catch(()=>setNeedsPlay(true));}};
- useEffect(()=>{play();return()=>{audio.current?.pause();};},[]);
+
+ const play=()=>{setStarted(Date.now());setEnded(false);setNeedsPlay(false);};
+ useEffect(()=>{play();},[]);
  useEffect(()=>{const timer=setTimeout(()=>setEnded(true),2200);return()=>clearTimeout(timer);},[started]);
  return <section className={`battle-cinema${compact?' battle-cinema-compact':''}`} aria-label="Анимация пиклбола">
   <div className="battle-cinema-frame battle-cinema-players">
    <BattleCourt players={players} state={{key:`${result.key}:${started}`,round,now:Date.now(),starts:Infinity,finalPointAt:started+828,winner:result.outcome,nearBlue}} onHit={()=>{}}/>
-   <audio ref={audio} src={media[result.outcome]} preload="auto"/>
    {ended&&<strong className="battle-cinema-status">{result.label}</strong>}
   </div>
-  <div className="battle-cinema-actions"><button onClick={play}>{needsPlay?'▶ Со звуком':'↻ Со звуком'}</button></div>
+  <div className="battle-cinema-actions"><button onClick={()=>{ readyBattleResultAudio(); playBattleResultSound(result.outcome==='near'?'victory':'defeat'); play(); }}>{needsPlay?'▶ Со звуком':'↻ Со звуком'}</button></div>
  </section>;
 }
