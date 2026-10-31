@@ -3,8 +3,8 @@ import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { MarketBlitzScreen } from './MarketBlitzScreen';
-import { products as allProducts, mixedWords } from '../content/advancedProduce';
-const products = allProducts.filter(p=>mixedWords.has(p[1]));
+import { products as allProducts } from '../content/advancedProduce';
+const products = allProducts.filter(p=>p[3]==='fruits');
 const audio = vi.hoisted(() => ({ beep: vi.fn(), explode: vi.fn(), unlock: vi.fn(), stop: vi.fn(), close: vi.fn() }));
 vi.mock('../domain/countdownSound', () => ({ createCountdownSound: () => audio }));
 Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
@@ -32,7 +32,7 @@ async function time(ms: number) { await act(async () => { vi.advanceTimersByTime
 beforeEach(async () => {
   vi.clearAllMocks(); localStorage.clear(); vi.useFakeTimers(); Object.defineProperty(document, 'hidden', { configurable: true, value: false });
   node = document.createElement('div'); document.body.append(node); root = createRoot(node);
-  await act(async () => root.render(<MarketBlitzScreen onBack={() => {}} />));
+  await act(async () => root.render(<MarketBlitzScreen category="fruits" onBack={() => {}} />));
 });
 afterEach(async () => { await act(async () => root.unmount()); node.remove(); vi.useRealTimers(); });
 it('has three choices, visits products once, explodes on a final error and clears it after a clean retry', async () => {

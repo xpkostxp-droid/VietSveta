@@ -3,7 +3,6 @@ export const profileGames = [
  {id:'lesson15-verbs',title:'Глаголы'},
  {id:'harvest-fruits',title:'Фрукты'},
  {id:'harvest-vegetables',title:'Овощи'},
- {id:'harvest-40',title:'Фрукты и овощи · суперблиц'},
  {id:'questions-15',title:'Вопросительные слова · блиц'},
  {id:'questions-24',title:'Вопросительные слова · суперблиц'},
  {id:'adjectives-tetris',title:'Прилагательные · размер, предметы и сравнение'},

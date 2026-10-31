@@ -3,7 +3,7 @@ import { BattleScreen } from './battle/BattleScreen';
 import { AdjectiveTetris } from './components/AdjectiveTetris';
 import { adjectiveSets } from './content/adjectiveSets';
 import { QuestionsBlitzScreen } from './components/QuestionsBlitzScreen';
-import { MarketGameScreen } from './components/MarketGameScreen';
+import { MarketBlitzScreen } from './components/MarketBlitzScreen';
 import { lazy, Suspense, useState } from 'react';
 import { GroupSelection, type CourseSection } from './components/GroupSelection';
 const VerbsGameScreen = lazy(() => import('./components/VerbsGameScreen'));
@@ -28,7 +28,7 @@ type Screen =
   | { name: 'home' }
   | { name: 'group-selection'; section: CourseSection }
   | { name: 'beginner'; section: CourseSection }
-  | { name: 'game' }
+  | { name: 'produce'; category: 'fruits' | 'vegetables' }
   | { name: 'games-menu' }
   | { name: 'battle' }
   | { name: 'verbs' }
@@ -81,10 +81,12 @@ function App({ isAdmin=false, memberId, memberName, syncStatus, onOpenProfile, c
         <h1 className="screen-title">Игры</h1>
         <nav className="games-menu-keys" aria-label="Игры">
           <button className="games-menu-key games-menu-key-battle" onClick={()=>setScreen({name:'battle'})}><span className="games-menu-key-icon" aria-hidden="true">⚔️</span>{' '}<span>Батл</span></button>
-          <button className="games-menu-key" onClick={()=>setScreen({name:'game'})}><span className="games-menu-key-icon" aria-hidden="true">🍎</span><span>Овощи-фрукты</span></button>
+
           <button className="games-menu-key" onClick={()=>setScreen({name:'questions-menu'})}><span className="games-menu-key-icon" aria-hidden="true">❓</span><span>Вопросительные слова</span></button>
           <button className="games-menu-key" onClick={()=>setScreen({name:'adjectives-menu'})}><span className="games-menu-key-icon" aria-hidden="true">🧪</span><span>Прилагательные</span></button>
           <button className="games-menu-key" onClick={()=>setScreen({name:'verbs'})}><span className="games-menu-key-icon" aria-hidden="true">🐉</span><span>Глаголы</span></button>
+          <button className="games-menu-key" onClick={()=>setScreen({name:'produce',category:'vegetables'})}><span className="games-menu-key-icon" aria-hidden="true">🥕</span><span>Овощи</span></button>
+          <button className="games-menu-key" onClick={()=>setScreen({name:'produce',category:'fruits'})}><span className="games-menu-key-icon" aria-hidden="true">🍉</span><span>Фрукты</span></button>
         </nav>
       </div>;
 
@@ -101,8 +103,8 @@ function App({ isAdmin=false, memberId, memberName, syncStatus, onOpenProfile, c
     case 'questions-blitz':
       return <QuestionsBlitzScreen key={screen.variant ?? 'super'} variant={screen.variant} onBack={() => setScreen({ name: 'questions-menu' })}/>;
 
-    case 'game':
-      return <MarketGameScreen onBack={() => setScreen({ name: 'games-menu' })} />;
+    case 'produce':
+      return <MarketBlitzScreen key={screen.category} category={screen.category} onBack={() => setScreen({ name: 'games-menu' })} />;
 
     case 'listening':
       return <div className="screen"><BackButton onClick={() => setScreen({ name: 'group-selection', section: 'listening' })} label="К выбору группы" /><h1 className="screen-title">Аудирование</h1><button className="lesson-item" onClick={() => setScreen({ name: 'listening-lesson' })}><span className="lesson-number">Урок 1</span><span>Поездка в Вунгтау</span></button><button className="lesson-item" onClick={() => setScreen({ name: 'listening-lesson', lesson: 2 })}><span className="lesson-number">Урок 2</span><span>На рынке · 4 диалога</span></button></div>;

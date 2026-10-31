@@ -37,6 +37,3 @@ export const products = [
   ["ninja/produce-18.webp", "bơ", "авокадо", "fruits"],
   ["market/fruits.webp", "trái cây", "фрукты", "fruits"],
 ] as const;
-
-// Keep the existing mixed superblitz at its original twenty products.
-export const mixedWords = new Set(["cà chua", "dưa chuột", "khoai tây", "hành củ", "tỏi", "bắp / ngô", "bắp cải", "ớt ngọt", "nấm", "chuối", "xoài", "dưa hấu", "táo", "cam", "nho", "dâu tây", "thơm", "dừa", "bơ", "đào"]);
