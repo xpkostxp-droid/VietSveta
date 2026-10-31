@@ -4,6 +4,7 @@ import { GameRanking } from './GameRanking';
 import { DragonWordScene } from './DragonWordScene';
 import { useFiveSecondQuestionTimer } from '../beginner/components/useFiveSecondQuestionTimer';
 import { verbGameWords, verbGameTasks, verbGameOptions, verbPrompt, type VerbTask } from '../content/verbGame';
+import { dragonTiming, dragonFeedbackMs } from '../domain/dragonTiming';
 import { createDragonSounds } from '../domain/dragonSounds';
 import { saveTimedAttempt } from '../domain/answerTime';
 import { updateGameRecord } from '../domain/gameRecord';
@@ -12,12 +13,11 @@ import './AdjectiveTetris.css';
 import './SharedPlayLayout.css';
 import './VerbsGameScreen.css';
 const GAME='lesson15-verbs';
-const FEEDBACK_MS=2650;
 type Round={tasks:VerbTask[];at:number;options:number[];phase:'question'|'feedback'|'end';chosen:number|null;success:boolean;correct:number;time:number;answerTime:number};
 export default function VerbsGameScreen({onBack}:{onBack:()=>void}){
  const [round,setRound]=useState<Round|null>(null),[feedbackPaused,setFeedbackPaused]=useState(false);
  const locked=useRef(false),saved=useRef(false),sounds=useRef<ReturnType<typeof createDragonSounds>|null>(null);
- const feedbackLeft=useRef(FEEDBACK_MS),speechDone=useRef(false),spokenQuestion=useRef<VerbTask|null>(null);
+ const feedbackLeft=useRef<number>(dragonTiming.successMs),speechDone=useRef(false),spokenQuestion=useRef<VerbTask|null>(null);
  const clock=useFiveSecondQuestionTimer(()=>answer(null),()=>{sounds.current?.stop();stopSpeaking();spokenQuestion.current=null});
  const task=round?.tasks[round.at];
  const paused=clock.paused||feedbackPaused;
@@ -30,7 +30,7 @@ export default function VerbsGameScreen({onBack}:{onBack:()=>void}){
   if(!round||!task||round.phase!=='question'||locked.current||clock.isPaused())return;
   locked.current=true;const elapsed=clock.finish(),success=choice===task.word&&elapsed<5000;
   if(elapsed>=5000)choice=null;
-  stopSpeaking();sounds.current?.stopVoice();feedbackLeft.current=FEEDBACK_MS;speechDone.current=false;
+  stopSpeaking();sounds.current?.stopVoice();feedbackLeft.current=dragonFeedbackMs(success);speechDone.current=false;
   sounds.current?.play(success?'success':'error');
   setRound({...round,phase:'feedback',chosen:choice,success,correct:round.correct+(success?1:0),time:round.time+(success?elapsed:0),answerTime:round.answerTime+elapsed});
  }
@@ -41,7 +41,7 @@ export default function VerbsGameScreen({onBack}:{onBack:()=>void}){
  useEffect(()=>{
   if(round?.phase!=='feedback'||paused)return;
   const started=performance.now(),remaining=feedbackLeft.current;
-  const speakAt=1100-(FEEDBACK_MS-remaining);
+  const speakAt=dragonTiming.voiceMs-(dragonFeedbackMs(round.success)-remaining);
   const shouldSpeak=round.success&&!round.tasks[round.at].reverse;
   const voice=!shouldSpeak||speechDone.current?undefined:setTimeout(()=>{speechDone.current=true;sounds.current?.speak(round.tasks[round.at].word)},Math.max(0,speakAt));
   const timer=setTimeout(()=>{
