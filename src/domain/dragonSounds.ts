@@ -1,6 +1,7 @@
+import { dragonTiming } from './dragonTiming';
 import { verbGameWords } from '../content/verbGame';
 // The cough file is already at 25% of its source amplitude. The approved
-// playback gain is 0.25 / 3 after the requested further reduction.
+// playback gain is now 0.25 / 6 after the requested further reductions.
 // Do not normalize the file on load.
 export function createDragonSounds(){
  let context:AudioContext|null=null,closed=false;
@@ -49,10 +50,11 @@ export function createDragonSounds(){
   play(kind:'success'|'error'){
    if(closed||!context||context.state!=='running'||!buffers[kind])return;
    stop();const source=context.createBufferSource(),level=context.createGain();
-   source.buffer=buffers[kind]!;level.gain.setValueAtTime(kind==='error'?(.25/3):1,context.currentTime);
+   source.buffer=buffers[kind]!;level.gain.setValueAtTime(kind==='error'?dragonTiming.coughGain:1,context.currentTime);
    source.connect(level);level.connect(context.destination);sources.add(source);
    source.onended=()=>{sources.delete(source);source.disconnect();level.disconnect()};
-   source.start(context.currentTime+(kind==='success'?.42:.65),0,kind==='error'?Math.min(1,source.buffer.duration):source.buffer.duration);
+   source.playbackRate.value=kind==='success'?dragonTiming.fireRate:dragonTiming.coughRate;
+   source.start(context.currentTime+dragonTiming.reactionSeconds,0,kind==='error'?Math.min(dragonTiming.coughSeconds,source.buffer.duration):source.buffer.duration);
   },
   close(){closed=true;abort.abort();stop();void context?.close().catch(()=>{})}
  };
