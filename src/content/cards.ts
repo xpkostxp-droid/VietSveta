@@ -4,9 +4,15 @@
 // { id: 'l52-01', lessonId: 'lesson-52', vi: '...', ru: '...' }
 // ID карточек должны быть постоянными после публикации.
 
+import { lesson15Verbs } from './vocabulary/lesson15';
 import type { FlashCard } from '../types';
 
 export const flashCards: FlashCard[] = [
+  ...lesson15Verbs.map((word, index) => ({
+    id: `l15-${String(index + 1).padStart(2, '0')}`, lessonId: 'lesson-15',
+    vi: word.vi, ru: word.ru,
+    example: { vi: word.example!, ru: word.exampleRu! },
+  })),
   // Урок 42 — Магазины, еда и напитки.
   { id: 'l42-01', lessonId: 'lesson-42', vi: 'nhà hàng', ru: 'ресторан' },
   { id: 'l42-02', lessonId: 'lesson-42', vi: 'quán phở bò', ru: 'заведение / кафе с фо бо' },

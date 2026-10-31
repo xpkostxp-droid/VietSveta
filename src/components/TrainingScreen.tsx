@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import './TrainingExamples.css';
 import { getLessonById } from '../content/lessons';
 import { getCardsForLesson } from '../content/cards';
 import type { CardOrder, Direction } from '../types';
@@ -185,7 +186,7 @@ export function TrainingScreen({ lessonId, direction, order, onExit }: Props) {
           <button
             key={card.id}
             type="button"
-            className={session.flipped ? 'flashcard-card is-flipped' : 'flashcard-card'}
+            className={'flashcard-card'+(session.flipped ? ' is-flipped' : '')+(card.example ? ' has-example' : '')}
             onClick={() => setSession((s) => flip(s))}
             aria-pressed={session.flipped}
             aria-label={session.flipped ? 'Скрыть перевод' : 'Показать перевод'}
@@ -213,6 +214,12 @@ export function TrainingScreen({ lessonId, direction, order, onExit }: Props) {
                 </>
               ) : (
                 <span className="flashcard-text">{back}</span>
+              )}
+              {session.flipped && card.example && (
+                <span className="flashcard-example">
+                  <span lang="vi">{card.example.vi}</span>
+                  <span lang="ru">{card.example.ru}</span>
+                </span>
               )}
             </span>
           </button>

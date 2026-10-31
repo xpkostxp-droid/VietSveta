@@ -13,10 +13,12 @@
 // иначе гостевой прогресс участников потеряет связь с уроком.
 
 import type { Lesson, TheoryMaterial } from '../types';
+import { lesson15Theory } from './theory/lesson15';
 import { lesson42Theory } from './theory/lesson42';
 import { lesson52Theory } from './theory/lesson52';
 
 export const lessons: Lesson[] = [
+  { id: 'lesson-15', number: 15, title: 'Глаголы' },
   {
     id: 'lesson-42',
     number: 42,
@@ -42,6 +44,7 @@ export const lessons: Lesson[] = [
 // Материалы теории по ID урока. У урока без записи здесь экран теории
 // покажет заглушку «Материалы скоро появятся».
 const theoryByLessonId: Record<string, TheoryMaterial['sections']> = {
+  'lesson-15': lesson15Theory,
   'lesson-42': lesson42Theory,
   'lesson-52': lesson52Theory,
 };
