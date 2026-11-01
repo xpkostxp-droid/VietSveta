@@ -1,3 +1,5 @@
+import {useStudyActivity} from '../domain/useStudyActivity';
+import {reportStudyAnswer} from '../domain/studyTelemetry';
 import { useEffect, useRef, useState } from 'react';
 import { phoneticsTests, type PhoneticsTestId } from '../content/phonetics/tests';
 import { BackButton } from './BackButton';
@@ -39,6 +41,9 @@ export function PhoneticaTestScreen({ onBack, testId }: { onBack: () => void; te
   const requestRef = useRef(0);
   const autoplayRef = useRef(false);
   const item = round[index];
+  const answerStart=useRef(Date.now());
+  useEffect(()=>{answerStart.current=Date.now();},[index,roundNumber]);
+  useStudyActivity('audio',`phonetics:advanced:${testId}`,!!item);
 
   useEffect(() => {
     if (item) return;
@@ -101,6 +106,7 @@ export function PhoneticaTestScreen({ onBack, testId }: { onBack: () => void; te
 
   function choose(value: string) {
     if (answer !== null || !heard) return;
+    reportStudyAnswer({topic:`phonetics:advanced:${testId}`,vi:item.syllable,ru:'Фонетика · слог',direction:'listening',chosen:value,result:value===item.syllable?'correct':'wrong',elapsed_ms:Date.now()-answerStart.current});
     setShowIntroHint(false);
     setAnswer(value);
     if (value === item.syllable) setScore(current => current + 1);

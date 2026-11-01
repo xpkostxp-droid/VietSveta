@@ -1,3 +1,4 @@
+import {useStudyActivity} from '../domain/useStudyActivity';
 import { useBattleResultSound } from '../battle/useBattleResultSound';
 import {useEffect,useRef,useState} from 'react';
 import {BackButton} from '../components/BackButton';
@@ -61,6 +62,7 @@ function NinjaMatch({topic,human,bot,sound,onBack,onReplay}:{topic:NinjaTopic;hu
  const seconds=Math.max(0,Math.ceil((state.startsAt+5000-now)/1000));
  const extra=state.round>=state.baseRounds;
  const label=extra?`Доп. раунд ${state.round-state.baseRounds+1}`:`Раунд ${state.round+1}/${state.baseRounds}`;
+ useStudyActivity('games',`battle:ninja:${topic}`,assetsReady&&!paused&&!finished);
  const choose=(product:number)=>{if(!assetsReady||paused)return;setState(roundGame.answer(product,state.round));setNow(Date.now());};
  if(paused)return <div className="screen ninja-setup"><BackButton onClick={onBack} label="К ниндзя"/><h1>Матч прерван</h1><p>Приложение было свёрнуто. Начнём новый матч?</p><button className="big-button" onClick={onReplay}>Начать заново</button></div>;
  if(!assetsReady)return <div className="screen ninja-setup"><BackButton onClick={onBack} label="К ниндзя"/><h1>🥷 Ниндзя</h1><p role={assetError?'alert':'status'}>{assetError?'Не удалось загрузить арену. Проверь интернет.':'Готовим арену…'}</p>{assetError&&<button className="big-button" onClick={onReplay}>Повторить</button>}</div>;

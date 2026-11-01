@@ -16,3 +16,8 @@ it.each([['harvest-fruits',40],['harvest-vegetables',32]])('requests current %s 
  await memberRequest({action:'leaderboard',game});
  expect(fetch).toHaveBeenCalledWith(expect.anything(),expect.objectContaining({body:JSON.stringify({action:'leaderboard',game,total})}));
 });
+
+it('routes admin statistics to the separate authenticated endpoint',async()=>{
+ await memberRequest({action:'admin-study-stats',days:7});
+ expect(fetch).toHaveBeenCalledWith('https://eqdlhipzjhbzfchwjazr.supabase.co/functions/v1/admin-study-stats',expect.objectContaining({headers:expect.objectContaining({Authorization:'Bearer test-token'}),body:JSON.stringify({action:'admin-study-stats',days:7})}));
+});

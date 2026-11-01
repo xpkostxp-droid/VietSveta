@@ -1,3 +1,5 @@
+import {useStudyActivity} from '../../domain/useStudyActivity';
+import {reportStudyAnswer} from '../../domain/studyTelemetry';
 import { useEffect, useRef, useState } from 'react';
 import { travelWords, travelBlitzGroups, travelBlitzTasks, travelBlitzAnswer, travelBlitzOptions, travelBlitzPool, type TravelBlitzGroup, type TravelTask } from '../content/games/travel';
 import { GameRanking } from '../../components/GameRanking';
@@ -26,6 +28,8 @@ export function TravelGameScreen({ onBack, initialGroup = null }: { onBack: () =
   const elapsed = useRef(0);
   const started = useRef(0);
   const locked = useRef(true);
+  const studyGame=group==='countries'?'lesson7-countries':'lesson7-travel';
+  useStudyActivity('games',studyGame,(phase==='playing'||phase==='feedback')&&!paused);
   const current = tasks[position];
   const word = current && travelWords[current.index];
   const answer = current && travelBlitzAnswer(current);
@@ -46,6 +50,7 @@ export function TravelGameScreen({ onBack, initialGroup = null }: { onBack: () =
     locked.current = true;
     const time = Math.min(5000, elapsed.current + performance.now() - started.current);
     if (time >= 5000) choice = null;
+    reportStudyAnswer({topic:studyGame,vi:travelWords[current.index][1],ru:travelWords[current.index][0],direction:current.reverse?'vi-ru':'ru-vi',chosen:choice,result:choice===answer?'correct':choice===null?'timeout':'wrong',elapsed_ms:time});
     setRemaining(Math.max(0, 5000 - time)); setSelected(choice);
     if (choice === answer) setScore(s => ({ correct: s.correct + 1, time: s.time + time }));
     setPhase('feedback'); speakVietnamese(travelWords[current.index][1]);

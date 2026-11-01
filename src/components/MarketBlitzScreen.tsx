@@ -1,3 +1,5 @@
+import {useStudyActivity} from '../domain/useStudyActivity';
+import {reportStudyAnswer} from '../domain/studyTelemetry';
 import './SharedPlayLayout.css';
 import { GameRanking } from './GameRanking';
 import { updateGameRecord } from '../domain/gameRecord';
@@ -54,6 +56,7 @@ export function MarketBlitzScreen({ onBack, category }: { onBack: () => void; ca
   const [active, setActive] = useState(false);
   const [started, setStarted] = useState(false);
   const [paused, setPaused] = useState(false);
+  useStudyActivity('games',game,active&&!paused);
   const [streak, setStreak] = useState(0);
   const [best, setBest] = useState(0);
   const sound = useRef<ReturnType<typeof createCountdownSound> | null>(null);
@@ -133,6 +136,8 @@ export function MarketBlitzScreen({ onBack, category }: { onBack: () => void; ca
     // A click at or after the deadline is a timeout, even between timer ticks.
     const timedOut = index === null || Date.now() >= deadline.current;
     const success = !timedOut && index === productForTask(current);
+    const word=products[productForTask(current)];
+    reportStudyAnswer({topic:game,vi:word[1],ru:word[2],direction:isPictureAnswer(current)?'vi-ru':'ru-vi',chosen:index===null?null:products[index][isPictureAnswer(current)?2:1],result:success?'correct':timedOut?'timeout':'wrong',elapsed_ms:questionTime});
     setSelected(index); setPhase(success ? 'success' : timedOut ? 'timeout' : 'wrong');
     const nextSaved = success ? saved.filter(i => i !== current) : [...new Set([...saved, current])];
     setSaved(nextSaved); saveErrors(nextSaved);

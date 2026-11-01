@@ -1,3 +1,5 @@
+import {useStudyActivity} from '../domain/useStudyActivity';
+import {reportStudyAnswer} from '../domain/studyTelemetry';
 import { GameRanking } from './GameRanking';
 import { saveTimedAttempt } from '../domain/answerTime';
 import { updateGameRecord } from '../domain/gameRecord';
@@ -27,6 +29,7 @@ export function AdjectiveTetris({onBack,variant='tetris'}:{onBack:()=>void;varia
  const deadline=useRef(0),frozen=useRef(5000),locked=useRef(false),pausedRef=useRef(false);
  const sound=useRef<ReturnType<typeof createCountdownSound>|null>(null),lastBeep=useRef(5);
  const task=round?.tasks[round.at];
+ useStudyActivity('games',gameId,!!round&&round.phase!=='end'&&!paused);
  function begin(){
   attemptSaved.current=false;
   sound.current??=createCountdownSound();sound.current.unlock();stopSpeaking();
@@ -39,6 +42,7 @@ export function AdjectiveTetris({onBack,variant='tetris'}:{onBack:()=>void;varia
   locked.current=true;sound.current?.stop();
   const elapsed=Math.max(0,Math.min(5000,5000-(deadline.current-Date.now())));
   const success=choice===task.word&&Date.now()<deadline.current;
+  reportStudyAnswer({topic:gameId,vi:words[task.word][0],ru:words[task.word][1],direction:task.reverse?'vi-ru':'ru-vi',chosen:choice===null?null:words[choice][task.reverse?1:0],result:success?'correct':elapsed>=5000?'timeout':'wrong',elapsed_ms:elapsed});
   const label=words[task.word][0];
   const landed=landWordBlock(round.board,{correct:success,label});
   setRevealed(!animated||success);
