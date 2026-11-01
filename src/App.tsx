@@ -6,6 +6,8 @@ import { QuestionsBlitzScreen } from './components/QuestionsBlitzScreen';
 import { MarketBlitzScreen } from './components/MarketBlitzScreen';
 import { lazy, Suspense, useState } from 'react';
 import { GroupSelection, type CourseSection } from './components/GroupSelection';
+const AdminStudyStatistics=lazy(()=>import('./components/AdminStudyStatistics'));
+const AdminBattleLab=lazy(()=>import('./battle/AdminBattleLab').then(m=>({default:m.AdminBattleLab})));
 const VerbsGameScreen = lazy(() => import('./components/VerbsGameScreen'));
 const BeginnerApp = lazy(() => import('./beginner/App'));
 import type { CardOrder, Direction } from './types';
@@ -26,6 +28,8 @@ import type { PhoneticsTestId } from './content/phonetics/tests';
 
 type Screen =
   | { name: 'home' }
+  | { name: 'admin-statistics' }
+  | { name: 'admin-bots' }
   | { name: 'group-selection'; section: CourseSection }
   | { name: 'beginner'; section: CourseSection }
   | { name: 'produce'; category: 'fruits' | 'vegetables' }
@@ -57,6 +61,7 @@ function App({ isAdmin=false, memberId, memberName, syncStatus, onOpenProfile, c
       // по-прежнему запоминается через saveLastActivity ниже, на будущее.
       return (
         <HomeScreen
+          isAdmin={isAdmin} onOpenStatistics={isAdmin?()=>setScreen({name:'admin-statistics'}):undefined}
           memberId={memberId} memberName={memberName} syncStatus={syncStatus} onOpenProfile={onOpenProfile}
           onOpenGame={() => setScreen({ name: 'group-selection', section: 'games' })}
           onOpenListening={() => setScreen({ name: 'group-selection', section: 'listening' })}
@@ -68,7 +73,11 @@ function App({ isAdmin=false, memberId, memberName, syncStatus, onOpenProfile, c
       );
 
     case 'group-selection':
-      return <GroupSelection preferredGroup={courseGroup} section={screen.section} onBack={()=>setScreen({name:'home'})} onChoose={group=>setScreen(group==='beginner'?{name:'beginner',section:screen.section}:screen.section==='games'?{name:'games-menu'}:screen.section==='theory'?{name:'theory-list'}:screen.section==='cards'?{name:'cards-lesson-list'}:{name:'listening'})}/>;
+      return <GroupSelection onOpenBots={isAdmin&&screen.section==='games'?()=>setScreen({name:'admin-bots'}):undefined} preferredGroup={courseGroup} section={screen.section} onBack={()=>setScreen({name:'home'})} onChoose={group=>setScreen(group==='beginner'?{name:'beginner',section:screen.section}:screen.section==='games'?{name:'games-menu'}:screen.section==='theory'?{name:'theory-list'}:screen.section==='cards'?{name:'cards-lesson-list'}:{name:'listening'})}/>;
+    case 'admin-statistics':
+      return isAdmin?<Suspense fallback={<div className="screen"><p role="status">Загружаем статистику…</p></div>}><AdminStudyStatistics isAdmin={isAdmin} backLabel="На главную" onBack={()=>setScreen({name:'home'})}/></Suspense>:null;
+    case 'admin-bots':
+      return isAdmin?<Suspense fallback={<div className="screen"><p role="status">Загружаем игры…</p></div>}><AdminBattleLab isAdmin={isAdmin} backLabel="К играм" onBack={()=>setScreen({name:'group-selection',section:'games'})}/></Suspense>:null;
     case 'beginner':
       return <Suspense fallback={<div className="screen"><BackButton onClick={()=>setScreen({name:'group-selection',section:screen.section})} label="К выбору группы"/><p role="status">Загружаем материалы…</p></div>}><div className="beginner-area"><BeginnerApp isAdmin={isAdmin} memberName={memberName} key={screen.section} section={screen.section} onBack={()=>setScreen({name:'group-selection',section:screen.section})}/></div></Suspense>;
 
