@@ -83,7 +83,7 @@ export function AdjectiveTetris({onBack,variant='tetris'}:{onBack:()=>void;varia
   updateGameRecord(gameId,{correct:round.correct,correctTimeMs:round.time});
   saveTimedAttempt({game:gameId,correct:round.correct,total:round.tasks.length,answerTimeMs:round.answerTime,correctTimeMs:round.time,completed:true});
  },[round,gameId]);
- if(!round||round.phase==='end')return <div className="screen ranking-screen"><BackButton onClick={onBack} label="К наборам"/><h1 className="screen-title">{set.title}</h1><GameRanking game={gameId} total={words.length*2} onStart={begin} startAtBottom startLabel={round?'Играть ещё':'Начать'} result={round?{correct:round.correct,time:round.time}:undefined}/></div>;
+ if(!round||round.phase==='end')return <div className="screen ranking-screen"><BackButton onClick={onBack} label="К наборам"/><h1 className="screen-title">{set.title}</h1><GameRanking game={gameId} total={words.length*2} onStart={begin} startLabel={round?'Играть ещё':'Начать'} result={round?{correct:round.correct,time:round.time}:undefined}/></div>;
  const current=task!;const row=5-Math.floor(round.board.length/5),col=round.board.length%5;
  return <div className={'screen at-screen at-playing'+(animated?' rope-playing':'')}>
   <div className="at-top"><BackButton onClick={onBack} label="Назад"/><span>{round.at+1}/{round.tasks.length} · ✓ {round.correct}</span><div className={'at-clock'+(left<=3000?' at-urgent':'')} aria-label="Время на ответ"><svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="25" className="at-track"/><circle cx="30" cy="30" r="25" pathLength="100" strokeDasharray="100" strokeDashoffset={100-left/50}/></svg><strong>{paused?'Ⅱ':round.phase==='feedback'?(round.success?'✓':'×'):Math.ceil(left/1000)}</strong></div></div>

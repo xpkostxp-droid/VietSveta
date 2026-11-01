@@ -98,7 +98,7 @@ export function PhoneGameScreen({ onBack }: { onBack: () => void }) {
   const player=voice.current;if(player){player.currentTime=0;void player.play().catch(()=>setError('Не удалось включить звук.'));}
  };
  const source=phone?(digit===0?`${import.meta.env.BASE_URL}beginner/audio/games/phone/${reverse?'ru':'vi'}-0.mp3`:`${import.meta.env.BASE_URL}beginner/audio/games/${reverse?'numbers-ru':'numbers'}/${digit}.mp3`):undefined;
- if(phase==='intro'||phase==='result')return <div className="screen ranking-screen"><BackButton onClick={onBack} label="К числительным"/><h1 className="screen-title">Цифры 1–10 · Номер телефона</h1><GameRanking game={game} total={20} onStart={begin} startAtBottom startLabel={phase==='result'?'Играть ещё':'Начать'} result={phase==='result'?score:undefined}/></div>;
+ if(phase==='intro'||phase==='result')return <div className="screen ranking-screen"><BackButton onClick={onBack} label="К числительным"/><h1 className="screen-title">Цифры 1–10 · Номер телефона</h1><GameRanking game={game} total={20} onStart={begin} startLabel={phase==='result'?'Играть ещё':'Начать'} result={phase==='result'?score:undefined}/></div>;
  const calling=phase==='calling';
  return <div className={"screen screen-phone-game phone-blitz " + beginnerPlayClass}>
   <BackButton onClick={stop} label="К числительным"/>

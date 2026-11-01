@@ -29,12 +29,12 @@ it('reads immediately without full sync, uploads completed runs first and permit
  expect(node.querySelector('button')?.disabled).toBe(false);
  await act(async()=>offline.unmount());
 });
-it('puts the start button below the five-player table when requested',async()=>{
+it('puts the start button before statistics for every game',async()=>{
  calls.fail=false;calls.order=[];
  const node=document.createElement('div'),root=createRoot(node);
- await act(async()=>root.render(<GameRanking game="adjectives-tetris" total={36} onStart={()=>{}} startAtBottom startLabel="Начать"/>));await flush();
+ await act(async()=>root.render(<GameRanking game="adjectives-tetris" total={36} onStart={()=>{}} startLabel="Начать"/>));await flush();
  const rows=node.querySelectorAll('.ranking-row'),button=node.querySelector('.ranking-start')!;
- expect(rows.length).toBeGreaterThan(0);expect(rows[rows.length-1].compareDocumentPosition(button)&Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+ expect(rows.length).toBeGreaterThan(0);expect(button.compareDocumentPosition(rows[0])&Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
  expect(node.textContent).toContain('7 из 36');await act(async()=>root.unmount());
 });
 

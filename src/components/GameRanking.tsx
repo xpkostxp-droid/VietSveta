@@ -19,7 +19,7 @@ function readRanking(key:string):RankedRows {
 function saveRanking(key:string,rows:RankedRows) {
  try{localStorage.setItem(cachePrefix+key,JSON.stringify({savedAt:Date.now(),rows}));}catch{/* Storage is optional; the live ranking still works. */}
 }
-export function GameRanking({game,total,onStart,startLabel='Начать игру',result,children,startAtBottom=false}:{game:string;total:number;onStart:()=>void;startLabel?:string;result?:Result;children?:React.ReactNode;startAtBottom?:boolean}) {
+export function GameRanking({game,total,onStart,startLabel='Начать игру',result,children}:{game:string;total:number;onStart:()=>void;startLabel?:string;result?:Result;children?:React.ReactNode}) {
  const member=cachedMember();
  const produceGame=game==='harvest-fruits'||game==='harvest-vegetables';
  const key=`${member?.user_id}:${member?.ranking_since??''}:${game}${produceGame?':'+total:''}`;
@@ -58,8 +58,8 @@ export function GameRanking({game,total,onStart,startLabel='Начать игр�
  },[game,key,retry,result?.correct,result?.time]);
  const seconds=(ms:number)=>(ms/1000).toFixed(2).replace('.',',');
  return <section className="game-ranking">
+  <button className="big-button ranking-start" onClick={()=>{if(rows.length)before.set(key,rows);onStart();}}>{startLabel}</button>
   {result&&<div className="ranking-result" aria-live="polite"><h2>Твоя попытка</h2><strong>{result.correct} из {total} · {seconds(result.time)} сек</strong>{notice&&<p>{notice}</p>}{member?.is_admin&&<p>Тест администратора · вне рейтинга</p>}</div>}
-  {!startAtBottom&&(<button className="big-button ranking-start" onClick={()=>{if(rows.length)before.set(key,rows);onStart();}}>{startLabel}</button>)}
   <h2 className="ranking-heading">🏆 Лучшие попытки</h2><p className="ranking-caption">За всё время · больше ответов, затем быстрее</p>
   {busy&&<p role="status">{rows.length?'Обновляем сохранённый рейтинг…':'Обновляем рейтинг…'}</p>}
   {error&&<div role="status"><p>{error}</p><button className="secondary-button" onClick={()=>setRetry(n=>n+1)}>Обновить рейтинг</button></div>}
@@ -69,6 +69,5 @@ export function GameRanking({game,total,onStart,startLabel='Начать игр�
    <div className="ranking-person"><strong>{row.name}{row.id===member?.id?' · ты':''}</strong><span>{row.best?`${row.best.correct} из ${total} · ${seconds(row.best.correct_time_ms)} сек`:'Пока нет результата'}</span></div>
   </li>)}</ol>}
   {children}
-  {startAtBottom&&(<button className="big-button ranking-start" onClick={()=>{if(rows.length)before.set(key,rows);onStart();}}>{startLabel}</button>)}
  </section>;
 }

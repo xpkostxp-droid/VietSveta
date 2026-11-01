@@ -97,7 +97,7 @@ export function PeopleGameScreen({ onBack }: { onBack: () => void }) {
     <h1 className="screen-title">{title?.label ?? 'Я, мы, они и все'}</h1>
     {phase === 'intro' || phase === 'result' ? <GameRanking
           game={'lesson8-people'}
-          total={title!.words * 2} onStart={start} startAtBottom
+          total={title!.words * 2} onStart={start}
           startLabel={phase === 'result' ? 'Играть ещё' : 'Начать'}
           result={phase === 'result' ? score : undefined}
         /> : word && <>
