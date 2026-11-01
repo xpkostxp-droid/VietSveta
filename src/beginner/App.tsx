@@ -1,3 +1,4 @@
+import ToneGameScreen from '../components/ToneGameScreen';
 import {useScenicDepth} from '../domain/useScenicDepth';
 import {beginnerScenicDepth} from '../domain/scenicDepth';
 import './index.css';
@@ -40,6 +41,8 @@ type Screen =
   | { name: 'home' }
   | { name: 'listening' }
   | { name: 'games-list' }
+  | { name: 'listening-games' }
+  | { name: 'tone-game' }
   | { name: 'beginner-battle' }
   | { name: 'numbers-games-list' }
   | { name: 'family-game' }
@@ -83,8 +86,12 @@ function App({section,onBack,isAdmin=false,memberName}:{section:BeginnerSection;
     case 'listening':
       return <Suspense fallback={<div className="screen"><BackButton onClick={onBack} label="К выбору группы" /><p role="status">Загружаем аудирование…</p></div>}><ListeningScreen onBack={onBack} /></Suspense>;
 
+    case 'tone-game':
+      return <ToneGameScreen variant="syllables" onBack={()=>setScreen({name:'listening-games'})}/>;
+    case 'listening-games':
+      return <div className="screen games-menu-screen"><BackButton onClick={()=>setScreen({name:'games-list'})} label="К играм"/><h1 className="screen-title">Аудирование</h1><nav className="games-menu-keys" aria-label="Игры на аудирование"><button className="games-menu-key" onClick={()=>setScreen({name:'tone-game'})}><span className="games-menu-key-icon" aria-hidden="true">🎧</span><span>Угадай тон</span></button></nav></div>;
     case 'games-list':
-      return <GamesListScreen isAdmin={isAdmin} onOpenBattle={() => setScreen({name:'beginner-battle'})} category={gamesCategory} onCategoryChange={setGamesCategory} onOpenTaxi={() => setScreen({ name: 'taxi-demo' })} onOpenQuestionTower={() => setScreen({ name: 'question-tower' })} onOpenSuperBlitz={() => setScreen({ name: 'questions-superblitz' })} onOpenRestaurant={() => setScreen({ name: 'restaurant-game' })} onOpenPeople={() => setScreen({ name: 'people-game' })} onBack={onBack} onOpenTravel={() => setScreen({ name: 'travel-game' })} onOpenProfessions={() => setScreen({ name: 'professions-game' })} onOpenFamily={() => setScreen({ name: 'family-game' })} onOpenHouse={() => setScreen({ name: 'house-game' })} onOpenAdjectives={() => setScreen({ name: 'adjectives-game' })} onOpenLesson9={() => setScreen({ name: 'numbers-games-list' })} />;
+      return <GamesListScreen onOpenListeningGames={()=>setScreen({name:'listening-games'})} isAdmin={isAdmin} onOpenBattle={() => setScreen({name:'beginner-battle'})} category={gamesCategory} onCategoryChange={setGamesCategory} onOpenTaxi={() => setScreen({ name: 'taxi-demo' })} onOpenQuestionTower={() => setScreen({ name: 'question-tower' })} onOpenSuperBlitz={() => setScreen({ name: 'questions-superblitz' })} onOpenRestaurant={() => setScreen({ name: 'restaurant-game' })} onOpenPeople={() => setScreen({ name: 'people-game' })} onBack={onBack} onOpenTravel={() => setScreen({ name: 'travel-game' })} onOpenProfessions={() => setScreen({ name: 'professions-game' })} onOpenFamily={() => setScreen({ name: 'family-game' })} onOpenHouse={() => setScreen({ name: 'house-game' })} onOpenAdjectives={() => setScreen({ name: 'adjectives-game' })} onOpenLesson9={() => setScreen({ name: 'numbers-games-list' })} />;
 
     case 'beginner-battle':
       return <BeginnerBattleScreen playerName={memberName} onBack={() => setScreen({name:'games-list'})}/>;

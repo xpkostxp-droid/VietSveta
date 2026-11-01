@@ -8,6 +8,16 @@ beforeEach(()=>{node=document.createElement('div');document.body.append(node);ro
 afterEach(()=>{act(()=>root.unmount());node.remove();});
 async function open(admin:boolean){await act(async()=>root.render(<BeginnerApp section="games" isAdmin={admin} onBack={()=>{}}/>));}
 async function lesson9(){await act(async()=>Array.from(node.querySelectorAll('button')).find(b=>b.textContent?.includes('Урок 9'))!.click());}
+it('puts Listening after Battle and opens the seventeen-syllable game for all participants',async()=>{
+ await open(false);
+ expect([...node.querySelectorAll('.games-menu-key')].map(b=>b.textContent?.trim())).toEqual(['⚔️ Батл','🎧Аудирование']);
+ await act(async()=>[...node.querySelectorAll<HTMLButtonElement>('button')].find(b=>b.textContent?.includes('Аудирование'))!.click());
+ expect(node.querySelector('[aria-label="Игры на аудирование"]')).toBeTruthy();
+ await act(async()=>[...node.querySelectorAll<HTMLButtonElement>('button')].find(b=>b.textContent?.includes('Угадай тон'))!.click());
+ expect(node.textContent).toContain('17 слогов');expect(node.querySelector('.ranking-start')).toBeTruthy();
+ await act(async()=>node.querySelector<HTMLButtonElement>('.back-button')!.click());expect(node.querySelector('[aria-label="Игры на аудирование"]')).toBeTruthy();
+ await act(async()=>node.querySelector<HTMLButtonElement>('.back-button')!.click());expect(node.textContent).toContain('Урок 5');
+});
 it('opens family and separate house/adjectives games to participants while retaining number-game restrictions',async()=>{
  await open(false);expect(node.textContent).toContain('Урок 10 · Семья');expect(node.textContent).toContain('Урок 11 · Дом');expect(node.textContent).toContain('Урок 11 · Прилагательные');expect(node.textContent).toContain('Урок 8');
  await lesson9();expect(node.textContent).toContain('Цифры 1–10 · Номер телефона');

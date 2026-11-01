@@ -1,0 +1,87 @@
+[
+  {
+    "vi": "thi",
+    "file": "1-1.mp3",
+    "source": "public/audio/phonetics-clips/3/4.mp3"
+  },
+  {
+    "vi": "thí",
+    "file": "1-2.mp3",
+    "source": "public/audio/phonetics-clips/30/47.mp3"
+  },
+  {
+    "vi": "thì",
+    "file": "1-3.mp3",
+    "source": "public/audio/phonetics-clips/28/24.mp3"
+  },
+  {
+    "vi": "thị",
+    "file": "1-4.mp3",
+    "source": "public/audio/phonetics-clips/30/48.mp3"
+  },
+  {
+    "vi": "ve",
+    "file": "2-1.mp3",
+    "source": "public/audio/phonetics-clips/23/18.mp3"
+  },
+  {
+    "vi": "vé",
+    "file": "2-2.mp3",
+    "source": "public/audio/phonetics-clips/30/43.mp3"
+  },
+  {
+    "vi": "vẻ",
+    "file": "2-3.mp3",
+    "source": "public/audio/phonetics-clips/32/37.mp3"
+  },
+  {
+    "vi": "vẹ",
+    "file": "2-4.mp3",
+    "source": "public/audio/phonetics-clips/30/44.mp3"
+  },
+  {
+    "vi": "la",
+    "file": "3-1.mp3",
+    "source": "public/audio/phonetics-clips/6/36.mp3"
+  },
+  {
+    "vi": "lá",
+    "file": "3-2.mp3",
+    "source": "public/audio/phonetics-clips/29/27.mp3"
+  },
+  {
+    "vi": "là",
+    "file": "3-3.mp3",
+    "source": "public/audio/phonetics-clips/33/15.mp3"
+  },
+  {
+    "vi": "me",
+    "file": "4-1.mp3",
+    "source": "public/audio/phonetics-clips/11/41.mp3"
+  },
+  {
+    "vi": "mé",
+    "file": "4-2.mp3",
+    "source": "public/audio/phonetics-clips/29/47.mp3"
+  },
+  {
+    "vi": "mẹ",
+    "file": "4-3.mp3",
+    "source": "public/audio/phonetics-clips/32/44.mp3"
+  },
+  {
+    "vi": "nghi",
+    "file": "5-1.mp3",
+    "source": "public/audio/phonetics-clips/7/34.mp3"
+  },
+  {
+    "vi": "nghỉ",
+    "file": "5-2.mp3",
+    "source": "public/audio/phonetics-clips/32/18.mp3"
+  },
+  {
+    "vi": "nghĩ",
+    "file": "5-3.mp3",
+    "source": "public/audio/phonetics-clips/32/23.mp3"
+  }
+]

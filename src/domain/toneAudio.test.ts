@@ -1,6 +1,11 @@
 import {expect,it,vi} from 'vitest';
 import {createToneAudio} from './toneAudio';
 import {toneWords,tones} from '../content/toneWords';
+import {toneSyllables} from '../content/toneSyllables';
+it('keeps the agreed seventeen beginner recordings and all six tones',()=>{
+ expect(toneSyllables.map(w=>w.vi)).toEqual(['thi','thí','thì','thị','ve','vé','vẻ','vẹ','la','lá','là','me','mé','mẹ','nghi','nghỉ','nghĩ']);
+ expect(new Set(toneSyllables.map(w=>w.tone)).size).toBe(6);
+});
 it('has five known single-syllable words per tone without repeats',()=>{
  expect(new Set(toneWords.map(w=>w.vi)).size).toBe(30);
  for(const tone of tones)expect(toneWords.filter(w=>w.tone===tone)).toHaveLength(5);

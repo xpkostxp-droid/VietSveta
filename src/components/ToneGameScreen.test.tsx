@@ -11,6 +11,7 @@ vi.mock('../domain/studyTelemetry',()=>({reportStudyAnswer:vi.fn()}));
 vi.mock('../domain/useStudyActivity',()=>({useStudyActivity:vi.fn()}));
 import {reportStudyAnswer} from '../domain/studyTelemetry';
 import {toneWords} from '../content/toneWords';
+import {toneSyllables} from '../content/toneSyllables';
 import * as attempts from '../domain/answerTime';
 let node:HTMLDivElement,root:ReturnType<typeof createRoot>;
 beforeEach(async()=>{vi.useFakeTimers();vi.clearAllMocks();audio.load.mockResolvedValue(undefined);node=document.createElement('div');document.body.append(node);root=createRoot(node);await act(async()=>root.render(<ToneGameScreen onBack={()=>{}}/>));});
@@ -42,6 +43,13 @@ it('finishes all thirty tasks and saves one completed attempt',async()=>{
  expect(reportStudyAnswer).toHaveBeenCalledTimes(30);expect(saved).toHaveBeenCalledTimes(1);
  expect(saved).toHaveBeenCalledWith(expect.objectContaining({game:'listening-tones',correct:0,total:30,correctTimeMs:0,completed:true}));
  expect(node.textContent).toContain('Результат 0');saved.mockRestore();
+});
+it('uses the same controls for seventeen beginner syllables and keeps their attempts separate',async()=>{
+ await act(async()=>root.render(<ToneGameScreen variant="syllables" onBack={()=>{}}/>));
+ const saved=vi.spyOn(attempts,'saveTimedAttempt');await start();await countdown();
+ expect(node.textContent).toContain('Задание 1/17');expect(node.textContent).toContain('Слушай слог');expect(node.querySelectorAll('.tone-options button')).toHaveLength(6);
+ for(let i=0;i<17;i++){await advance(5000);if(i===0){const id=audio.playThreeTimes.mock.calls[0][0];expect(toneSyllables.some(w=>w.id===id)).toBe(true);expect(node.querySelector('.tone-translation')?.textContent).toBe('Слог');}await advance(1100);}
+ expect(saved).toHaveBeenCalledTimes(1);expect(saved).toHaveBeenCalledWith(expect.objectContaining({game:'beginner-listening-tones',total:17,completed:true}));saved.mockRestore();
 });
 it('stops audio and freezes the question while hidden, then resumes the remaining time',async()=>{
  await start();await countdown();await advance(1000);
