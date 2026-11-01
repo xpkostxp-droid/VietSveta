@@ -44,6 +44,7 @@ type Screen =
   | { name: 'lesson-games-list' }
   | { name: 'listening-games' }
   | { name: 'tone-game' }
+  | { name: 'tone-basics' }
   | { name: 'beginner-battle' }
   | { name: 'numbers-games-list' }
   | { name: 'family-game' }
@@ -87,10 +88,12 @@ function App({section,onBack,isAdmin=false,memberName}:{section:BeginnerSection;
     case 'listening':
       return <Suspense fallback={<div className="screen"><BackButton onClick={onBack} label="К выбору группы" /><p role="status">Загружаем аудирование…</p></div>}><ListeningScreen onBack={onBack} /></Suspense>;
 
+    case 'tone-basics':
+      return <ToneGameScreen variant="basics" onBack={()=>setScreen({name:'listening-games'})}/>;
     case 'tone-game':
       return <ToneGameScreen variant="syllables" onBack={()=>setScreen({name:'listening-games'})}/>;
     case 'listening-games':
-      return <div className="screen games-menu-screen"><BackButton onClick={()=>setScreen({name:'games-list'})} label="К играм"/><h1 className="screen-title">Аудирование</h1><nav className="games-menu-keys" aria-label="Игры на аудирование"><button className="games-menu-key" onClick={()=>setScreen({name:'tone-game'})}><span className="games-menu-key-icon" aria-hidden="true">🎧</span><span>Угадай тон</span></button></nav></div>;
+      return <div className="screen games-menu-screen"><BackButton onClick={()=>setScreen({name:'games-list'})} label="К играм"/><h1 className="screen-title">Аудирование</h1><nav className="games-menu-keys" aria-label="Игры на аудирование"><button className="games-menu-key" onClick={()=>setScreen({name:'tone-basics'})}><span className="games-menu-key-icon" aria-hidden="true">🎧</span><span>Тоны · пять слогов</span></button><button className="games-menu-key" onClick={()=>setScreen({name:'tone-game'})}><span className="games-menu-key-icon" aria-hidden="true">🎧</span><span>Тоны · разные слоги</span></button></nav></div>;
     case 'games-list':
       return <div className="screen games-menu-screen">
         <BackButton onClick={onBack} label="К выбору группы"/>
