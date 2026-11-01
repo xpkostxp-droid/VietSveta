@@ -41,6 +41,7 @@ type Screen =
   | { name: 'home' }
   | { name: 'listening' }
   | { name: 'games-list' }
+  | { name: 'lesson-games-list' }
   | { name: 'listening-games' }
   | { name: 'tone-game' }
   | { name: 'beginner-battle' }
@@ -91,13 +92,23 @@ function App({section,onBack,isAdmin=false,memberName}:{section:BeginnerSection;
     case 'listening-games':
       return <div className="screen games-menu-screen"><BackButton onClick={()=>setScreen({name:'games-list'})} label="К играм"/><h1 className="screen-title">Аудирование</h1><nav className="games-menu-keys" aria-label="Игры на аудирование"><button className="games-menu-key" onClick={()=>setScreen({name:'tone-game'})}><span className="games-menu-key-icon" aria-hidden="true">🎧</span><span>Угадай тон</span></button></nav></div>;
     case 'games-list':
-      return <GamesListScreen onOpenListeningGames={()=>setScreen({name:'listening-games'})} isAdmin={isAdmin} onOpenBattle={() => setScreen({name:'beginner-battle'})} category={gamesCategory} onCategoryChange={setGamesCategory} onOpenTaxi={() => setScreen({ name: 'taxi-demo' })} onOpenQuestionTower={() => setScreen({ name: 'question-tower' })} onOpenSuperBlitz={() => setScreen({ name: 'questions-superblitz' })} onOpenRestaurant={() => setScreen({ name: 'restaurant-game' })} onOpenPeople={() => setScreen({ name: 'people-game' })} onBack={onBack} onOpenTravel={() => setScreen({ name: 'travel-game' })} onOpenProfessions={() => setScreen({ name: 'professions-game' })} onOpenFamily={() => setScreen({ name: 'family-game' })} onOpenHouse={() => setScreen({ name: 'house-game' })} onOpenAdjectives={() => setScreen({ name: 'adjectives-game' })} onOpenLesson9={() => setScreen({ name: 'numbers-games-list' })} />;
+      return <div className="screen games-menu-screen">
+        <BackButton onClick={onBack} label="К выбору группы"/>
+        <h1 className="screen-title">Игры</h1>
+        <nav className="games-menu-keys" aria-label="Разделы игр">
+          <button className="games-menu-key games-menu-key-battle" onClick={()=>setScreen({name:'beginner-battle'})}><span className="games-menu-key-icon" aria-hidden="true">⚔️</span>{' '}<span>Батл</span></button>
+          <button className="games-menu-key" onClick={()=>setScreen({name:'listening-games'})}><span className="games-menu-key-icon" aria-hidden="true">🎧</span><span>Аудирование</span></button>
+          <button className="games-menu-key" onClick={()=>setScreen({name:'lesson-games-list'})}><span className="games-menu-key-icon" aria-hidden="true">📚</span><span>Игры по урокам</span></button>
+        </nav>
+      </div>;
+    case 'lesson-games-list':
+      return <GamesListScreen isAdmin={isAdmin} category={gamesCategory} onCategoryChange={setGamesCategory} onOpenTaxi={() => setScreen({ name: 'taxi-demo' })} onOpenQuestionTower={() => setScreen({ name: 'question-tower' })} onOpenSuperBlitz={() => setScreen({ name: 'questions-superblitz' })} onOpenRestaurant={() => setScreen({ name: 'restaurant-game' })} onOpenPeople={() => setScreen({ name: 'people-game' })} onBack={()=>setScreen({name:'games-list'})} onOpenTravel={() => setScreen({ name: 'travel-game' })} onOpenProfessions={() => setScreen({ name: 'professions-game' })} onOpenFamily={() => setScreen({ name: 'family-game' })} onOpenHouse={() => setScreen({ name: 'house-game' })} onOpenAdjectives={() => setScreen({ name: 'adjectives-game' })} onOpenLesson9={() => setScreen({ name: 'numbers-games-list' })} />;
 
     case 'beginner-battle':
       return <BeginnerBattleScreen playerName={memberName} onBack={() => setScreen({name:'games-list'})}/>;
 
     case 'numbers-games-list':
-      return <NumbersGamesListScreen isAdmin={isAdmin} onBack={() => setScreen({ name: 'games-list' })} onOpenDialogues={() => setScreen({ name: 'dialogue-games-list' })} onOpenBigNumbers={() => setScreen({ name: 'big-numbers-setup' })} onOpenNumbers={range => setScreen({ name: 'numbers-game-setup', range })} />;
+      return <NumbersGamesListScreen isAdmin={isAdmin} onBack={() => setScreen({ name: 'lesson-games-list' })} onOpenDialogues={() => setScreen({ name: 'dialogue-games-list' })} onOpenBigNumbers={() => setScreen({ name: 'big-numbers-setup' })} onOpenNumbers={range => setScreen({ name: 'numbers-game-setup', range })} />;
 
     case 'questions-superblitz':
       return <QuestionsBlitzScreen onBack={() => { setGamesCategory('extra'); setScreen({ name: 'games-list' }); }} />;
@@ -112,22 +123,22 @@ function App({section,onBack,isAdmin=false,memberName}:{section:BeginnerSection;
       return <RestaurantGameScreen onBack={() => setScreen({ name: 'games-list' })} />;
 
     case 'people-game':
-      return <PeopleGameScreen onBack={() => setScreen({ name: 'games-list' })} />;
+      return <PeopleGameScreen onBack={() => setScreen({ name: 'lesson-games-list' })} />;
 
     case 'travel-game':
-      return <TravelGameScreen onBack={() => setScreen({ name: 'games-list' })} />;
+      return <TravelGameScreen onBack={() => setScreen({ name: 'lesson-games-list' })} />;
 
     case 'professions-game':
-      return <ProfessionsGameScreen onBack={() => setScreen({ name: 'games-list' })} />;
+      return <ProfessionsGameScreen onBack={() => setScreen({ name: 'lesson-games-list' })} />;
 
     case 'family-game':
-      return <FamilyGameScreen onBack={() => setScreen({ name: 'games-list' })} />;
+      return <FamilyGameScreen onBack={() => setScreen({ name: 'lesson-games-list' })} />;
 
     case 'adjectives-game':
-      return <HouseGameScreen key="adjectives" game="adjectives" onBack={() => setScreen({ name: 'games-list' })} />;
+      return <HouseGameScreen key="adjectives" game="adjectives" onBack={() => setScreen({ name: 'lesson-games-list' })} />;
 
     case 'house-game':
-      return <HouseGameScreen key="house" onBack={() => setScreen({ name: 'games-list' })} />;
+      return <HouseGameScreen key="house" onBack={() => setScreen({ name: 'lesson-games-list' })} />;
 
     case 'dialogue-games-list':
       return <div className="screen"><BackButton onClick={() => setScreen({ name: 'numbers-games-list' })} label="К уроку 9" /><span className="badge">Урок 9 · Числа и возраст</span><h1 className="screen-title">Диалоги</h1><button className="lesson-item game-menu-item" onClick={() => setScreen({ name: 'dialogue-game-setup' })}><span className="game-menu-icon" aria-hidden="true">💬</span><span className="lesson-number">Собери фразу</span><span>17 фраз · Знакомство и возраст</span></button></div>;
