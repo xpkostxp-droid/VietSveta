@@ -1,0 +1,182 @@
+[
+  {
+    "file": "level-1.mp3",
+    "vi": "đi",
+    "source": "public/audio/phonetics-clips/23/35.mp3",
+    "approval": "phonetics preview approved"
+  },
+  {
+    "file": "level-2.mp3",
+    "vi": "mua",
+    "source": "public/audio/phonetics-clips/10/50.mp3",
+    "approval": "phonetics preview approved"
+  },
+  {
+    "file": "level-3.mp3",
+    "vi": "nghe",
+    "source": "public/audio/phonetics-clips/10/36.mp3",
+    "approval": "phonetics preview approved"
+  },
+  {
+    "file": "level-4.mp3",
+    "vi": "to",
+    "source": "public/audio/phonetics-clips/11/3.mp3",
+    "approval": "phonetics preview approved"
+  },
+  {
+    "file": "level-5.mp3",
+    "vi": "bia",
+    "source": "public/audio/phonetics-clips/10/31.mp3",
+    "approval": "phonetics preview approved"
+  },
+  {
+    "file": "sac-1.mp3",
+    "vi": "đến",
+    "source": "public/audio/phonetics-clips/29/4.mp3",
+    "approval": "phonetics preview approved"
+  },
+  {
+    "file": "sac-2.mp3",
+    "vi": "có",
+    "source": "public/audio/phonetics-clips/29/43.mp3",
+    "approval": "phonetics preview approved"
+  },
+  {
+    "file": "sac-3.mp3",
+    "vi": "khó",
+    "source": "public/audio/phonetics-clips/32/40.mp3",
+    "approval": "phonetics preview approved"
+  },
+  {
+    "file": "sac-4.mp3",
+    "vi": "mấy",
+    "source": "public/audio/phonetics-clips/29/34.mp3",
+    "approval": "phonetics preview approved"
+  },
+  {
+    "file": "sac-5.mp3",
+    "vi": "lớn",
+    "source": "public/audio/phonetics-clips/33/23.mp3",
+    "approval": "phonetics preview approved"
+  },
+  {
+    "file": "huyen-1.mp3",
+    "vi": "trà",
+    "source": "public/audio/phonetics-clips/28/5.mp3",
+    "approval": "phonetics preview approved"
+  },
+  {
+    "file": "huyen-2.mp3",
+    "vi": "nhà",
+    "source": "public/audio/phonetics-clips/28/40.mp3",
+    "approval": "phonetics preview approved"
+  },
+  {
+    "file": "huyen-3.mp3",
+    "vi": "làm",
+    "source": "public/audio/phonetics-clips/28/37.mp3",
+    "approval": "phonetics preview approved"
+  },
+  {
+    "file": "huyen-4.mp3",
+    "vi": "bà",
+    "source": "public/audio/phonetics-clips/32/6.mp3",
+    "approval": "phonetics preview approved"
+  },
+  {
+    "file": "huyen-5.mp3",
+    "vi": "nhiều",
+    "source": "public/audio/phonetics-clips/29/11.mp3",
+    "approval": "phonetics preview approved"
+  },
+  {
+    "file": "hoi-1.mp3",
+    "vi": "nghỉ",
+    "source": "public/audio/phonetics-clips/32/18.mp3",
+    "approval": "phonetics preview approved"
+  },
+  {
+    "file": "hoi-2.mp3",
+    "vi": "hỏi",
+    "source": "public/audio/phonetics-clips/31/36.mp3",
+    "approval": "phonetics preview approved"
+  },
+  {
+    "file": "hoi-3.mp3",
+    "vi": "khỏe",
+    "source": "public/audio/phonetics-clips/31/49.mp3",
+    "approval": "phonetics preview approved"
+  },
+  {
+    "file": "hoi-4.mp3",
+    "vi": "ở",
+    "source": "public/audio/phonetics-clips/32/28.mp3",
+    "approval": "phonetics preview approved"
+  },
+  {
+    "file": "hoi-5.mp3",
+    "vi": "bảy",
+    "source": "public/audio/phonetics-clips/31/14.mp3",
+    "approval": "phonetics preview approved"
+  },
+  {
+    "file": "nga-1.mp3",
+    "vi": "nghĩ",
+    "source": "public/audio/phonetics-clips/32/23.mp3",
+    "approval": "phonetics preview approved"
+  },
+  {
+    "file": "nga-2.mp3",
+    "vi": "đã",
+    "source": "public/audio/phonetics-clips/33/45.mp3",
+    "approval": "phonetics preview approved"
+  },
+  {
+    "file": "nga-3.mp3",
+    "vi": "sữa",
+    "source": "user supplied video 1793512707443771.mp4",
+    "approval": "user approved"
+  },
+  {
+    "file": "nga-4.mp3",
+    "vi": "bữa",
+    "source": "listening/08.mp3 47.99814–48.32714",
+    "approval": "user approved"
+  },
+  {
+    "file": "nga-5.mp3",
+    "vi": "cũ",
+    "source": "listening/17.mp3 37.80113–38.42113",
+    "approval": "user approved"
+  },
+  {
+    "file": "nang-1.mp3",
+    "vi": "mẹ",
+    "source": "public/audio/phonetics-clips/32/44.mp3",
+    "approval": "phonetics preview approved"
+  },
+  {
+    "file": "nang-2.mp3",
+    "vi": "chị",
+    "source": "public/audio/phonetics-clips/30/9.mp3",
+    "approval": "phonetics preview approved"
+  },
+  {
+    "file": "nang-3.mp3",
+    "vi": "rộng",
+    "source": "public/audio/phonetics-clips/33/24.mp3",
+    "approval": "phonetics preview approved"
+  },
+  {
+    "file": "nang-4.mp3",
+    "vi": "ngọt",
+    "source": "public/audio/phonetics-clips/30/2.mp3",
+    "approval": "phonetics preview approved"
+  },
+  {
+    "file": "nang-5.mp3",
+    "vi": "một",
+    "source": "public/audio/phonetics-clips/33/10.mp3",
+    "approval": "phonetics preview approved"
+  }
+]

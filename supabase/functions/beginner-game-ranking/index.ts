@@ -18,11 +18,11 @@ Deno.serve(async req => {
     if (authError || !user) return reply({ error: 'Войди снова' }, 401);
     const { data: profile, error: profileError } = await admin.from('participants').select('id').eq('user_id', user.id).eq('active', true).single();
     if (profileError || !profile) return reply({ error: 'Учётная запись отключена' }, 403);
-    if (body.action !== 'leaderboard' || !['lesson10-family', 'lesson11-house', 'lesson11-adjectives', 'lesson15-verbs'].includes(body.game)) return reply({ error: 'game' }, 400);
+    if (body.action !== 'leaderboard' || !['lesson10-family', 'lesson11-house', 'lesson11-adjectives', 'lesson15-verbs','listening-tones'].includes(body.game)) return reply({ error: 'game' }, 400);
     const { data: players, error: playersError } = await admin.from('participants').select('id,display_name,user_id,ranking_since').eq('active', true).eq('is_admin', false);
     if (playersError) throw playersError;
     const rows = await Promise.all((players ?? []).map(async p => {
-      const { data, error } = await admin.from('game_attempts').select('correct,correct_time_ms').eq('game', body.game).eq('user_id', p.user_id).gte('created_at', p.ranking_since ?? '1970-01-01T00:00:00Z').order('correct', { ascending: false }).order('correct_time_ms').limit(1);
+      const { data, error } = await admin.from('game_attempts').select('correct,correct_time_ms').eq('game', body.game).eq('total', body.game==='listening-tones'?30:body.game==='lesson15-verbs'?52:body.game==='lesson11-house'?36:38).eq('user_id', p.user_id).gte('created_at', p.ranking_since ?? '1970-01-01T00:00:00Z').order('correct', { ascending: false }).order('correct_time_ms').limit(1);
       if (error) throw error;
       return { id: p.id, name: p.display_name, best: data?.[0] ?? null };
     }));

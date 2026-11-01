@@ -1,0 +1,9 @@
+.tone-screen .tone-display{width:100%;height:210px;border:1px solid #b8ded7;border-radius:24px;background:#fffdf8;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:16px;color:#193d40}
+.tone-display>span{color:#6c7a86}.tone-display .tone-translation{color:#193d40;font-size:1.2rem;line-height:1.3;max-width:100%;overflow-wrap:anywhere}
+.tone-display .tone-word{font-size:2.6rem;line-height:1.2}.tone-display .tone-count{font-size:3rem;line-height:1.2}
+.tone-speaker{width:92px;height:92px;fill:#193d40}.tone-waves{fill:none;stroke:#193d40;stroke-width:6;stroke-linecap:round}
+.screen.harvest-playing .harvest-options.tone-options{grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(2,var(--play-answer-height));gap:8px}
+.tone-options .blitz-option svg{display:block;width:100%;height:100%;max-width:75px;margin:auto;fill:#193d40;stroke:#193d40;stroke-width:8;stroke-linecap:round;stroke-linejoin:round}.tone-options .blitz-option path{fill:none}
+.tone-screen .tone-options button:disabled{opacity:1}
+@media(max-height:720px){.tone-screen .tone-display{height:170px}}
+@media(max-height:650px){.tone-screen .tone-display{height:130px}.tone-speaker{width:60px;height:60px}.tone-display .tone-word{font-size:2rem}.tone-display .tone-count{font-size:2rem}}
