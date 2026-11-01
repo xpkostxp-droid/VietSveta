@@ -18,7 +18,9 @@ function apply(){
  const depth=Math.max(0,...entries.values()) as ScenicDepth;
  if(depth===0){delete document.body.dataset.scenicDepth;document.body.style.removeProperty('--scenic-wallpaper');return;}
  document.body.dataset.scenicDepth=String(depth);
- document.body.style.setProperty('--scenic-wallpaper',`url("${import.meta.env.BASE_URL}backgrounds/${scenicFiles[depth as 1|2|3|4]}")`);
+ // CSS is served from assets/: resolve against the document, never the CSS file.
+ const wallpaper=new URL(`${import.meta.env.BASE_URL}backgrounds/${scenicFiles[depth as 1|2|3|4]}`,document.baseURI);
+ document.body.style.setProperty('--scenic-wallpaper',`url("${wallpaper.href}")`);
 }
 export function registerScenicDepth(depth:ScenicDepth){
  if(!depth)return()=>{};

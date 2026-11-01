@@ -1,6 +1,9 @@
 /* Fixed viewport layer: no layout changes and no iOS background-attachment scrolling bug. */
 body[data-scenic-depth]{isolation:isolate}
-body[data-scenic-depth]::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background-image:var(--scenic-wallpaper);background-size:cover;background-repeat:no-repeat;background-position:center bottom;opacity:.85}
+body[data-scenic-depth]::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background-image:var(--scenic-wallpaper);background-size:cover;background-repeat:no-repeat;background-position:center bottom;opacity:.85}
+/* Keep the wallpaper above the body canvas and all app controls above it. */
+body[data-scenic-depth] #root{position:relative;z-index:1}
+body[data-scenic-depth] .beginner-area{background:transparent}
 body[data-scenic-depth="2"]::before{opacity:.8}
 body[data-scenic-depth="3"]::before{opacity:.75}
 body[data-scenic-depth="4"]::before{opacity:.55}
