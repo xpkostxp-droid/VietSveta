@@ -5,5 +5,7 @@
 .screen.harvest-playing .harvest-options.tone-options{grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(2,var(--play-answer-height));gap:8px}
 .tone-options .blitz-option svg{display:block;width:100%;height:100%;max-width:75px;margin:auto;fill:#193d40;stroke:#193d40;stroke-width:8;stroke-linecap:round;stroke-linejoin:round}.tone-options .blitz-option path{fill:none}
 .tone-screen .tone-options button:disabled{opacity:1}
+/* Raise the whole word-and-answer block by one answer row to the approved thumb position. */
+.screen.harvest-playing.tone-screen{padding-bottom:max(calc(var(--play-bottom-reserve) + var(--play-answer-height) + 8px),env(safe-area-inset-bottom,0px))}
 @media(max-height:720px){.tone-screen .tone-display{height:170px}}
 @media(max-height:650px){.tone-screen .tone-display{height:130px}.tone-speaker{width:60px;height:60px}.tone-display .tone-word{font-size:2rem}.tone-display .tone-count{font-size:2rem}}
