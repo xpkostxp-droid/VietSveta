@@ -21,3 +21,5 @@ it('routes admin statistics to the separate authenticated endpoint',async()=>{
  await memberRequest({action:'admin-study-stats',days:7});
  expect(fetch).toHaveBeenCalledWith('https://eqdlhipzjhbzfchwjazr.supabase.co/functions/v1/admin-study-stats',expect.objectContaining({headers:expect.objectContaining({Authorization:'Bearer test-token'}),body:JSON.stringify({action:'admin-study-stats',days:7})}));
 });
+
+it('uses the limited overall ranking endpoint for shared medals',async()=>{await memberRequest({action:'overall-ranking'});expect(fetch).toHaveBeenCalledWith('https://eqdlhipzjhbzfchwjazr.supabase.co/functions/v1/overall-ranking',expect.objectContaining({headers:expect.objectContaining({Authorization:'Bearer test-token'})}));});

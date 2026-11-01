@@ -1,0 +1,25 @@
+.overall-ranking{margin-top:28px;padding:16px 12px;background:#fffdf7;border:1px solid #e3dbc8;border-radius:20px;color:#193e40;width:100%;box-sizing:border-box}
+.overall-ranking h2{font-size:1.25rem;margin:0 0 5px;text-align:left}
+.overall-ranking .overall-caption{font-size:.78rem;line-height:1.45;color:#687779;margin:5px 0 10px}
+.overall-filters{display:flex;gap:3px;padding:3px;background:#eee8d9;border-radius:12px;margin:14px 0 10px}
+.overall-filters button{flex:1;min-width:0;min-height:44px;padding:7px 3px;border:0;border-radius:9px;background:transparent;font:inherit;font-size:.76rem;color:#193e40}
+.overall-filters button[aria-pressed=true]{background:#176e68;color:#fff}
+.overall-grid{display:grid;grid-template-columns:22px minmax(0,1fr) 24px 24px 24px 14px;align-items:center;gap:5px}
+.overall-columns{padding:8px 6px;color:#687779;font-size:.8rem}
+.overall-columns>span:nth-child(n+3){text-align:center}
+.overall-players{border:1px solid #e5dfd1;border-radius:12px;overflow:hidden}
+.overall-player+.overall-player{border-top:1px solid #e5dfd1}
+.overall-player-toggle{width:100%;min-height:66px;border:0;background:transparent;padding:10px 6px;text-align:left;color:inherit;font:inherit;font-size:.86rem;cursor:pointer}
+.overall-place{text-align:center;font-variant-numeric:tabular-nums}
+.overall-name{display:flex;align-items:center;gap:7px;min-width:0;font-weight:700;overflow-wrap:anywhere}
+.overall-name>span{min-width:0}.overall-name small{font-size:.7rem;white-space:nowrap;font-weight:500}
+.overall-count{text-align:center;font-weight:700;font-variant-numeric:tabular-nums}
+.overall-own{background:#e2f0e9}.overall-own-extra{border-top:2px dashed #b3cdc4!important}
+.overall-details{padding:12px;background:#f3f4e9;border-top:1px solid #dce3d7}
+.overall-details h3{font-size:.9rem;margin:0 0 10px}.overall-details h4{font-size:.84rem;margin:12px 0 3px}
+.overall-game{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;min-height:44px;text-align:left;padding:9px 0;background:none;border:0;border-bottom:1px solid #e2e4d7;color:#193e40;font:inherit;font-size:.82rem;cursor:pointer}
+.overall-more{min-height:44px;width:100%;border:1px solid #dedbc9;border-radius:11px;background:#f3efe3;color:#193e40;font:inherit;font-size:.86rem;margin-top:10px;padding:10px}
+.overall-ranking .overall-note{font-size:.7rem;margin:12px 0 0}.overall-ranking button:focus-visible{outline:2px solid #13766a;outline-offset:-3px}
+@media(min-width:460px){.overall-grid{grid-template-columns:28px minmax(0,1fr) 32px 32px 32px 18px;gap:8px}.overall-player-toggle{font-size:.95rem;padding:12px 10px}.overall-ranking{padding:20px}}
+
+.overall-heading{display:flex;align-items:center;justify-content:space-between;gap:8px}.overall-heading>button{min-width:44px;min-height:44px;background:none;border:0;color:#176e68;font-size:1.3rem;cursor:pointer}
