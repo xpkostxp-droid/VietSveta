@@ -1,3 +1,4 @@
+import type {ProfileGameId} from './domain/profileGames';
 import './components/GamesMenu.css';
 import { BattleScreen } from './battle/BattleScreen';
 import { AdjectiveTetris } from './components/AdjectiveTetris';
@@ -6,6 +7,7 @@ import { QuestionsBlitzScreen } from './components/QuestionsBlitzScreen';
 import { MarketBlitzScreen } from './components/MarketBlitzScreen';
 import { lazy, Suspense, useState } from 'react';
 import { GroupSelection, type CourseSection } from './components/GroupSelection';
+import {ProfileGameLauncher as RankedGame} from './components/ProfileGameLauncher';
 const AdminStudyStatistics=lazy(()=>import('./components/AdminStudyStatistics'));
 const AdminBattleLab=lazy(()=>import('./battle/AdminBattleLab').then(m=>({default:m.AdminBattleLab})));
 const VerbsGameScreen = lazy(() => import('./components/VerbsGameScreen'));
@@ -28,6 +30,7 @@ import type { PhoneticsTestId } from './content/phonetics/tests';
 
 type Screen =
   | { name: 'home' }
+  | { name: 'ranked-game'; game:ProfileGameId }
   | { name: 'admin-statistics' }
   | { name: 'admin-bots' }
   | { name: 'group-selection'; section: CourseSection }
@@ -73,7 +76,9 @@ function App({ isAdmin=false, memberId, memberName, syncStatus, onOpenProfile, c
       );
 
     case 'group-selection':
-      return <GroupSelection onOpenBots={isAdmin&&screen.section==='games'?()=>setScreen({name:'admin-bots'}):undefined} preferredGroup={courseGroup} section={screen.section} onBack={()=>setScreen({name:'home'})} onChoose={group=>setScreen(group==='beginner'?{name:'beginner',section:screen.section}:screen.section==='games'?{name:'games-menu'}:screen.section==='theory'?{name:'theory-list'}:screen.section==='cards'?{name:'cards-lesson-list'}:{name:'listening'})}/>;
+      return <GroupSelection onOpenRankedGame={game=>{window.scrollTo(0,0);setScreen({name:'ranked-game',game});}} onOpenBots={isAdmin&&screen.section==='games'?()=>setScreen({name:'admin-bots'}):undefined} preferredGroup={courseGroup} section={screen.section} onBack={()=>setScreen({name:'home'})} onChoose={group=>setScreen(group==='beginner'?{name:'beginner',section:screen.section}:screen.section==='games'?{name:'games-menu'}:screen.section==='theory'?{name:'theory-list'}:screen.section==='cards'?{name:'cards-lesson-list'}:{name:'listening'})}/>;
+    case 'ranked-game':
+      return <Suspense fallback={<div className="screen"><p role="status">Загружаем игру…</p></div>}><RankedGame game={screen.game} backLabel="К играм" onBack={()=>{window.scrollTo(0,0);setScreen({name:'group-selection',section:'games'});}}/></Suspense>;
     case 'admin-statistics':
       return isAdmin?<Suspense fallback={<div className="screen"><p role="status">Загружаем статистику…</p></div>}><AdminStudyStatistics isAdmin={isAdmin} backLabel="На главную" onBack={()=>setScreen({name:'home'})}/></Suspense>:null;
     case 'admin-bots':

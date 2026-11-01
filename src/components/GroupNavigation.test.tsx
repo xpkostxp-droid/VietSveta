@@ -68,3 +68,12 @@ it('does not expose admin shortcuts or the bot entry to ordinary participants',a
   expect(node.querySelectorAll('.market-options button')).toHaveLength(2);expect(node.textContent).not.toContain('Игра с ботами');
  }finally{await act(async()=>root.unmount());}
 });
+
+vi.mock('./OverallRanking',()=>({default:({onOpenGame}:any)=><section data-overall-ranking><button onClick={()=>onOpenGame('lesson15-verbs')}>Играть из общего рейтинга</button></section>}));
+
+it('puts the overall ranking below course buttons and opens a selected medal game',async()=>{
+ vi.spyOn(window,'scrollTo').mockImplementation(()=>{});await import('./OverallRanking');
+ const node=document.createElement('div'),root=createRoot(node);
+ const click=async(text:string)=>act(async()=>[...node.querySelectorAll('button')].find(b=>b.textContent?.includes(text))!.click());
+ try{await act(async()=>root.render(<App/>));await click('Игра');expect(node.querySelector('.market-options')!.compareDocumentPosition(node.querySelector('[data-overall-ranking]')!)&Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();await click('Играть из общего рейтинга');expect(node.querySelector('[data-verbs-game]')).toBeTruthy();await click('К играм');expect(node.querySelector('[data-overall-ranking]')).toBeTruthy();}finally{await act(async()=>root.unmount());}
+});
