@@ -1,3 +1,4 @@
+import {toneBasics} from '../content/toneBasics';
 import {toneSyllables} from '../content/toneSyllables';
 import {useEffect,useRef,useState} from 'react';
 import {toneWords,shuffledToneWords,tones,toneLabels,type Tone,type ToneWord} from '../content/toneWords';
@@ -18,10 +19,11 @@ function ToneSign({tone}:{tone:Tone}){
  const paths:Partial<Record<Tone,string>>={sac:'M35 58 L65 30',huyen:'M35 30 L65 58',hoi:'M37 34 C38 17 65 16 65 34 C65 46 48 45 48 59',nga:'M23 47 C40 20 58 69 77 38'};
  return <svg viewBox="0 0 100 100" aria-hidden="true">{paths[tone]&&<path d={paths[tone]} />}{tone==='nang'&&<circle cx="50" cy="72" r="6"/>}</svg>;
 }
-export default function ToneGameScreen({onBack,variant='words'}:{onBack:()=>void;variant?:'words'|'syllables'}){
- const words=variant==='syllables'?toneSyllables:toneWords;
- const game=variant==='syllables'?'beginner-listening-tones':'listening-tones';
- const isSyllables=variant==='syllables';
+export default function ToneGameScreen({onBack,variant='words'}:{onBack:()=>void;variant?:'words'|'syllables'|'basics'}){
+ const words=variant==='basics'?toneBasics:variant==='syllables'?toneSyllables:toneWords;
+ const game=variant==='basics'?'beginner-tone-basics':variant==='syllables'?'beginner-listening-tones':'listening-tones';
+ const isSyllables=variant!=='words';
+ const title=variant==='basics'?'Тоны · пять слогов':variant==='syllables'?'Тоны · разные слоги':'Угадай тон';
  const [phase,setPhase]=useState<Phase>('intro'),[round,setRound]=useState<ToneWord[]>([]),[position,setPosition]=useState(0);
  const [count,setCount]=useState(4),[remaining,setRemaining]=useState(LIMIT),[selected,setSelected]=useState<Tone|null>(null),[paused,setPaused]=useState(false);
  const [score,setScore]=useState(0),[time,setTime]=useState(0);
@@ -83,11 +85,11 @@ export default function ToneGameScreen({onBack,variant='words'}:{onBack:()=>void
   }
  },[phase,count,position,paused]);
  async function resume(){try{await player.current?.unlock();sound.current?.unlock();if(document.hidden)return;pausedRef.current=false;setPaused(false);}catch{setPhase('error');}}
- if(phase==='intro'||phase==='result')return <div className="screen ranking-screen"><BackButton onClick={onBack} label="К аудированию"/><h1 className="screen-title">🎧 Угадай тон</h1><GameRanking game={game} total={words.length} onStart={()=>void start()} startLabel={phase==='result'?'Играть ещё':'Начать'} result={phase==='result'?{correct:score,time}:undefined}><p>{words.length} {isSyllables?'слогов':'слов'} · 5 секунд на ответ. Запись звучит трижды. Выбери знак тона.</p></GameRanking></div>;
- if(phase==='loading'||phase==='error')return <div className="screen"><BackButton onClick={onBack} label="К аудированию"/><h1 className="screen-title">🎧 Угадай тон</h1><p role="status">{phase==='loading'?'Подготавливаем звук…':'Не удалось включить записи. Проверь интернет и звук.'}</p>{phase==='error'&&<button className="big-button" onClick={()=>void start()}>Попробовать снова</button>}</div>;
+ if(phase==='intro'||phase==='result')return <div className="screen ranking-screen"><BackButton onClick={onBack} label="К аудированию"/><h1 className="screen-title">🎧 {title}</h1><GameRanking game={game} total={words.length} onStart={()=>void start()} startLabel={phase==='result'?'Играть ещё':'Начать'} result={phase==='result'?{correct:score,time}:undefined}><p>{words.length} {isSyllables?'слогов':'слов'} · 5 секунд на ответ. Запись звучит трижды. Выбери знак тона.</p></GameRanking></div>;
+ if(phase==='loading'||phase==='error')return <div className="screen"><BackButton onClick={onBack} label="К аудированию"/><h1 className="screen-title">🎧 {title}</h1><p role="status">{phase==='loading'?'Подготавливаем звук…':'Не удалось включить записи. Проверь интернет и звук.'}</p>{phase==='error'&&<button className="big-button" onClick={()=>void start()}>Попробовать снова</button>}</div>;
  const word=round[position],feedback=phase==='feedback';
  return <div className="screen market-screen harvest-screen harvest-playing tone-screen">
-  <BackButton onClick={onBack} label="К аудированию"/><h1 className="screen-title">🎧 Угадай тон</h1>
+  <BackButton onClick={onBack} label="К аудированию"/><h1 className="screen-title">🎧 {title}</h1>
   <div className="harvest-play-header"><span>Задание {position+1}/{round.length}</span><span>⏱ {formatAnswerTime(time)} · ✓ {score}</span></div>
   <div className="harvest-question-bar"><span>Какой тон звучит?</span><div className={'harvest-countdown'+(remaining<=3000?' harvest-countdown-urgent':'')} role="progressbar" aria-label="Время на ответ" aria-valuemin={0} aria-valuemax={5} aria-valuenow={phase==='question'?Math.ceil(remaining/1000):0}><svg viewBox="0 0 100 100" aria-hidden="true"><circle className="harvest-ring-track" cx="50" cy="50" r="43"/><circle className="harvest-ring-progress" cx="50" cy="50" r="43" pathLength="100" strokeDasharray="100" strokeDashoffset={100-(phase==='question'?remaining/LIMIT*100:0)}/></svg><span className="harvest-countdown-number">{paused?'Ⅱ':phase==='countdown'?'5':feedback?(selected===word.tone?'✓':'0'):Math.ceil(remaining/1000)}</span></div></div>
   <div className="harvest-play-block">

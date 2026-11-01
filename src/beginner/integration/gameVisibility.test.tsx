@@ -14,7 +14,8 @@ it('puts Listening after Battle and opens the seventeen-syllable game for all pa
  expect([...node.querySelectorAll('.games-menu-key')].map(b=>b.textContent?.trim())).toEqual(['⚔️ Батл','🎧Аудирование','📚Игры по урокам']);
  await act(async()=>[...node.querySelectorAll<HTMLButtonElement>('button')].find(b=>b.textContent?.includes('Аудирование'))!.click());
  expect(node.querySelector('[aria-label="Игры на аудирование"]')).toBeTruthy();
- await act(async()=>[...node.querySelectorAll<HTMLButtonElement>('button')].find(b=>b.textContent?.includes('Угадай тон'))!.click());
+ expect([...node.querySelectorAll('.games-menu-key')].map(b=>b.textContent)).toEqual(['🎧Тоны · пять слогов','🎧Тоны · разные слоги']);
+ await act(async()=>[...node.querySelectorAll<HTMLButtonElement>('button')].find(b=>b.textContent?.includes('Тоны · разные слоги'))!.click());
  expect(node.textContent).toContain('17 слогов');expect(node.querySelector('.ranking-start')).toBeTruthy();
  await act(async()=>node.querySelector<HTMLButtonElement>('.back-button')!.click());expect(node.querySelector('[aria-label="Игры на аудирование"]')).toBeTruthy();
  await act(async()=>node.querySelector<HTMLButtonElement>('.back-button')!.click());expect(node.textContent).toContain('Игры по урокам');expect(node.textContent).not.toContain('Урок 5');
@@ -53,4 +54,14 @@ it('nests lesson games and returns through their parent menus',async()=>{
  await act(async()=>node.querySelector<HTMLButtonElement>('.back-button')!.click());
  expect(node.querySelectorAll('.games-menu-key')).toHaveLength(3);
  expect(node.textContent).not.toContain('Урок 5');
+});
+
+it('opens the thirty-recording game first and keeps the previous game second',async()=>{
+ await open(false);
+ await act(async()=>[...node.querySelectorAll<HTMLButtonElement>('button')].find(b=>b.textContent?.includes('Аудирование'))!.click());
+ await act(async()=>node.querySelector<HTMLButtonElement>('.games-menu-key')!.click());
+ expect(node.textContent).toContain('30 слогов');
+ expect(node.textContent).toContain('Тоны · пять слогов');
+ await act(async()=>node.querySelector<HTMLButtonElement>('.back-button')!.click());
+ expect(node.querySelectorAll('.games-menu-key')).toHaveLength(2);
 });

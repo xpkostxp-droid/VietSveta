@@ -58,3 +58,12 @@ it('stops audio and freezes the question while hidden, then resumes the remainin
  Object.defineProperty(document,'hidden',{configurable:true,value:false});await act(async()=>[...node.querySelectorAll<HTMLButtonElement>('button')].find(b=>b.textContent==='Продолжить')!.click());
  await advance(3990);expect(reportStudyAnswer).not.toHaveBeenCalled();await advance(50);expect(reportStudyAnswer).toHaveBeenCalledWith(expect.objectContaining({result:'timeout',elapsed_ms:5000}));
 });
+
+it('finishes thirty basic syllables under their own game ID',async()=>{
+ await act(async()=>root.render(<ToneGameScreen variant="basics" onBack={()=>{}}/>));
+ const saved=vi.spyOn(attempts,'saveTimedAttempt');await start();await countdown();
+ expect(node.textContent).toContain('Задание 1/30');expect(node.textContent).toContain('Слушай слог');
+ for(let i=0;i<30;i++){await advance(5000);await advance(1100);}
+ expect(saved).toHaveBeenCalledWith(expect.objectContaining({game:'beginner-tone-basics',total:30,completed:true}));
+ expect(reportStudyAnswer).toHaveBeenCalledTimes(30);saved.mockRestore();
+});
