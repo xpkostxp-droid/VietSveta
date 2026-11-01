@@ -42,3 +42,5 @@
 @media(max-width:390px){.admin-study summary{padding:12px 10px}.admin-study .study-body{padding:10px}.admin-study .study-summary-right{gap:6px}.admin-study summary strong{font-size:.92rem}}
 
 .admin-study .study-table-split{display:grid;grid-template-columns:1fr 1fr;gap:3px 8px;color:#68766d;font-size:.7rem;margin-top:6px}
+
+@media(max-width:520px){.admin-study .study-period{flex-wrap:wrap;min-width:230px}.admin-study .study-period button{flex:1 0 calc(50% - 4px)}.admin-study .study-table{font-size:.78rem}.admin-study .study-table td{padding:9px 3px}.admin-study .study-summary-right{font-size:.85rem}}

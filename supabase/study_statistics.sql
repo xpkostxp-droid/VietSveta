@@ -38,10 +38,17 @@ create function public.get_study_admin_stats(p_days integer default 7) returns j
 language plpgsql stable security invoker set search_path=public as $$
 declare since_at timestamptz; stats_payload jsonb;
 begin
- if p_days not in (1,7,30) then raise exception 'invalid period'; end if;
- since_at:=(((now() at time zone 'Asia/Ho_Chi_Minh')::date-(p_days-1))::timestamp at time zone 'Asia/Ho_Chi_Minh');
+ if p_days is null or p_days not in (0,1,7,30) then raise exception 'invalid period'; end if;
+ since_at:=case when p_days=0 then '1970-01-01'::timestamptz else (((now() at time zone 'Asia/Ho_Chi_Minh')::date-(p_days-1))::timestamp at time zone 'Asia/Ho_Chi_Minh') end;
  with people as (
   select id,display_name,user_id,course_group,ranking_since from participants where active and not is_admin
+ ), saved_learning as (
+  select s.user_id,
+   jsonb_build_object('progress',coalesce(s.data->'vietCards.progress.v1'->'value'->'records','{}'::jsonb),'theory',coalesce(s.data->'vietCards.theoryVisits.v1'->'value','{}'::jsonb),'last',s.data->'vietCards.lastActivity.v1'->'value') as advanced,
+   jsonb_build_object('progress',coalesce(s.data->'vietSveta.beginner.vietCards.progress.v1'->'value'->'records','{}'::jsonb),'theory',coalesce(s.data->'vietSveta.beginner.vietCards.theoryVisits.v1'->'value','{}'::jsonb),'last',s.data->'vietSveta.beginner.vietCards.lastActivity.v1'->'value') as beginner,
+   coalesce(s.data->'vietSveta.marketBlitz.errors.v2'->'value','[]'::jsonb) as market_errors,
+   coalesce((select jsonb_agg(jsonb_build_object('game',substring(e.key from '^vietSveta\.gameRecord\.(.+)\.v[12]$'),'record',e.value->'value')) from jsonb_each(s.data) e where e.key ~ '^vietSveta\.gameRecord\..+\.v[12]$'),'[]'::jsonb) as bests
+  from learning_state s join people p using(user_id)
  ), coverage as (
   select a.user_id,min(a.created_at) as first_seen,max(a.updated_at) as last_seen from study_activity a join people p using(user_id) group by a.user_id
  ), activity as (
@@ -83,6 +90,7 @@ begin
  )
  select jsonb_build_object(
   'since',since_at,'generated_at',now(),'timezone','Asia/Ho_Chi_Minh',
+  'saved_learning',coalesce((select jsonb_agg(to_jsonb(s)) from saved_learning s),'[]'::jsonb),
   'participants',coalesce((select jsonb_agg(to_jsonb(p)) from people p),'[]'::jsonb),
   'coverage',coalesce((select jsonb_agg(to_jsonb(c)) from coverage c),'[]'::jsonb),
   'activity',coalesce((select jsonb_agg(to_jsonb(a)) from activity a),'[]'::jsonb),
