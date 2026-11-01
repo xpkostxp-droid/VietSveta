@@ -20,7 +20,7 @@ it('cancels the playing word and both scheduled repetitions immediately',async()
 });
 
 it('has exactly five approved syllables in all six tones, using thirty distinct files',()=>{
- expect(toneBasics.map(w=>w.vi)).toEqual('la là lã lả lá lạ bo bò bõ bỏ bó bọ me mè mẽ mẻ mé mẹ phơ phờ phỡ phở phớ phợ ga gà gã gả gá gạ'.split(' '));
+ expect(toneBasics.map(w=>w.vi)).toEqual('la là lã lả lá lạ bo bò bõ bỏ bó bọ me mè mẽ mẻ mé mẹ cu cù cũ củ cú cụ ga gà gã gả gá gạ'.split(' '));
  for(const tone of tones)expect(toneBasics.filter(w=>w.tone===tone)).toHaveLength(5);
  expect(new Set(toneBasics.map(w=>w.audio)).size).toBe(30);
  expect(toneBasics.every(w=>w.ru==='')).toBe(true);

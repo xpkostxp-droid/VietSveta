@@ -129,42 +129,42 @@ export const toneBasics:ToneWord[] = [
  },
  {
   "id": "basic-4-level",
-  "vi": "phơ",
+  "vi": "cu",
   "ru": "",
   "tone": "level",
   "audio": "audio/tone-basics/basic-4-level.mp3"
  },
  {
   "id": "basic-4-huyen",
-  "vi": "phờ",
+  "vi": "cù",
   "ru": "",
   "tone": "huyen",
   "audio": "audio/tone-basics/basic-4-huyen.mp3"
  },
  {
   "id": "basic-4-nga",
-  "vi": "phỡ",
+  "vi": "cũ",
   "ru": "",
   "tone": "nga",
   "audio": "audio/tone-basics/basic-4-nga.mp3"
  },
  {
   "id": "basic-4-hoi",
-  "vi": "phở",
+  "vi": "củ",
   "ru": "",
   "tone": "hoi",
   "audio": "audio/tone-basics/basic-4-hoi.mp3"
  },
  {
   "id": "basic-4-sac",
-  "vi": "phớ",
+  "vi": "cú",
   "ru": "",
   "tone": "sac",
   "audio": "audio/tone-basics/basic-4-sac.mp3"
  },
  {
   "id": "basic-4-nang",
-  "vi": "phợ",
+  "vi": "cụ",
   "ru": "",
   "tone": "nang",
   "audio": "audio/tone-basics/basic-4-nang.mp3"
