@@ -69,7 +69,7 @@ export default function ToneGameScreen({onBack}:{onBack:()=>void}){
   }
   if(phase==='question'){
    if(pausedRef.current)return;
-   try{player.current!.playTwice(round[position].id);}catch{locked.current=true;setPhase('error');return;}
+   try{player.current!.playThreeTimes(round[position].id);}catch{locked.current=true;setPhase('error');return;}
    deadline.current=Date.now()+frozen.current;locked.current=false;let last=Math.ceil(frozen.current/1000);
    const tick=()=>{if(pausedRef.current||locked.current)return;const left=Math.max(0,deadline.current-Date.now());setRemaining(left);const second=Math.ceil(left/1000);if(second>0&&second<=3&&second<last)sound.current?.beep();last=second;if(!left)resolveRef.current(null);};
    tick();const timer=window.setInterval(tick,40);return()=>{clearInterval(timer);player.current?.stop();};
@@ -80,7 +80,7 @@ export default function ToneGameScreen({onBack}:{onBack:()=>void}){
   }
  },[phase,count,position,paused]);
  async function resume(){try{await player.current?.unlock();sound.current?.unlock();if(document.hidden)return;pausedRef.current=false;setPaused(false);}catch{setPhase('error');}}
- if(phase==='intro'||phase==='result')return <div className="screen ranking-screen"><BackButton onClick={onBack} label="К аудированию"/><h1 className="screen-title">🎧 Угадай тон</h1><GameRanking game={GAME} total={30} onStart={()=>void start()} startLabel={phase==='result'?'Играть ещё':'Начать'} result={phase==='result'?{correct:score,time}:undefined}><p>30 слов · 5 секунд на ответ. Каждое слово звучит дважды. Выбери знак тона.</p></GameRanking></div>;
+ if(phase==='intro'||phase==='result')return <div className="screen ranking-screen"><BackButton onClick={onBack} label="К аудированию"/><h1 className="screen-title">🎧 Угадай тон</h1><GameRanking game={GAME} total={30} onStart={()=>void start()} startLabel={phase==='result'?'Играть ещё':'Начать'} result={phase==='result'?{correct:score,time}:undefined}><p>30 слов · 5 секунд на ответ. Каждое слово звучит трижды. Выбери знак тона.</p></GameRanking></div>;
  if(phase==='loading'||phase==='error')return <div className="screen"><BackButton onClick={onBack} label="К аудированию"/><h1 className="screen-title">🎧 Угадай тон</h1><p role="status">{phase==='loading'?'Подготавливаем звук…':'Не удалось включить записи. Проверь интернет и звук.'}</p>{phase==='error'&&<button className="big-button" onClick={()=>void start()}>Попробовать снова</button>}</div>;
  const word=round[position],feedback=phase==='feedback';
  return <div className="screen market-screen harvest-screen harvest-playing tone-screen">
