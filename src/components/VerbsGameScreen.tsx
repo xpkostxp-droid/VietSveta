@@ -67,7 +67,7 @@ export default function VerbsGameScreen({onBack}:{onBack:()=>void}){
  },[round]);
  const back=()=>{sounds.current?.stop();stopSpeaking();clock.stop();onBack()};
  const resume=()=>{if(document.hidden)return;void sounds.current?.prepare();clock.resume();setFeedbackPaused(false)};
- if(!round||round.phase==='end')return <div className="screen ranking-screen"><BackButton onClick={back} label="К играм"/><h1 className="screen-title">Глаголы</h1><GameRanking game={GAME} total={52} onStart={begin} startAtBottom startLabel={round?'Играть ещё':'Начать'} result={round?{correct:round.correct,time:round.time}:undefined}/></div>;
+ if(!round||round.phase==='end')return <div className="screen ranking-screen"><BackButton onClick={back} label="К играм"/><h1 className="screen-title">Глаголы</h1><GameRanking game={GAME} total={52} onStart={begin} startLabel={round?'Играть ещё':'Начать'} result={round?{correct:round.correct,time:round.time}:undefined}/></div>;
  const current=task!,word=verbPrompt(current),next=round.tasks[round.at+1];
  return <div className="screen at-screen at-playing verbs-playing">
   <div className="at-top"><BackButton onClick={back} label="Назад"/><span>{round.at+1}/52 · ✓ {round.correct}</span><div className={'at-clock'+(clock.remaining<=3000?' at-urgent':'')} aria-label="Время на ответ"><svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="25" className="at-track"/><circle cx="30" cy="30" r="25" pathLength="100" strokeDasharray="100" strokeDashoffset={100-clock.remaining/50}/></svg><strong>{paused?'Ⅱ':round.phase==='feedback'?(round.success?'✓':'×'):Math.ceil(clock.remaining/1000)}</strong></div></div>

@@ -67,7 +67,7 @@ export function HouseGameScreen({ onBack, game = 'house' }: { onBack: () => void
   return <div className={'screen family-screen work-blitz' + (active ? ' ' + beginnerPlayClass : '')}>
     <BackButton onClick={back} label={tasks.length ? 'Назад' : 'К играм'} />
     <span className="badge">Урок 11 · {title}</span><h1 className="screen-title">{title}</h1>
-    {!active ? <GameRanking key={tasks.length ? 'result' : 'intro'} game={rankingGame} total={words.length * 2} onStart={start} startAtBottom
+    {!active ? <GameRanking key={tasks.length ? 'result' : 'intro'} game={rankingGame} total={words.length * 2} onStart={start}
       startLabel={tasks.length ? 'Играть ещё' : 'Начать'} result={tasks.length ? score : undefined} /> : current && <>
       <div className="work-status"><strong>{position + 1}/{tasks.length} · ✓ {score.correct}</strong><span className="work-clock" aria-label="Осталось секунд">{Math.ceil(clock.remaining / 1000)}</span></div>
       <div className="work-timebar"><div style={{ width: `${clock.remaining / 50}%` }} /></div>

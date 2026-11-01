@@ -27,12 +27,12 @@ const cases = [
  ['lesson11-house', () => <HouseGameScreen onBack={() => {}} />, houseGameWords('house')],
  ['lesson11-adjectives', () => <HouseGameScreen game="adjectives" onBack={() => {}} />, houseGameWords('adjectives')],
 ] as const;
-it.each(cases)('loads %s ranking, places Start last and saves a separate completed result with five-second questions and active time', async (game, render, words) => {
+it.each(cases)('loads %s ranking, places Start first and saves a separate completed result with five-second questions and active time', async (game, render, words) => {
  await act(async () => root.render(render()));
  await act(async () => vi.advanceTimersByTime(0));
  expect(cloud.memberRequest).toHaveBeenCalledWith({action:'leaderboard',game});
  expect(host.querySelector('.game-ranking')?.textContent).toContain('Участник');
- expect(host.querySelector('.game-ranking')?.lastElementChild?.textContent).toBe('Начать');
+ expect(host.querySelector('.game-ranking')?.firstElementChild?.textContent).toBe('Начать');
  expect(host.querySelector('img')).toBeNull();
  const dir=process.env.BEGINNER_LAYOUT_QA_DIR;
  if(dir){mkdirSync(dir,{recursive:true});writeFileSync(`${dir}/ranking-${game}.fragment.html`,host.innerHTML);}
@@ -57,7 +57,7 @@ it.each(cases)('loads %s ranking, places Start last and saves a separate complet
  expect(saveTimedAttempt).toHaveBeenCalledWith({game,correct:words.length*2,total:words.length*2,answerTimeMs:words.length*2*3000,correctTimeMs:words.length*2*3000,completed:true});
  expect(host.querySelector('.game-ranking')).toBeTruthy();
  expect(host.querySelector('.ranking-result')?.textContent).toContain(`${words.length*2} из ${words.length*2}`);
- expect(host.querySelector('.game-ranking')?.lastElementChild?.textContent).toBe('Играть ещё');
+ expect(host.querySelector('.game-ranking')?.firstElementChild?.textContent).toBe('Играть ещё');
  expect(host.querySelector('img')).toBeNull();
 });
 

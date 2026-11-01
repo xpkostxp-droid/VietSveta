@@ -163,7 +163,7 @@ export function MarketBlitzScreen({ onBack, category }: { onBack: () => void; ca
     saveTimedAttempt({game:isReview.current ? 'harvest-review' : game,correct:collected.length,total:round.length,answerTimeMs:answerClock.current.value(),correctTimeMs:correctTime.current,completed:true});
   }, [active]);
   if(!started||(!active&&!isReview.current))return <div className="screen ranking-screen"><BackButton onClick={onBack} label="К играм"/><h1 className="screen-title">{title}</h1>
-    <GameRanking game={game} total={tasks.length} onStart={()=>start(tasks)} startAtBottom startLabel={started?'Играть ещё':'Начать'} result={started?{correct:collected.length,time:correctTime.current}:undefined}><small><a href={import.meta.env.BASE_URL+'market/credits.html'} target="_blank" rel="noreferrer">Источники изображений</a></small></GameRanking>
+    <GameRanking game={game} total={tasks.length} onStart={()=>start(tasks)} startLabel={started?'Играть ещё':'Начать'} result={started?{correct:collected.length,time:correctTime.current}:undefined}><small><a href={import.meta.env.BASE_URL+'market/credits.html'} target="_blank" rel="noreferrer">Источники изображений</a></small></GameRanking>
   </div>;
   const current = products[productForTask(round[position])];
   const pictureAnswers = isPictureAnswer(round[position]);
