@@ -2,6 +2,8 @@ import { MemberAvatar } from './MemberAvatar';
 import { BookIcon, CardsIcon, SpeakerOnIcon } from './icons';
 
 interface Props {
+  isAdmin?: boolean;
+  onOpenStatistics?: () => void;
   memberId?: string;
   memberName?: string;
   syncStatus?: string;
@@ -14,7 +16,7 @@ interface Props {
   onOpenPhoneticaTest: () => void;
 }
 
-export function HomeScreen({ memberId, memberName, onOpenProfile, onOpenGame, onOpenListening, onOpenTheory, onOpenCards, onOpenPronunciation, onOpenPhoneticaTest }: Props) {
+export function HomeScreen({ isAdmin, onOpenStatistics, memberId, memberName, onOpenProfile, onOpenGame, onOpenListening, onOpenTheory, onOpenCards, onOpenPronunciation, onOpenPhoneticaTest }: Props) {
   return (
     <div className="screen screen-home">
       {memberName && <div className="home-account"><button onClick={onOpenProfile} aria-label={`Профиль: ${memberName}`}><MemberAvatar id={memberId} name={memberName} className="home-avatar"/><span>{memberName}</span></button></div>}
@@ -42,6 +44,7 @@ export function HomeScreen({ memberId, memberName, onOpenProfile, onOpenGame, on
           <span className="home-tile-label">Карточки</span>
         </button>
       </div>
+      {isAdmin&&onOpenStatistics&&<button className="secondary-button home-admin-statistics" onClick={onOpenStatistics}>Статистика</button>}
     </div>
   );
 }

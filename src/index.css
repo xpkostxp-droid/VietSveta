@@ -1192,3 +1192,6 @@ a:focus-visible {
 .harvest-stage .produce-picture{display:block;width:160px;height:116px;object-fit:contain;margin:auto}
 .harvest-picture-options .produce-picture{display:block;width:100%;height:calc(var(--play-answer-height) - 20px);object-fit:contain;margin:auto}
 @media(max-height:720px){.harvest-stage .produce-picture{height:80px}}
+
+.home-admin-statistics.secondary-button{width:100%;min-height:58px;margin:14px 0 0;background:#dedede;border:1px solid #bcbcbc;color:#303b3e;border-radius:16px;font-size:1.1rem;font-weight:700;box-shadow:0 2px 5px #00000010}
+.home-admin-statistics.secondary-button:active{background:#cdcdcd}

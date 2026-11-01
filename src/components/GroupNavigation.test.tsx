@@ -45,3 +45,26 @@ it('opens fruits and vegetables directly from matching beige menu buttons withou
   }
  }finally{await act(async()=>root.unmount());}
 });
+
+vi.mock('./AdminStudyStatistics',()=>({default:({onBack,backLabel}:{onBack:()=>void;backLabel:string})=><div data-admin-statistics><button onClick={onBack}>{backLabel}</button></div>}));
+vi.mock('../battle/AdminBattleLab',()=>({AdminBattleLab:({onBack,backLabel}:{onBack:()=>void;backLabel:string})=><div data-admin-bots><button onClick={onBack}>{backLabel}</button></div>}));
+it('adds a gray admin home statistics shortcut and puts bots third in Games with correct returns',async()=>{
+ await import('./AdminStudyStatistics');await import('../battle/AdminBattleLab');
+ const node=document.createElement('div'),root=createRoot(node);
+ const click=async(text:string)=>{const b=[...node.querySelectorAll('button')].find(b=>b.textContent?.includes(text));expect(b,text).toBeTruthy();await act(async()=>b!.click());};
+ try{
+  await act(async()=>root.render(<App isAdmin memberId="admin"/>));
+  expect(node.querySelector('.home-admin-statistics')?.textContent).toBe('Статистика');
+  await click('Статистика');expect(node.querySelector('[data-admin-statistics]')).toBeTruthy();await click('На главную');expect(node.querySelector('.screen-home')).toBeTruthy();
+  await click('Игра');expect([...node.querySelectorAll('.market-options button')].map(b=>b.textContent)).toEqual(['Начальная группа','Продвинутая группа','Игра с ботами']);
+  await click('Игра с ботами');expect(node.querySelector('[data-admin-bots]')).toBeTruthy();await click('К играм');expect(node.textContent).toContain('Начальная группа');
+ }finally{await act(async()=>root.unmount());}
+});
+it('does not expose admin shortcuts or the bot entry to ordinary participants',async()=>{
+ const node=document.createElement('div'),root=createRoot(node);
+ try{
+  await act(async()=>root.render(<App isAdmin={false} memberId="svetlana"/>));expect(node.textContent).not.toContain('Статистика');
+  await act(async()=>node.querySelector<HTMLButtonElement>('.home-tile-game')!.click());
+  expect(node.querySelectorAll('.market-options button')).toHaveLength(2);expect(node.textContent).not.toContain('Игра с ботами');
+ }finally{await act(async()=>root.unmount());}
+});

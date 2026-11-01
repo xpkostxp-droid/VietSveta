@@ -18,10 +18,9 @@ beforeEach(()=>{
 afterEach(async()=>{await act(async()=>root.unmount());expect(fx.rpc).not.toHaveBeenCalled();node.remove();vi.useRealTimers();vi.restoreAllMocks();vi.unstubAllGlobals();});
 const click=async(text:string)=>act(async()=>[...node.querySelectorAll('button')].find(b=>b.textContent===text)!.click());
 const gender=async(value:string)=>act(async()=>{const select=node.querySelector('select')!;select.value=value;select.dispatchEvent(new Event('change',{bubbles:true}));});
-it.each([true,false])('shows the profile lab button only when administrator=%s',async(is_admin)=>{
+it.each([true,false])('keeps the bot lab out of the profile when administrator=%s',async(is_admin)=>{
  await act(async()=>root.render(<ProfileScreen member={{id:is_admin?'admin':'svetlana',user_id:'test',display_name:'Профиль',is_admin,course_group:'advanced'}} status="" onBack={()=>{}} onLogout={()=>{}} busy={false}/>));
- expect(node.textContent?.includes('🤖 Проверить игры с ботом')).toBe(is_admin);
- if(is_admin){await click('🤖 Проверить игры с ботом');expect(node.querySelector('select')?.value).toBe('man');}
+ expect(node.textContent?.includes('🤖 Проверить игры с ботом')).toBe(false);
 });
 it('does not render the lab for a non-admin even if directly mounted',async()=>{
  await act(async()=>root.render(<AdminBattleLab isAdmin={false} onBack={()=>{}}/>));expect(node.textContent).toBe('');
