@@ -5,7 +5,7 @@ language sql stable security invoker set search_path=public as $$
  with people as (
   select id,display_name,user_id,ranking_since from public.participants where active and not is_admin
  ), rules(game,total) as (values
- ('listening-tones',30),('lesson15-verbs',52),('harvest-fruits',40),('harvest-vegetables',32),
+ ('beginner-listening-tones',17),('listening-tones',30),('lesson15-verbs',52),('harvest-fruits',40),('harvest-vegetables',32),
  ('questions-15',30),('questions-24',48),('adjectives-tetris',36),('adjectives-rope',36),('adjectives-cannon',34),
  ('lesson5-professions',30),('lesson5-work',28),('lesson7-countries',30),('lesson7-travel',34),('lesson8-people',34),
  ('lesson10-family',38),('lesson11-house',36),('lesson11-adjectives',38),('lesson9-phone',20)

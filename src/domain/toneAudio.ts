@@ -1,6 +1,6 @@
-import {toneWords} from '../content/toneWords';
+import {toneWords,type ToneWord} from '../content/toneWords';
 /** Decoded before the countdown. All three scheduled repetitions share one cancellation path. */
-export function createToneAudio(){
+export function createToneAudio(words:readonly ToneWord[]=toneWords){
  let context:AudioContext|undefined;
  let sources:AudioBufferSourceNode[]=[];
  const buffers=new Map<string,AudioBuffer>();
@@ -18,8 +18,8 @@ export function createToneAudio(){
    const ctx=context;
    // Bounded requests; opening the main application never loads these files.
    let next=0;
-   await Promise.all(Array.from({length:4},async()=>{while(!closed&&next<toneWords.length){
-    const word=toneWords[next++];if(buffers.has(word.id))continue;
+   await Promise.all(Array.from({length:4},async()=>{while(!closed&&next<words.length){
+    const word=words[next++];if(buffers.has(word.id))continue;
     const response=await fetch(import.meta.env.BASE_URL+word.audio,{signal:AbortSignal.timeout(15000)});
     if(!response.ok)throw new Error('audio unavailable');
     const buffer=await ctx.decodeAudioData(await response.arrayBuffer());

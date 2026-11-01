@@ -214,4 +214,4 @@ export const toneWords:ToneWord[] = [
   "audio": "audio/tones/nang-5.mp3"
  }
 ];
-export function shuffledToneWords(){return toneWords.map(word=>({word,key:Math.random()})).sort((a,b)=>a.key-b.key).map(x=>x.word);}
+export function shuffledToneWords(words:readonly ToneWord[]=toneWords){return words.map(word=>({word,key:Math.random()})).sort((a,b)=>a.key-b.key).map(x=>x.word);}
