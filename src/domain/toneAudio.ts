@@ -1,5 +1,5 @@
 import {toneWords} from '../content/toneWords';
-/** Decoded before the countdown. Both scheduled repetitions share one cancellation path. */
+/** Decoded before the countdown. All three scheduled repetitions share one cancellation path. */
 export function createToneAudio(){
  let context:AudioContext|undefined;
  let sources:AudioBufferSourceNode[]=[];
@@ -27,11 +27,11 @@ export function createToneAudio(){
    }}));
    if(closed)throw new Error('closed');
   },
-  playTwice(id:string){
+  playThreeTimes(id:string){
    stop();const buffer=buffers.get(id);
    if(!context||context.state!=='running'||!buffer)throw new Error('audio unavailable');
    const start=context.currentTime;
-   for(const offset of [0,buffer.duration+.35]){
+   for(const offset of [0,buffer.duration+.35,2*(buffer.duration+.35)]){
     const source=context.createBufferSource();source.buffer=buffer;source.connect(context.destination);
     sources.push(source);source.start(start+offset);
    }
