@@ -12,11 +12,31 @@ it('has five known single-syllable words per tone without repeats',()=>{
  for(const tone of tones)expect(toneWords.filter(w=>w.tone===tone)).toHaveLength(5);
  expect(toneWords.every(w=>!w.vi.includes(' '))).toBe(true);
 });
-it('cancels the playing word and both scheduled repetitions immediately',async()=>{
- const sources:any[]=[];
- class Context {state='running';currentTime=10;destination={};resume=vi.fn().mockResolvedValue(undefined);close=vi.fn().mockResolvedValue(undefined);decodeAudioData=vi.fn().mockResolvedValue({duration:.6});createBufferSource(){const s={connect:vi.fn(),disconnect:vi.fn(),start:vi.fn(),stop:vi.fn(),buffer:null};sources.push(s);return s;}}
- vi.stubGlobal('AudioContext',Context);vi.stubGlobal('fetch',vi.fn().mockResolvedValue({ok:true,arrayBuffer:async()=>new ArrayBuffer(1)}));
- try{const audio=createToneAudio();await audio.unlock();await audio.load();audio.playThreeTimes(toneWords[0].id);expect(sources).toHaveLength(3);expect(sources[0].start).toHaveBeenCalledWith(10);expect(sources[1].start).toHaveBeenCalledWith(10.95);expect(sources[2].start).toHaveBeenCalledWith(11.9);audio.stop();expect(sources.every(s=>s.stop.mock.calls.length===1)).toBe(true);audio.close();}finally{vi.unstubAllGlobals();}
+it('fades the active recording, cancels future repetitions immediately and disconnects only after silence',async()=>{
+ const sources:any[]=[],gains:any[]=[];
+ let ctx:any;
+ class Context {
+  state='running';currentTime=10;destination={};
+  constructor(){ctx=this;}
+  resume=vi.fn().mockResolvedValue(undefined);close=vi.fn().mockResolvedValue(undefined);
+  decodeAudioData=vi.fn().mockResolvedValue({duration:.6});
+  createGain(){const g={gain:{setValueAtTime:vi.fn(),cancelScheduledValues:vi.fn(),linearRampToValueAtTime:vi.fn()},connect:vi.fn(),disconnect:vi.fn()};gains.push(g);return g;}
+  createBufferSource(){const s={connect:vi.fn(),disconnect:vi.fn(),start:vi.fn(),stop:vi.fn(),buffer:null,onended:null};sources.push(s);return s;}
+ }
+ vi.useFakeTimers();vi.stubGlobal('AudioContext',Context);vi.stubGlobal('fetch',vi.fn().mockResolvedValue({ok:true,arrayBuffer:async()=>new ArrayBuffer(1)}));
+ try{
+  const audio=createToneAudio();await audio.unlock();await audio.load();audio.playThreeTimes(toneWords[0].id);
+  expect(sources.map(s=>s.start.mock.calls[0][0])).toEqual([10,10.95,11.9]);
+  ctx.currentTime=10.2;audio.stop();
+  expect(gains[0].gain.linearRampToValueAtTime).toHaveBeenCalledWith(0,10.215);
+  expect(sources[0].stop).toHaveBeenCalledWith(10.215);
+  expect(sources[0].disconnect).not.toHaveBeenCalled();
+  for(const i of [1,2]){expect(sources[i].stop).toHaveBeenCalledWith();expect(sources[i].disconnect).toHaveBeenCalledTimes(1);}
+  audio.stop();expect(sources[0].stop).toHaveBeenCalledTimes(1);
+  sources[0].onended();expect(sources[0].disconnect).toHaveBeenCalledTimes(1);expect(gains[0].disconnect).toHaveBeenCalledTimes(1);
+  audio.playThreeTimes(toneWords[1].id);audio.close();expect(ctx.close).not.toHaveBeenCalled();
+  await vi.advanceTimersByTimeAsync(20);expect(ctx.close).toHaveBeenCalledTimes(1);
+ }finally{vi.unstubAllGlobals();vi.useRealTimers();}
 });
 
 it('has exactly five approved syllables in all six tones, using thirty distinct files',()=>{
