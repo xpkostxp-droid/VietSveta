@@ -1,3 +1,4 @@
+import {useScenicDepth} from '../../domain/useScenicDepth';
 import {useStudyActivity} from '../../domain/useStudyActivity';
 import {reportStudyAnswer} from '../../domain/studyTelemetry';
 import { useEffect, useRef, useState } from 'react';
@@ -29,6 +30,7 @@ export function ProfessionsGameScreen({ onBack, initialGroup = null }: { onBack:
   const locked = useRef(true);
   const studyGame=group==='professions'?'lesson5-professions':'lesson5-work';
   useStudyActivity('games',studyGame,(phase==='playing'||phase==='feedback')&&!paused);
+ useScenicDepth(phase==='playing'||phase==='feedback'?4:3);
   const current = tasks[position];
   const word = current && professionWords[current.index];
   const answer = current && workBlitzAnswer(current);

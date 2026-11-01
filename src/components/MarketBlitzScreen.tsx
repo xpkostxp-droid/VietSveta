@@ -1,3 +1,4 @@
+import {useScenicDepth} from '../domain/useScenicDepth';
 import {useStudyActivity} from '../domain/useStudyActivity';
 import {reportStudyAnswer} from '../domain/studyTelemetry';
 import './SharedPlayLayout.css';
@@ -57,6 +58,7 @@ export function MarketBlitzScreen({ onBack, category }: { onBack: () => void; ca
   const [started, setStarted] = useState(false);
   const [paused, setPaused] = useState(false);
   useStudyActivity('games',game,active&&!paused);
+ useScenicDepth(active?4:3);
   const [streak, setStreak] = useState(0);
   const [best, setBest] = useState(0);
   const sound = useRef<ReturnType<typeof createCountdownSound> | null>(null);

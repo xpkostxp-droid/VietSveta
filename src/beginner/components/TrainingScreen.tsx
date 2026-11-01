@@ -1,3 +1,4 @@
+import {useScenicDepth} from '../../domain/useScenicDepth';
 import {useStudyActivity} from '../../domain/useStudyActivity';
 import {reportStudyAnswer} from '../../domain/studyTelemetry';
 import { useEffect, useRef, useState } from 'react';
@@ -48,6 +49,7 @@ export function TrainingScreen({ lessonId, direction, order, onExit }: Props) {
   const studyStart=useRef(Date.now());
   useEffect(()=>{studyStart.current=Date.now();},[session.index,session.direction]);
   useStudyActivity('cards',`cards:beginner:${lessonId}`,!isFinished(session));
+ useScenicDepth(4);
 
   // Кнопка звука показывается только тогда, когда на устройстве вообще
   // есть вьетнамский голос — иначе озвучка и так молчит, и кнопка была бы

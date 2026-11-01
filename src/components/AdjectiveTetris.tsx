@@ -1,3 +1,4 @@
+import {useScenicDepth} from '../domain/useScenicDepth';
 import {useStudyActivity} from '../domain/useStudyActivity';
 import {reportStudyAnswer} from '../domain/studyTelemetry';
 import { GameRanking } from './GameRanking';
@@ -30,6 +31,7 @@ export function AdjectiveTetris({onBack,variant='tetris'}:{onBack:()=>void;varia
  const sound=useRef<ReturnType<typeof createCountdownSound>|null>(null),lastBeep=useRef(5);
  const task=round?.tasks[round.at];
  useStudyActivity('games',gameId,!!round&&round.phase!=='end'&&!paused);
+ useScenicDepth(!!round&&round.phase!=='end'?4:3);
  function begin(){
   attemptSaved.current=false;
   sound.current??=createCountdownSound();sound.current.unlock();stopSpeaking();

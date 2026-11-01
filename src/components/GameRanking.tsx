@@ -1,3 +1,4 @@
+import {useScenicDepth} from '../domain/useScenicDepth';
 import { useEffect, useState } from 'react';
 import { cachedMember, memberRequest, syncAccount } from '../domain/cloud';
 import { rankPlayers, betterAttempt, type RankingRow } from '../domain/leaderboard';
@@ -20,6 +21,7 @@ function saveRanking(key:string,rows:RankedRows) {
  try{localStorage.setItem(cachePrefix+key,JSON.stringify({savedAt:Date.now(),rows}));}catch{/* Storage is optional; the live ranking still works. */}
 }
 export function GameRanking({game,total,onStart,startLabel='Начать игру',result,children}:{game:string;total:number;onStart:()=>void;startLabel?:string;result?:Result;children?:React.ReactNode}) {
+ useScenicDepth(3);
  const member=cachedMember();
  const produceGame=game==='harvest-fruits'||game==='harvest-vegetables';
  const key=`${member?.user_id}:${member?.ranking_since??''}:${game}${produceGame?':'+total:''}`;

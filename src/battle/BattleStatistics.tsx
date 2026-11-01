@@ -1,8 +1,10 @@
+import {useScenicDepth} from '../domain/useScenicDepth';
 import { useEffect,useState } from 'react';
 import { supabase } from '../domain/cloud';
 import { battleRanking,battleOpponents,type BattleStats } from './battleRanking';
 import './BattleStatistics.css';
 export function BattleStatistics({onPlay,startLabel='Играть'}:{onPlay:()=>void;startLabel?:string}){
+ useScenicDepth(3);
  const [data,setData]=useState<BattleStats>({viewer_id:'',matches:[]}),[busy,setBusy]=useState(true),[error,setError]=useState(''),[retry,setRetry]=useState(0),[expanded,setExpanded]=useState<string|null>(null);
  useEffect(()=>{
   let alive=true;setBusy(true);setError('');

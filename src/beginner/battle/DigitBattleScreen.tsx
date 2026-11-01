@@ -1,3 +1,4 @@
+import {useScenicDepth} from '../../domain/useScenicDepth';
 import {useStudyActivity} from '../../domain/useStudyActivity';
 import { TopicWheel } from '../../battle/TopicWheel';
 import { useBattleResultSound } from '../../battle/useBattleResultSound';
@@ -59,6 +60,7 @@ function DigitBattleMatch({ playerName, sound, onBack, onReplay }: { playerName:
  }, [game]);
  const resolved = state.phase === 'result' || state.phase === 'finished';
  useStudyActivity('games','battle:digits:bot',!paused&&state.phase!=='finished');
+ useScenicDepth(4);
  const seconds = Math.max(0,Math.ceil((state.startsAt + (state.phase === 'ready' ? 0 : DIGIT_ROUND_MS) - now)/1000));
  useEffect(() => {
   if (paused) return;

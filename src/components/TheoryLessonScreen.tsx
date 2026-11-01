@@ -1,3 +1,4 @@
+import {useScenicDepth} from '../domain/useScenicDepth';
 import {useStudyActivity} from '../domain/useStudyActivity';
 import { getLessonById, getTheoryForLesson } from '../content/lessons';
 import type { TheoryBlock } from '../types';
@@ -164,6 +165,7 @@ function TheoryBlockView({ block }: { block: TheoryBlock }) {
 
 export function TheoryLessonScreen({ lessonId, onBack }: Props) {
   useStudyActivity('theory',`theory:advanced:${lessonId}`);
+ useScenicDepth(4);
   const lesson = getLessonById(lessonId);
 
   if (!lesson) {

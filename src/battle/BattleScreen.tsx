@@ -1,3 +1,4 @@
+import {useScenicDepth} from '../domain/useScenicDepth';
 import {useStudyActivity} from '../domain/useStudyActivity';
 import { OnlineDigitBattle } from '../beginner/battle/OnlineDigitBattle';
 import { readyBattleDigitAudio } from './resultAudio';
@@ -110,6 +111,7 @@ function BattleSession({onBack,audio,botConfig,onBotReplay,course='advanced',onT
  const cinemaResult:CinemaResult|null=finished&&outcome?{key:match.id,outcome,label:outcome==='near'?'Твоя победа!':'Победа соперника'}:null;
  const playing=!!inMatch&&(match.status==='active'||showResult&&!isNinja&&!isDigits);
  useStudyActivity('games',`battle:${course}:${match?.topic??topic}`,playing&&!hidden);
+ useScenicDepth(playing?4:3);
  const showCinema=!!state&&!hidden;
  const shownWord=showResult?'':preparing?'Приготовились!':running?(match?.task?.word??''):'';
  const shownOptions=showResult?match?.last_result?.options??[]:match?.task?.options??[];

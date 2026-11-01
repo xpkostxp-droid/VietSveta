@@ -1,3 +1,4 @@
+import {useScenicDepth} from '../../domain/useScenicDepth';
 import {useStudyActivity} from '../../domain/useStudyActivity';
 import {reportStudyAnswer} from '../../domain/studyTelemetry';
 import { useEffect, useRef, useState } from 'react';
@@ -31,6 +32,7 @@ export function PeopleGameScreen({ onBack }: { onBack: () => void }) {
   const locked = useRef(true);
   const studyGame='lesson8-people';
   useStudyActivity('games',studyGame,(phase==='playing'||phase==='feedback')&&!paused);
+ useScenicDepth(phase==='playing'||phase==='feedback'?4:3);
   const current = tasks[position];
   const word = current && peopleWords[current.index];
   const answer = current && peopleBlitzAnswer(current);

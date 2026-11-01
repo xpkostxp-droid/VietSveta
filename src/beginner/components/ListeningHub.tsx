@@ -1,3 +1,4 @@
+import {useScenicDepth} from '../../domain/useScenicDepth';
 import { lazy, Suspense, useState } from 'react';
 import { BackButton } from './BackButton';
 import './listening.css';
@@ -9,6 +10,7 @@ const Course = lazy(() => import('./CourseListeningScreen'));
 const Songs = lazy(() => import('./SongsListeningScreen'));
 export default function ListeningHub({ onBack }: { onBack: () => void }) {
   const [section, setSection] = useState<'course' | 'book1' | 'book2' | 'songs'>();
+  useScenicDepth(section?3:2);
   const back = () => { setSection(undefined); window.scrollTo(0, 0); };
   const loading = <div className="screen"><BackButton onClick={back} label="К разделам аудирования" /><p role="status">Загружаем уроки…</p></div>;
   if (section) return <Suspense fallback={loading}>{section === 'course' ? <Course onBack={back} /> : section === 'songs' ? <Songs onBack={back} /> : section === 'book2' ? <Book2 onBack={back} /> : <Book1 onBack={back} title="Разговорник 1" backLabel="К разделам аудирования" />}</Suspense>;

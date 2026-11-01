@@ -77,3 +77,17 @@ it('puts the overall ranking below course buttons and opens a selected medal gam
  const click=async(text:string)=>act(async()=>[...node.querySelectorAll('button')].find(b=>b.textContent?.includes(text))!.click());
  try{await act(async()=>root.render(<App/>));await click('Игра');expect(node.querySelector('.market-options')!.compareDocumentPosition(node.querySelector('[data-overall-ranking]')!)&Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();await click('Играть из общего рейтинга');expect(node.querySelector('[data-verbs-game]')).toBeTruthy();await click('К играм');expect(node.querySelector('[data-overall-ranking]')).toBeTruthy();}finally{await act(async()=>root.unmount());}
 });
+
+it('restores the scenic navigation level when entering and leaving group menus',async()=>{
+ const node=document.createElement('div'),root=createRoot(node);
+ const click=async(text:string)=>act(async()=>[...node.querySelectorAll('button')].find(b=>b.textContent?.includes(text))!.click());
+ try{
+  await act(async()=>root.render(<App/>));expect(document.body.hasAttribute('data-scenic-depth')).toBe(false);
+  await click('Игра');expect(document.body.dataset.scenicDepth).toBe('1');
+  await click('Продвинутая группа');expect(document.body.dataset.scenicDepth).toBe('2');
+  await click('Прилагательные');expect(document.body.dataset.scenicDepth).toBe('3');
+  await act(async()=>node.querySelector<HTMLButtonElement>('.back-button')!.click());expect(document.body.dataset.scenicDepth).toBe('2');
+  await act(async()=>node.querySelector<HTMLButtonElement>('.back-button')!.click());expect(document.body.dataset.scenicDepth).toBe('1');
+  await click('На главную');expect(document.body.hasAttribute('data-scenic-depth')).toBe(false);
+ }finally{await act(async()=>root.unmount());}
+});

@@ -1,3 +1,4 @@
+import {useScenicDepth} from '../../domain/useScenicDepth';
 import {useStudyActivity} from '../../domain/useStudyActivity';
 import {reportStudyAnswer} from '../../domain/studyTelemetry';
 import { useEffect, useRef, useState } from 'react';
@@ -30,6 +31,7 @@ export function TravelGameScreen({ onBack, initialGroup = null }: { onBack: () =
   const locked = useRef(true);
   const studyGame=group==='countries'?'lesson7-countries':'lesson7-travel';
   useStudyActivity('games',studyGame,(phase==='playing'||phase==='feedback')&&!paused);
+ useScenicDepth(phase==='playing'||phase==='feedback'?4:3);
   const current = tasks[position];
   const word = current && travelWords[current.index];
   const answer = current && travelBlitzAnswer(current);

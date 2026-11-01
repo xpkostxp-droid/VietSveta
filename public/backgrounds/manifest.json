@@ -1,0 +1,30 @@
+{
+  "style": "Very pale warm ivory watercolor, washed sage green, sand and faded peach; blank center, artwork at edges and bottom. No text or interface.",
+  "tool": "Built-in image_gen",
+  "assets": [
+    {
+      "file": "depth-1-lake.webp",
+      "purpose": "Выбор группы: озеро, лодочка, лотосы и бамбук",
+      "bytes": 56064,
+      "sha256": "731e96e8676bd0c8ae0c1af49aff82f9e7b303fbb72108e9a330384bff4f6889"
+    },
+    {
+      "file": "depth-2-hoian.webp",
+      "purpose": "Меню и списки: Хойан, фонарики и тихий канал",
+      "bytes": 75176,
+      "sha256": "67b62324aa1436f38380151b17b29a63fd9c900604f6e1fa554bbb5bd758a3bc"
+    },
+    {
+      "file": "depth-3-garden.webp",
+      "purpose": "Подготовка игры и рейтинг: тропический сад",
+      "bytes": 81272,
+      "sha256": "3c51bad89cf108e4da1d63336f89798033768af118e165aa6cfda55d586e3587"
+    },
+    {
+      "file": "depth-4-terraces.webp",
+      "purpose": "Упражнения и чтение: бледные рисовые террасы",
+      "bytes": 31818,
+      "sha256": "48b08999163528d3c7093cfff76d3b7e134d054c0e3ab8722e6c009be3366e57"
+    }
+  ]
+}

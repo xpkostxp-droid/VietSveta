@@ -1,3 +1,5 @@
+import {useScenicDepth} from '../domain/useScenicDepth';
+import {beginnerScenicDepth} from '../domain/scenicDepth';
 import './index.css';
 import { BeginnerBattleScreen } from './battle/BeginnerBattleScreen';
 import { readJSON, writeJSON } from './domain/storage';
@@ -76,6 +78,7 @@ function App({section,onBack,isAdmin=false,memberName}:{section:BeginnerSection;
     if(['dialogue-games-list','dialogue-game-setup','dialogue-game','big-numbers-setup','big-numbers-game'].includes(screen.name)
       || ((screen.name === 'numbers-game-setup' || screen.name === 'numbers-game') && screen.range !== 'phone')) screen = {name:'numbers-games-list'};
   }
+  useScenicDepth(beginnerScenicDepth(screen.name));
   switch (screen.name) {
     case 'listening':
       return <Suspense fallback={<div className="screen"><BackButton onClick={onBack} label="К выбору группы" /><p role="status">Загружаем аудирование…</p></div>}><ListeningScreen onBack={onBack} /></Suspense>;
