@@ -34,4 +34,12 @@ begin
  select count(*) into n from jsonb_array_elements(payload->'activity') a where a->>'user_id'=own_user::text and a->>'topic'='statistics-rls-check' and a->>'active_ms'='3000';
  if n<>1 then raise exception 'Cumulative activity upsert failed'; end if;
 end $$;
+do $$
+declare all_stats jsonb:=public.get_study_admin_stats(0); today_stats jsonb:=public.get_study_admin_stats(1); expected integer;
+begin
+ select count(*) into expected from public.game_attempts a join public.participants p using(user_id) where p.active and not p.is_admin and a.created_at<='now'::timestamptz;
+ if jsonb_array_length(all_stats->'attempts')<>expected then raise exception 'All-time history is incomplete'; end if;
+ if jsonb_array_length(all_stats->'attempts')<jsonb_array_length(today_stats->'attempts') then raise exception 'Period filter is reversed'; end if;
+ if jsonb_typeof(all_stats->'saved_learning')<>'array' then raise exception 'Saved learning is missing'; end if;
+end $$;
 rollback;

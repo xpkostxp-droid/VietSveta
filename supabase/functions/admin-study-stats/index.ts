@@ -11,7 +11,7 @@ Deno.serve(async req=>{
   const {data:{user},error}=await admin.auth.getUser(token);if(error||!user)return reply({error:'Войди снова'},401);
   const {data:profile,error:profileError}=await admin.from('participants').select('is_admin').eq('user_id',user.id).eq('active',true).single();
   if(profileError||!profile?.is_admin)return reply({error:'Только для администратора'},403);
-  const body=JSON.parse(text);if(body.action!=='admin-study-stats'||![1,7,30].includes(body.days))return reply({error:'period'},400);
+  const body=JSON.parse(text);if(body.action!=='admin-study-stats'||![0,1,7,30].includes(body.days))return reply({error:'period'},400);
   const {data,error:statsError}=await admin.rpc('get_study_admin_stats',{p_days:body.days});if(statsError)throw statsError;
   return reply(data);
  }catch{return reply({error:'Не удалось загрузить статистику. Попробуй ещё раз.'},500);}
