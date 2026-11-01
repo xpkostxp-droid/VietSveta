@@ -1,4 +1,4 @@
-import {afterEach,expect,it} from 'vitest';
+import {afterEach,expect,it,vi} from 'vitest';
 import {appScenicDepth,beginnerScenicDepth,registerScenicDepth} from './scenicDepth';
 let stops:(()=>void)[]=[];afterEach(()=>{stops.forEach(stop=>stop());stops=[];});
 it('follows the agreed hierarchy in both groups and keeps home unchanged',()=>{
@@ -16,4 +16,15 @@ it('keeps the deepest child active regardless of effect order and restores the p
 it('does not load a scenic asset on home and tolerates repeated cleanup',()=>{
  const stop=registerScenicDepth(0);stops.push(stop);expect(document.body.hasAttribute('data-scenic-depth')).toBe(false);
  const menu=registerScenicDepth(1);menu();menu();expect(document.body.hasAttribute('data-scenic-depth')).toBe(false);
+});
+it('resolves wallpaper against the app directory even when CSS lives in assets',()=>{
+ vi.stubEnv('BASE_URL','./');
+ const base=document.createElement('base');base.href='https://example.test/VietSveta/';document.head.append(base);
+ try{
+  const stop=registerScenicDepth(1);stops.push(stop);
+  const value=document.body.style.getPropertyValue('--scenic-wallpaper');
+  const url=value.match(/url\("([^"]+)"\)/)?.[1];
+  expect(url).toBe('https://example.test/VietSveta/backgrounds/depth-1-lake.webp');
+  expect(new URL(url!, 'https://example.test/VietSveta/assets/index.css').pathname).toBe('/VietSveta/backgrounds/depth-1-lake.webp');
+ }finally{base.remove();vi.unstubAllEnvs();}
 });
