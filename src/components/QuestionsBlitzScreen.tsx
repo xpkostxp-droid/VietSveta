@@ -1,3 +1,5 @@
+import {useStudyActivity} from '../domain/useStudyActivity';
+import {reportStudyAnswer} from '../domain/studyTelemetry';
 import { GameRanking } from './GameRanking';
 import { readGameRecord, updateGameRecord } from '../domain/gameRecord';
 import { createAnswerClock, formatAnswerTime, saveTimedAttempt } from '../domain/answerTime';
@@ -62,6 +64,7 @@ export function QuestionsBlitzScreen({onBack, variant = 'super'}:{onBack:()=>voi
  const [failed,setFailed]=useState<'wrong'|'timeout'|null>(null);
  const [feedback,setFeedback]=useState(false);
  const gameId = basic ? 'questions-15' : 'questions-24';
+ useStudyActivity('games',gameId,started&&!failed&&!completed&&!showRanking);
  const [record,setRecord]=useState(()=>readGameRecord(gameId,bestKey));
  const best=record.correct;
  const recordText = best > 0 && record.correctTimeMs !== null ? `${best} из ${totalTasks} · ${(record.correctTimeMs / 1000).toFixed(2).replace('.', ',')} сек` : 'пока нет';
@@ -107,16 +110,18 @@ export function QuestionsBlitzScreen({onBack, variant = 'super'}:{onBack:()=>voi
   if(retry!==null){const at=all.indexOf(retry);all=[...all.slice(at),...all.slice(0,at)];}
   setRetry(null);setQuestion(all);
  };
- const lose=(reason:'wrong'|'timeout')=>{
+ const lose=(reason:'wrong'|'timeout',choice:number|null=null)=>{
   if(locked.current)return;
-  setAnswerTime(answerClock.current.finish());
+  const finished=answerClock.current.finish();setAnswerTime(finished);
+  reportStudyAnswer({topic:gameId,vi:cards[q][0],ru:cards[q][1],direction:reverse?'vi-ru':'ru-vi',chosen:choice===null?null:cards[choice][reverse?1:0],result:reason,elapsed_ms:finished-finishedTime.current});
   locked.current=true;deadline.current=null;setRetry(queue[0]);setFailed(reason);setFeedback(false);stopSpeaking();sound('crash');
  };
  const answer=(index:number)=>{
   if(locked.current||failed||!started)return;
   if(deadline.current !== null && Date.now() >= deadline.current){lose('timeout');return;}
-  if(index!==q){lose('wrong');return;}
+  if(index!==q){lose('wrong',index);return;}
   const finished=answerClock.current.finish();
+  reportStudyAnswer({topic:gameId,vi:cards[q][0],ru:cards[q][1],direction:reverse?'vi-ru':'ru-vi',chosen:cards[index][reverse?1:0],result:'correct',elapsed_ms:finished-finishedTime.current});
   correctTime.current += finished-finishedTime.current; finishedTime.current=finished; setAnswerTime(finished);
   locked.current=true;deadline.current=null;setFeedback(true);
   speakVietnamese(cards[q][0]);

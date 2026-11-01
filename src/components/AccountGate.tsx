@@ -1,3 +1,4 @@
+import {useStudyCollection} from '../domain/useStudyCollection';
 import { MemberAvatar } from './MemberAvatar';
 import { useEffect, useState } from 'react';
 import App from '../App';
@@ -13,6 +14,7 @@ function clearLegacyProgress() {
 }
 export function AccountGate() {
  const [member,setMember]=useState<Member|null>(null),[loading,setLoading]=useState(true),[profile,setProfile]=useState(false);
+ useStudyCollection(member);
  const [selected,setSelected]=useState(''),[pin,setPin]=useState(''),[error,setError]=useState(''),[busy,setBusy]=useState(false),[status,setStatus]=useState('');
  const enter=async(m:Member)=>{
   setStorageOwner(m.user_id,m.is_admin);cacheMember(m);

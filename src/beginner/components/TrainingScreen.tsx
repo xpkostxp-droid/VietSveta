@@ -1,4 +1,6 @@
-import { useEffect, useState } from 'react';
+import {useStudyActivity} from '../../domain/useStudyActivity';
+import {reportStudyAnswer} from '../../domain/studyTelemetry';
+import { useEffect, useRef, useState } from 'react';
 import { getLessonById } from '../content/lessons';
 import { getCardsForLesson } from '../content/cards';
 import type { CardOrder, Direction } from '../types';
@@ -43,6 +45,9 @@ export function TrainingScreen({ lessonId, direction, order, onExit }: Props) {
   const cards = getCardsForLesson(lessonId);
 
   const [session, setSession] = useState<SessionState>(() => startSession(cards, direction, order));
+  const studyStart=useRef(Date.now());
+  useEffect(()=>{studyStart.current=Date.now();},[session.index,session.direction]);
+  useStudyActivity('cards',`cards:beginner:${lessonId}`,!isFinished(session));
 
   // Кнопка звука показывается только тогда, когда на устройстве вообще
   // есть вьетнамский голос — иначе озвучка и так молчит, и кнопка была бы
@@ -114,6 +119,7 @@ export function TrainingScreen({ lessonId, direction, order, onExit }: Props) {
   const handleAnswer = (result: 'remembered' | 'not-remembered') => {
     const card = currentCard(session);
     if (!card) return;
+    reportStudyAnswer({topic:`cards:beginner:${lessonId}`,vi:card.vi,ru:card.ru,direction:session.direction,chosen:null,result:result==='remembered'?'correct':'wrong',elapsed_ms:Date.now()-studyStart.current});
     recordResult(card.id, session.direction, result);
     setSession((s) => answer(s, result));
   };

@@ -1,3 +1,5 @@
+import {useStudyActivity} from '../domain/useStudyActivity';
+import {reportStudyAnswer} from '../domain/studyTelemetry';
 import { useEffect, useRef, useState } from 'react';
 import { BackButton } from './BackButton';
 import { GameRanking } from './GameRanking';
@@ -21,6 +23,7 @@ export default function VerbsGameScreen({onBack}:{onBack:()=>void}){
  const clock=useFiveSecondQuestionTimer(()=>answer(null),()=>{sounds.current?.stop();stopSpeaking();spokenQuestion.current=null});
  const task=round?.tasks[round.at];
  const paused=clock.paused||feedbackPaused;
+ useStudyActivity('games',GAME,!!round&&round.phase!=='end'&&!paused);
  useEffect(()=>{sounds.current=createDragonSounds();void sounds.current.prepare();return()=>{sounds.current?.close();stopSpeaking()}},[]);
  function begin(){
   void sounds.current?.prepare();clock.ready();stopSpeaking();saved.current=false;locked.current=false;spokenQuestion.current=null;setFeedbackPaused(false);
@@ -30,6 +33,7 @@ export default function VerbsGameScreen({onBack}:{onBack:()=>void}){
   if(!round||!task||round.phase!=='question'||locked.current||clock.isPaused())return;
   locked.current=true;const elapsed=clock.finish(),success=choice===task.word&&elapsed<5000;
   if(elapsed>=5000)choice=null;
+  reportStudyAnswer({topic:GAME,vi:verbGameWords[task.word][0],ru:verbGameWords[task.word][1],direction:task.reverse?'vi-ru':'ru-vi',chosen:choice===null?null:verbGameWords[choice][task.reverse?1:0],result:success?'correct':choice===null?'timeout':'wrong',elapsed_ms:elapsed});
   stopSpeaking();sounds.current?.stopVoice();feedbackLeft.current=dragonFeedbackMs(success);speechDone.current=false;
   sounds.current?.play(success?'success':'error');
   setRound({...round,phase:'feedback',chosen:choice,success,correct:round.correct+(success?1:0),time:round.time+(success?elapsed:0),answerTime:round.answerTime+elapsed});

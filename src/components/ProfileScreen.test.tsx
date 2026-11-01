@@ -49,3 +49,14 @@ it('shows Konstantin achievements while preserving logout and profile switching'
  await act(async()=>Array.from(node.querySelectorAll('button')).find(b=>b.textContent==='Переключить профиль')!.click());
  expect(switchProfile).toHaveBeenCalledOnce();
 });
+
+it('places Statistics below the admin heading and hides it for participants',async()=>{
+ await render();expect(Array.from(node.querySelectorAll('button')).some(b=>b.textContent==='Статистика')).toBe(false);
+ await render({...base,id:'admin',is_admin:true});const heading=node.querySelector('.profile-avatar-heading')!;
+ expect(heading.nextElementSibling?.textContent).toBe('Статистика');
+ vi.mocked(memberRequest).mockImplementation(async(body:any)=>body.action==='admin-study-stats'?{since:'',generated_at:'2026-11-01T05:00:00Z',timezone:'Asia/Ho_Chi_Minh',participants:[],coverage:[],activity:[],words:[],medals:[],attempts:[]}:{participants:[],states:[],attempts:[]});
+ await import('./AdminStudyStatistics');
+ await act(async()=>{(heading.nextElementSibling as HTMLButtonElement).click();});
+ await vi.waitFor(()=>expect(node.querySelector('.admin-study')).toBeTruthy());expect(node.querySelector('.admin-study')).toBeTruthy();
+ await act(async()=>Array.from(node.querySelectorAll('button')).find(b=>b.textContent?.includes('К профилю администратора'))!.click());expect(node.querySelector('.profile-avatar-heading')).toBeTruthy();
+});

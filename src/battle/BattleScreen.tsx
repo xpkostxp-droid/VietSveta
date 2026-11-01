@@ -1,3 +1,4 @@
+import {useStudyActivity} from '../domain/useStudyActivity';
 import { OnlineDigitBattle } from '../beginner/battle/OnlineDigitBattle';
 import { readyBattleDigitAudio } from './resultAudio';
 import { useEffect, useRef, useState } from 'react';
@@ -108,6 +109,7 @@ function BattleSession({onBack,audio,botConfig,onBotReplay,course='advanced',onT
  const outcome=finished?finalOutcome(match.score_host,match.score_guest,match.side):null;
  const cinemaResult:CinemaResult|null=finished&&outcome?{key:match.id,outcome,label:outcome==='near'?'Твоя победа!':'Победа соперника'}:null;
  const playing=!!inMatch&&(match.status==='active'||showResult&&!isNinja&&!isDigits);
+ useStudyActivity('games',`battle:${course}:${match?.topic??topic}`,playing&&!hidden);
  const showCinema=!!state&&!hidden;
  const shownWord=showResult?'':preparing?'Приготовились!':running?(match?.task?.word??''):'';
  const shownOptions=showResult?match?.last_result?.options??[]:match?.task?.options??[];

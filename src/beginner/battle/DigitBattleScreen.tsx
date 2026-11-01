@@ -1,3 +1,4 @@
+import {useStudyActivity} from '../../domain/useStudyActivity';
 import { TopicWheel } from '../../battle/TopicWheel';
 import { useBattleResultSound } from '../../battle/useBattleResultSound';
 import { readyBattleDigitAudio, playBattleDigit } from '../../battle/resultAudio';
@@ -57,6 +58,7 @@ function DigitBattleMatch({ playerName, sound, onBack, onReplay }: { playerName:
   document.addEventListener('visibilitychange',hide); return () => document.removeEventListener('visibilitychange',hide);
  }, [game]);
  const resolved = state.phase === 'result' || state.phase === 'finished';
+ useStudyActivity('games','battle:digits:bot',!paused&&state.phase!=='finished');
  const seconds = Math.max(0,Math.ceil((state.startsAt + (state.phase === 'ready' ? 0 : DIGIT_ROUND_MS) - now)/1000));
  useEffect(() => {
   if (paused) return;

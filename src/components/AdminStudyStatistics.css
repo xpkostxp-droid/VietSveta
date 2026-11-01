@@ -1,0 +1,44 @@
+.admin-study{color:#193e40;gap:10px;padding-top:18px;max-width:680px;margin:auto}
+.admin-study .screen-title{margin:5px 0;font-size:1.7rem}
+.admin-study .study-caption{color:#68766d;font-size:.85rem;margin:4px 0 10px;line-height:1.45}
+.admin-study .study-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.admin-study .study-period{display:flex;gap:4px;background:#eae6d6;padding:4px;border-radius:13px;flex:1}
+.admin-study .study-period button{flex:1;min-height:44px;padding:8px 9px;border:0;border-radius:10px;background:transparent;font:inherit;font-size:.9rem}
+.admin-study .study-period button[aria-pressed=true]{background:#fffdf7;box-shadow:0 1px 4px #00000012}
+.admin-study details{background:#fffdf7;border:1px solid #dedfce;border-radius:15px;margin:8px 0;overflow:hidden}
+.admin-study summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:72px;padding:14px;cursor:pointer}
+.admin-study summary::-webkit-details-marker{display:none}
+.admin-study summary strong{font-size:1rem;font-weight:750}
+.admin-study summary small{display:block;color:#68766d;font-size:.77rem;margin-top:4px}
+.admin-study .study-summary-right{display:flex;align-items:center;gap:10px;flex-shrink:0;font-variant-numeric:tabular-nums}
+.admin-study .study-chevron{display:grid;place-items:center;width:30px;height:30px;border-radius:9px;background:#eee8d8;font-size:20px}
+.admin-study details[open]>summary .study-chevron{transform:rotate(180deg)}
+.admin-study details[open]>summary{border-bottom:1px solid #dedfce}
+.admin-study .study-body{padding:14px}
+.admin-study .study-body details{border-radius:11px;margin:7px 0}
+.admin-study .study-body summary{min-height:58px;padding:10px 12px}
+.admin-study .study-body summary strong{font-size:.9rem}
+.admin-study .study-row{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;padding:10px 0;border-bottom:1px solid #e4e4d8;font-size:.88rem;overflow-wrap:anywhere}
+.admin-study .study-row:last-child{border:0}
+.admin-study .study-row small{display:block;color:#68766d;font-size:.75rem;margin-top:3px}
+.admin-study .study-number{white-space:nowrap;font-variant-numeric:tabular-nums;text-align:right}
+.admin-study .study-section-label{font-size:.77rem;color:#68766d;margin:14px 0 0}
+.admin-study .study-table{width:100%;border-collapse:collapse;font-size:.85rem}
+.admin-study .study-table th{text-align:left;font-size:.75rem;font-weight:500;color:#68766d;padding:0 4px 10px}
+.admin-study .study-table td{padding:9px 4px;border-top:1px solid #e4e4d8;vertical-align:top}
+.admin-study .study-table td:last-child,.admin-study .study-table th:last-child{text-align:right}
+.admin-study .study-name-link{padding:0;background:none;border:0;min-height:44px;text-align:left;font:inherit;color:inherit}
+.admin-study .study-filters{display:flex;gap:5px;flex-wrap:wrap;margin:5px 0 12px}
+.admin-study .study-filters button{flex:1;min-height:44px;border:0;border-radius:10px;background:#eee8d8;font:inherit;font-size:.8rem;padding:8px}
+.admin-study .study-filters button[aria-pressed=true]{background:#dcece0}
+.admin-study select{font:inherit;min-height:44px;width:100%;max-width:100%;border:1px solid #dedfce;background:#fffdf7;border-radius:10px;padding:9px;margin-bottom:8px}
+.admin-study .study-history{display:flex;gap:5px;align-items:center;margin-top:8px;font-size:.8rem;color:#68766d}
+.admin-study .study-history span{display:grid;place-items:center;width:23px;height:23px;background:#eee8d8;border-radius:5px}
+.admin-study .study-history .study-correct{color:#217560}.admin-study .study-history .study-error{color:#9b503c}
+.admin-study .study-word-detail{background:#f2eee1;border-radius:10px;padding:10px;margin:0 10px 10px}
+.admin-study .study-more{width:100%;min-height:44px;margin-top:10px;border:0;border-radius:10px;background:#dcece0;font:inherit;padding:10px}
+.admin-study .study-error-message{background:#f8e5dc;padding:14px;border-radius:12px}
+.admin-study .study-refresh{min-height:44px}
+@media(max-width:390px){.admin-study summary{padding:12px 10px}.admin-study .study-body{padding:10px}.admin-study .study-summary-right{gap:6px}.admin-study summary strong{font-size:.92rem}}
+
+.admin-study .study-table-split{display:grid;grid-template-columns:1fr 1fr;gap:3px 8px;color:#68766d;font-size:.7rem;margin-top:6px}

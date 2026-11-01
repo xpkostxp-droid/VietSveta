@@ -1,3 +1,4 @@
+import {useStudyActivity} from '../../domain/useStudyActivity';
 import { getLessonById, getTheoryForLesson } from '../content/lessons';
 import type { TheoryBlock } from '../types';
 import { BackButton } from './BackButton';
@@ -167,6 +168,7 @@ function TheoryBlockView({ block }: { block: TheoryBlock }) {
 }
 
 export function TheoryLessonScreen({ lessonId, onBack }: Props) {
+  useStudyActivity('theory',`theory:beginner:${lessonId}`);
   const lesson = getLessonById(lessonId);
 
   if (!lesson) {

@@ -2,6 +2,8 @@
 import {act} from 'react';import {createRoot,type Root} from 'react-dom/client';
 import {beforeEach,afterEach,expect,it,vi} from 'vitest';
 import VerbsGameScreen from './VerbsGameScreen';
+import {reportStudyAnswer} from '../domain/studyTelemetry';
+vi.mock('../domain/studyTelemetry',()=>({reportStudyAnswer:vi.fn(),registerStudyContext:()=>()=>{}}));
 import {verbGameWords,verbGameTasks,verbGameOptions} from '../content/verbGame';
 const audio=vi.hoisted(()=>({prepare:vi.fn(),play:vi.fn(),stop:vi.fn(),close:vi.fn(),speak:vi.fn(),stopVoice:vi.fn()}));
 vi.mock('../domain/dragonSounds',()=>({createDragonSounds:()=>audio}));
@@ -28,6 +30,9 @@ it('completes every word once each way, saves one attempt and excludes animation
   await time(100);await click(pair[reverse?1:0]);expect(node.querySelectorAll('.at-right')).toHaveLength(1);expect(audio.play).toHaveBeenLastCalledWith('success');
   await time(1800);
  }
+ expect(vi.mocked(reportStudyAnswer).mock.calls).toHaveLength(52);
+ expect(vi.mocked(reportStudyAnswer).mock.calls.filter(([a])=>a.direction==='vi-ru')).toHaveLength(26);
+ expect(vi.mocked(reportStudyAnswer).mock.calls.every(([a])=>a.result==='correct'&&a.elapsed_ms===100)).toBe(true);
  expect(seen.size).toBe(52);expect(node.querySelector('[data-result]')!.textContent).toBe('52 из 52 · 5200');
  const attempts=JSON.parse(localStorage.getItem('vietSveta.timedAttempts.v1')!);expect(attempts).toHaveLength(1);expect(attempts[0]).toMatchObject({game:'lesson15-verbs',total:52,correct:52,correctTimeMs:5200,answerTimeMs:5200});
 });
@@ -37,6 +42,7 @@ it('coughs on a wrong answer and timeout, highlights the correct button and move
  await act(async()=>{wrong.click();wrong.click()});expect(audio.play).toHaveBeenCalledTimes(1);expect(audio.play).toHaveBeenCalledWith('error');expect(node.querySelectorAll('.at-right')).toHaveLength(1);expect(node.querySelectorAll('.at-wrong')).toHaveLength(1);
  await time(1100);expect(node.querySelector('.at-top')!.textContent).toContain('2/52');
  await time(5000);expect(audio.play).toHaveBeenCalledTimes(2);expect(audio.play).toHaveBeenLastCalledWith('error');await time(1100);expect(node.querySelector('.at-top')!.textContent).toContain('3/52');
+ expect(vi.mocked(reportStudyAnswer).mock.calls.map(([a])=>a.result)).toEqual(['wrong','timeout']);
 });
 it('pauses both question and feedback while hidden and saves no unfinished run',async()=>{
  await click('Начать');await time(1000);Object.defineProperty(document,'hidden',{configurable:true,value:true});await act(async()=>document.dispatchEvent(new Event('visibilitychange')));await time(9000);expect(node.textContent).toContain('Продолжить');

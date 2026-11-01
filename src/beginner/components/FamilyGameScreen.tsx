@@ -1,3 +1,5 @@
+import {useStudyActivity} from '../../domain/useStudyActivity';
+import {reportStudyAnswer} from '../../domain/studyTelemetry';
 import { useEffect, useRef, useState } from 'react';
 import { GameRanking } from '../../components/GameRanking';
 import { saveTimedAttempt } from '../../domain/answerTime';
@@ -29,6 +31,7 @@ export function FamilyGameScreen({ onBack }: { onBack: () => void }) {
   const task = tasks[position];
   const current = task && words[task.index];
   const active = Boolean(current);
+  useStudyActivity('games',rankingGame,active&&!clock.paused);
   useEffect(() => {
     const off = onVoicesChanged(() => setVoice(hasVietnameseVoice()));
     return () => { off(); clearTimeout(timer.current); stopSpeaking(); };
@@ -51,6 +54,7 @@ export function FamilyGameScreen({ onBack }: { onBack: () => void }) {
     locked.current = true;
     const time = clock.finish(); answerTime.current += time;
     if (time >= 5000) index = null;
+    reportStudyAnswer({topic:rankingGame,vi:words[task.index][1],ru:words[task.index][0],direction:task.reverse?'vi-ru':'ru-vi',chosen:index===null?null:words[index][task.reverse?0:1],result:index===task.index?'correct':index===null?'timeout':'wrong',elapsed_ms:time});
     setSelected(index); setAnswered(true);
     const nextScore = { correct: score.correct + (index === task.index ? 1 : 0), time: score.time + (index === task.index ? time : 0) };
     setScore(nextScore);

@@ -1,3 +1,5 @@
+import {useStudyActivity} from '../../domain/useStudyActivity';
+import {reportStudyAnswer} from '../../domain/studyTelemetry';
 import { useEffect, useRef, useState } from 'react';
 import { peopleWords, peopleBlitzTasks, peopleBlitzAnswer, peopleBlitzOptions, type PeopleTask } from '../content/games/people';
 import { GameRanking } from '../../components/GameRanking';
@@ -27,6 +29,8 @@ export function PeopleGameScreen({ onBack }: { onBack: () => void }) {
   const elapsed = useRef(0);
   const started = useRef(0);
   const locked = useRef(true);
+  const studyGame='lesson8-people';
+  useStudyActivity('games',studyGame,(phase==='playing'||phase==='feedback')&&!paused);
   const current = tasks[position];
   const word = current && peopleWords[current.index];
   const answer = current && peopleBlitzAnswer(current);
@@ -47,6 +51,7 @@ export function PeopleGameScreen({ onBack }: { onBack: () => void }) {
     locked.current = true;
     const time = Math.min(5000, elapsed.current + performance.now() - started.current);
     if (time >= 5000) choice = null;
+    reportStudyAnswer({topic:studyGame,vi:peopleWords[current.index][1],ru:peopleWords[current.index][0],direction:current.reverse?'vi-ru':'ru-vi',chosen:choice,result:choice===answer?'correct':choice===null?'timeout':'wrong',elapsed_ms:time});
     setRemaining(Math.max(0, 5000 - time)); setSelected(choice);
     if (choice === answer) setScore(s => ({ correct: s.correct + 1, time: s.time + time }));
     setPhase('feedback'); speakVietnamese(peopleWords[current.index][1]);

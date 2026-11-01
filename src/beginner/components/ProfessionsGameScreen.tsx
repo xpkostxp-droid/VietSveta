@@ -1,3 +1,5 @@
+import {useStudyActivity} from '../../domain/useStudyActivity';
+import {reportStudyAnswer} from '../../domain/studyTelemetry';
 import { useEffect, useRef, useState } from 'react';
 import { professionWords, workBlitzGroups, workBlitzTasks, workBlitzAnswer, workBlitzOptions, workBlitzPool, type WorkBlitzGroup, type WorkTask } from '../content/games/professions';
 import { GameRanking } from '../../components/GameRanking';
@@ -25,6 +27,8 @@ export function ProfessionsGameScreen({ onBack, initialGroup = null }: { onBack:
   const elapsed = useRef(0);
   const started = useRef(0);
   const locked = useRef(true);
+  const studyGame=group==='professions'?'lesson5-professions':'lesson5-work';
+  useStudyActivity('games',studyGame,(phase==='playing'||phase==='feedback')&&!paused);
   const current = tasks[position];
   const word = current && professionWords[current.index];
   const answer = current && workBlitzAnswer(current);
@@ -45,6 +49,7 @@ export function ProfessionsGameScreen({ onBack, initialGroup = null }: { onBack:
     locked.current = true;
     const time = Math.min(5000, elapsed.current + performance.now() - started.current);
     if (time >= 5000) choice = null;
+    reportStudyAnswer({topic:studyGame,vi:professionWords[current.index][1],ru:professionWords[current.index][0],direction:current.reverse?'vi-ru':'ru-vi',chosen:choice,result:choice===answer?'correct':choice===null?'timeout':'wrong',elapsed_ms:time});
     setRemaining(Math.max(0, 5000 - time)); setSelected(choice);
     if (choice === answer) setScore(s => ({ correct: s.correct + 1, time: s.time + time }));
     setPhase('feedback'); speakVietnamese(professionWords[current.index][1]);
