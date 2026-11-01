@@ -1,3 +1,4 @@
+import {useScenicDepth} from '../domain/useScenicDepth';
 import {useStudyActivity} from '../domain/useStudyActivity';
 import {reportStudyAnswer} from '../domain/studyTelemetry';
 import { GameRanking } from './GameRanking';
@@ -65,6 +66,7 @@ export function QuestionsBlitzScreen({onBack, variant = 'super'}:{onBack:()=>voi
  const [feedback,setFeedback]=useState(false);
  const gameId = basic ? 'questions-15' : 'questions-24';
  useStudyActivity('games',gameId,started&&!failed&&!completed&&!showRanking);
+ useScenicDepth(started&&!failed&&!completed&&!showRanking?4:3);
  const [record,setRecord]=useState(()=>readGameRecord(gameId,bestKey));
  const best=record.correct;
  const recordText = best > 0 && record.correctTimeMs !== null ? `${best} из ${totalTasks} · ${(record.correctTimeMs / 1000).toFixed(2).replace('.', ',')} сек` : 'пока нет';

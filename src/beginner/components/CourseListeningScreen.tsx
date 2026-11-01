@@ -1,3 +1,4 @@
+import {useScenicDepth} from '../../domain/useScenicDepth';
 import { useEffect, useRef, useState } from 'react';
 import { BackButton } from './BackButton';
 import { courseListeningLessons } from '../content/listening/course';
@@ -5,6 +6,7 @@ import './listening.css';
 
 export default function CourseListeningScreen({ onBack }: { onBack: () => void }) {
   const [lessonId, setLessonId] = useState<string>();
+  useScenicDepth(lessonId?4:3);
   const [showTranslation, setShowTranslation] = useState(true);
   const [time, setTime] = useState(0);
   const [error, setError] = useState(false);

@@ -1,3 +1,4 @@
+import {useScenicDepth} from '../domain/useScenicDepth';
 import {useEffect,useState} from 'react';
 import {BackButton} from '../components/BackButton';
 import {NinjaScreen} from '../ninja/NinjaScreen';
@@ -8,6 +9,7 @@ import {createBattleAudio,BotBattleScreen} from './BattleScreen';
 import {botVocabulary} from './botVocabulary';
 import {TopicWheel} from './TopicWheel';
 export function AdminBattleLab({isAdmin,onBack,backLabel="К админке"}:{isAdmin:boolean;onBack:()=>void;backLabel?:string}){
+ useScenicDepth(3);
  const [audio]=useState(createBattleAudio),[topic,setTopic]=useState('fruits'),[gender,setGender]=useState<MemberGender>('man'),[playing,setPlaying]=useState(false),[session,setSession]=useState(0);
  useEffect(()=>()=>{audio.sound.close();audio.court.close();audio.ninja.close();},[audio]);
  if(!isAdmin)return null;

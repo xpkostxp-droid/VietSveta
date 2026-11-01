@@ -1,3 +1,4 @@
+import {useScenicDepth} from '../../domain/useScenicDepth';
 import {useStudyActivity} from '../../domain/useStudyActivity';
 import {reportStudyAnswer} from '../../domain/studyTelemetry';
 import { useEffect, useRef, useState } from 'react';
@@ -29,6 +30,7 @@ export function HouseGameScreen({ onBack, game = 'house' }: { onBack: () => void
   const current = task && words[task.index];
   const active = Boolean(current);
   useStudyActivity('games',rankingGame,active&&!clock.paused);
+ useScenicDepth(active?4:3);
   useEffect(() => {
     const off = onVoicesChanged(() => setVoice(hasVietnameseVoice()));
     return () => { off(); clearTimeout(timer.current); stopSpeaking(); };

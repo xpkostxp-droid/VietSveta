@@ -1,3 +1,5 @@
+import {useScenicDepth} from './domain/useScenicDepth';
+import {appScenicDepth} from './domain/scenicDepth';
 import type {ProfileGameId} from './domain/profileGames';
 import './components/GamesMenu.css';
 import { BattleScreen } from './battle/BattleScreen';
@@ -56,6 +58,7 @@ type Screen =
 
 function App({ isAdmin=false, memberId, memberName, syncStatus, onOpenProfile, courseGroup='advanced' }: { courseGroup?: 'beginner'|'advanced'; isAdmin?: boolean; memberId?: string; memberName?: string; syncStatus?: string; onOpenProfile?: () => void } = {}) {
   const [screen, setScreen] = useState<Screen>({ name: 'home' });
+  useScenicDepth(appScenicDepth(screen.name));
 
   switch (screen.name) {
     case 'home':

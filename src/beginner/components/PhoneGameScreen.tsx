@@ -1,3 +1,4 @@
+import {useScenicDepth} from '../../domain/useScenicDepth';
 import {useStudyActivity} from '../../domain/useStudyActivity';
 import {reportStudyAnswer} from '../../domain/studyTelemetry';
 import { useEffect, useRef, useState } from 'react';
@@ -20,6 +21,7 @@ export function PhoneGameScreen({ onBack }: { onBack: () => void }) {
  const deadline=useRef(0),frozen=useRef(5000),lastBeep=useRef<number|null>(null),clean=useRef(true),locked=useRef(true),request=useRef(0);
  const result=useRef({correct:0,time:0,answerTime:0}),saved=useRef(false);
  useStudyActivity('games',game,!['intro','result'].includes(phase)&&!paused);
+ useScenicDepth(!['intro','result'].includes(phase)?4:3);
  const studyLogged=useRef(-1);
  const logStudy=(choice:number|null)=>{if(studyLogged.current===at)return;studyLogged.current=at;reportStudyAnswer({topic:game,vi:phoneDigitWords[digit],ru:String(digit),direction:reverse?'vi-ru':'listening',chosen:choice===null?null:String(choice),result:choice===digit?'correct':choice===null?'timeout':'wrong',elapsed_ms:Math.max(0,Math.min(5000,5000-(deadline.current-Date.now())))});};
  const numberIndex=Math.floor(at/10),position=at%10,reverse=numberIndex===1;

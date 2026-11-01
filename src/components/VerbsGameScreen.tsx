@@ -1,3 +1,4 @@
+import {useScenicDepth} from '../domain/useScenicDepth';
 import {useStudyActivity} from '../domain/useStudyActivity';
 import {reportStudyAnswer} from '../domain/studyTelemetry';
 import { useEffect, useRef, useState } from 'react';
@@ -24,6 +25,7 @@ export default function VerbsGameScreen({onBack}:{onBack:()=>void}){
  const task=round?.tasks[round.at];
  const paused=clock.paused||feedbackPaused;
  useStudyActivity('games',GAME,!!round&&round.phase!=='end'&&!paused);
+ useScenicDepth(!!round&&round.phase!=='end'?4:3);
  useEffect(()=>{sounds.current=createDragonSounds();void sounds.current.prepare();return()=>{sounds.current?.close();stopSpeaking()}},[]);
  function begin(){
   void sounds.current?.prepare();clock.ready();stopSpeaking();saved.current=false;locked.current=false;spokenQuestion.current=null;setFeedbackPaused(false);

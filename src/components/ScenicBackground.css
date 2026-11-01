@@ -1,0 +1,13 @@
+/* Fixed viewport layer: no layout changes and no iOS background-attachment scrolling bug. */
+body[data-scenic-depth]{isolation:isolate}
+body[data-scenic-depth]::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background-image:var(--scenic-wallpaper);background-size:cover;background-repeat:no-repeat;background-position:center bottom;opacity:.85}
+body[data-scenic-depth="2"]::before{opacity:.8}
+body[data-scenic-depth="3"]::before{opacity:.75}
+body[data-scenic-depth="4"]::before{opacity:.55}
+body[data-scenic-depth] .screen:not(.screen-home){background-color:transparent}
+body[data-scenic-depth] .screen.screen-photo{background-image:none;background-color:transparent}
+body[data-scenic-depth] .screen-photo :is(.lesson-item,.choice-button,.summary-box,.placeholder-box,.sound-toggle){background:#fffdf8;border-color:#e6dcc8;backdrop-filter:none;-webkit-backdrop-filter:none}
+body[data-scenic-depth] .screen-photo .choice-button-active{background:var(--color-primary-soft);border-color:var(--color-primary)}
+body[data-scenic-depth] .theory-body{background:rgba(255,253,248,.97);border-radius:18px}
+body[data-scenic-depth] .flashcard-face{background:#fffdf8}
+@media(min-width:800px){body[data-scenic-depth]::before{background-size:auto 100%;background-position:center bottom}}

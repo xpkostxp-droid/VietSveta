@@ -1,3 +1,4 @@
+import {useScenicDepth} from '../domain/useScenicDepth';
 import {useStudyActivity} from '../domain/useStudyActivity';
 import {reportStudyAnswer} from '../domain/studyTelemetry';
 import { useEffect, useRef, useState } from 'react';
@@ -44,6 +45,7 @@ export function PhoneticaTestScreen({ onBack, testId }: { onBack: () => void; te
   const answerStart=useRef(Date.now());
   useEffect(()=>{answerStart.current=Date.now();},[index,roundNumber]);
   useStudyActivity('audio',`phonetics:advanced:${testId}`,!!item);
+ useScenicDepth(4);
 
   useEffect(() => {
     if (item) return;

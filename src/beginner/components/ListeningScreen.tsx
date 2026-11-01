@@ -1,3 +1,4 @@
+import {useScenicDepth} from '../../domain/useScenicDepth';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { BackButton } from './BackButton';
 import { listeningLessons } from '../content/listening/lessons';
@@ -16,6 +17,7 @@ interface Props { onBack: () => void; lessons?: ListeningLesson[]; title?: strin
 
 export default function ListeningScreen({ onBack, lessons = listeningLessons, title = 'Аудирование', backLabel = 'На главную', description = 'Изучите слова, прослушайте фразу на вьетнамском и выберите её перевод.' }: Props) {
   const [lesson, setLesson] = useState<ListeningLesson>();
+  useScenicDepth(lesson?4:3);
   const [completed, setCompleted] = useState(completedLessons);
   const [stage, setStage] = useState<'vocabulary' | 'game' | 'complete'>('vocabulary');
   const [index, setIndex] = useState(0);
