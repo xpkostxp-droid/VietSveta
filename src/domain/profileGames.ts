@@ -1,5 +1,6 @@
 import { rankPlayers, type RankingRow } from './leaderboard';
 export const profileGames = [
+ {id:'listening-tones',title:'Аудирование · Угадай тон',group:'advanced'},
  {id:'lesson15-verbs',title:'Глаголы',group:'advanced'},
  {id:'harvest-fruits',title:'Фрукты',group:'advanced'},
  {id:'harvest-vegetables',title:'Овощи',group:'advanced'},

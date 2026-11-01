@@ -1,4 +1,5 @@
 import {useScenicDepth} from './domain/useScenicDepth';
+import ToneGameScreen from './components/ToneGameScreen';
 import {appScenicDepth} from './domain/scenicDepth';
 import type {ProfileGameId} from './domain/profileGames';
 import './components/GamesMenu.css';
@@ -39,6 +40,8 @@ type Screen =
   | { name: 'beginner'; section: CourseSection }
   | { name: 'produce'; category: 'fruits' | 'vegetables' }
   | { name: 'games-menu' }
+  | { name: 'listening-games' }
+  | { name: 'tone-game' }
   | { name: 'battle' }
   | { name: 'verbs' }
   | { name: 'adjectives-menu' }
@@ -92,6 +95,10 @@ function App({ isAdmin=false, memberId, memberName, syncStatus, onOpenProfile, c
     case 'battle':
       return <BattleScreen onBack={()=>setScreen({name:'games-menu'})}/>;
 
+    case 'tone-game':
+      return <ToneGameScreen onBack={()=>setScreen({name:'listening-games'})}/>;
+    case 'listening-games':
+      return <div className="screen games-menu-screen"><BackButton onClick={()=>setScreen({name:'games-menu'})} label="К играм"/><h1 className="screen-title">Аудирование</h1><nav className="games-menu-keys" aria-label="Игры на аудирование"><button className="games-menu-key" onClick={()=>setScreen({name:'tone-game'})}><span className="games-menu-key-icon" aria-hidden="true">🎧</span><span>Угадай тон</span></button></nav></div>;
     case 'games-menu':
       return <div className="screen games-menu-screen">
         <BackButton onClick={()=>setScreen({name:'group-selection',section:'games'})} label="К выбору группы"/>
@@ -102,6 +109,7 @@ function App({ isAdmin=false, memberId, memberName, syncStatus, onOpenProfile, c
           <button className="games-menu-key" onClick={()=>setScreen({name:'questions-menu'})}><span className="games-menu-key-icon" aria-hidden="true">❓</span><span>Вопросительные слова</span></button>
           <button className="games-menu-key" onClick={()=>setScreen({name:'adjectives-menu'})}><span className="games-menu-key-icon" aria-hidden="true">🧪</span><span>Прилагательные</span></button>
           <button className="games-menu-key" onClick={()=>setScreen({name:'verbs'})}><span className="games-menu-key-icon" aria-hidden="true">🐉</span><span>Глаголы</span></button>
+          <button className="games-menu-key" onClick={()=>setScreen({name:'listening-games'})}><span className="games-menu-key-icon" aria-hidden="true">🎧</span><span>Аудирование</span></button>
           <button className="games-menu-key" onClick={()=>setScreen({name:'produce',category:'vegetables'})}><span className="games-menu-key-icon" aria-hidden="true">🥕</span><span>Овощи</span></button>
           <button className="games-menu-key" onClick={()=>setScreen({name:'produce',category:'fruits'})}><span className="games-menu-key-icon" aria-hidden="true">🍉</span><span>Фрукты</span></button>
         </nav>

@@ -6,6 +6,15 @@ import App from '../App';
 vi.mock('../beginner/App',()=>({default:({section,onBack}:{section:string;onBack:()=>void})=><div>Начальный раздел: {section}<button onClick={onBack}>К выбору группы</button></div>}));
 beforeEach(()=>{vi.spyOn(HTMLMediaElement.prototype,'pause').mockImplementation(()=>{});});
 Object.assign(globalThis,{IS_REACT_ACT_ENVIRONMENT:true});
+vi.mock('./ToneGameScreen',()=>({default:({onBack}:any)=><div data-tone-game><button onClick={onBack}>К аудированию</button></div>}));
+it('opens the advanced tone game through Listening and returns to its menu',async()=>{
+ const node=document.createElement('div'),root=createRoot(node);
+ const click=async(text:string)=>{const b=[...node.querySelectorAll('button')].find(b=>b.textContent?.includes(text));expect(b,text).toBeTruthy();await act(async()=>b!.click());};
+ try{await act(async()=>root.render(<App/>));await click('Игра');await click('Продвинутая группа');
+  const entry=[...node.querySelectorAll('button')].find(b=>b.textContent?.includes('Аудирование'))!;expect(entry.classList.contains('games-menu-key')).toBe(true);
+  await click('Аудирование');expect(node.querySelector('[aria-label="Игры на аудирование"]')).toBeTruthy();await click('Угадай тон');expect(node.querySelector('[data-tone-game]')).toBeTruthy();await click('К аудированию');expect(node.querySelector('[aria-label="Игры на аудирование"]')).toBeTruthy();await click('К играм');expect(node.textContent).toContain('Овощи');
+ }finally{await act(async()=>root.unmount());}
+});
 it.each([['Игра','games','Овощи'],['Аудирование','listening','Поездка в Вунгтау'],['Теория','theory','Теория'],['Карточки','cards','Карточки']])('opens both groups inside %s and returns to the group selector',async(label,section,advanced)=>{
  const node=document.createElement('div'),root=createRoot(node);
  const click=async(text:string)=>{const b=[...node.querySelectorAll('button')].find(b=>b.textContent?.includes(text));expect(b,text).toBeTruthy();await act(async()=>b!.click());};
