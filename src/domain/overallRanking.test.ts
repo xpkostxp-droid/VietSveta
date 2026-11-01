@@ -9,5 +9,5 @@ it('sorts gold before any number of silver, then bronze, and gives identical cou
 it('filters games by course, keeps the same participants and ignores retired games',()=>{
  const rows:OverallPlayer[]=[{id:'a',name:'А',medals:[medal('lesson15-verbs',1),medal('lesson10-family',3),{...medal('harvest-fruits',1),game:'harvest-40' as any}]}];
  expect(overallPlayers(rows,'beginner')[0].counts).toEqual([0,0,1]);expect(overallPlayers(rows,'advanced')[0].counts).toEqual([1,0,0]);expect(rows[0].medals).toHaveLength(3);
- expect(profileGames.filter(g=>gameGroup(g.id)==='beginner')).toHaveLength(10);expect(profileGames.filter(g=>gameGroup(g.id)==='advanced')).toHaveLength(9);
+ expect(profileGames.filter(g=>gameGroup(g.id)==='beginner')).toHaveLength(11);expect(gameGroup('beginner-tone-basics')).toBe('beginner');expect(profileGames.filter(g=>gameGroup(g.id)==='advanced')).toHaveLength(9);
 });
